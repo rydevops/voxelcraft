@@ -7,6 +7,9 @@ released those lines move under a new version heading. The list of everything th
 
 ## [Unreleased]
 
+### Changed
+- The sun is now a round, glowing disc (like the moon is round) that always faces you, with a soft warm halo that fades at sunset, instead of a flat square.
+
 ## [0.12.0]
 
 ### Changed

@@ -79,11 +79,17 @@ export function blockColors(avg) {
 }
 
 // ---- sky art ----------------------------------------------------------------------------
+// The sun: a round disc (like the moon) with a hot white core, a yellow body and a soft orange edge. Transparent outside the circle.
 export function sunTexture() {
-  const c = makeCanvas(16, 16), x = c.getContext('2d');
-  x.fillStyle = '#fff3a8'; x.fillRect(0, 0, 16, 16);
-  x.fillStyle = '#ffd84a'; x.fillRect(1, 1, 14, 14);
-  x.fillStyle = '#fff7c4'; x.fillRect(4, 4, 8, 8);
+  const S = 128, c = makeCanvas(S, S), x = c.getContext('2d');
+  const g = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.35, '#fffbd0');
+  g.addColorStop(0.72, '#ffe45c');
+  g.addColorStop(0.94, '#ffb92e');
+  g.addColorStop(1, 'rgba(255, 170, 40, 0)'); // anti-aliased edge
+  x.fillStyle = g;
+  x.beginPath(); x.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2); x.fill();
   return c;
 }
 

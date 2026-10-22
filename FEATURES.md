@@ -14,7 +14,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Caves: winding tunnels, wide caverns and openings onto the surface; coal and iron ore veins |
 | ✔ | Flowing water that spreads over level ground and pours down slopes; sources and streams that retreat |
 | ✔ | Grass that spreads onto dirt; tall grass with three growth stages and wind sway |
-| ✔ | Day and night cycle with a sun, a lit 3D moon with 8 phases, twinkling stars and volumetric clouds |
+| ✔ | Day and night cycle with a round sun, a lit 3D moon with 8 phases, twinkling stars and volumetric clouds |
 | ✔ | Light levels 0–15: sealed rooms and deep tunnels are dark, torches and lit furnaces give light, held torches follow you |
 | ✔ | Several worlds, each with its own seed, mode and save; create, play and delete from the world list |
 | ✘ | Mobs, villages, nether / other dimensions, multiplayer |

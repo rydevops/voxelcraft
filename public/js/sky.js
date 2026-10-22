@@ -157,15 +157,22 @@ export class Sky {
     this.pivot = new THREE.Group();
     tilt.add(this.pivot);
 
-    // sun: the classic square
-    const sun = new THREE.Mesh(
-      new THREE.PlaneGeometry(90, 90),
-      new THREE.MeshBasicMaterial({ map: pixelTexture(art.sun), fog: false, depthWrite: false })
-    );
+    // sun: a round disc that always faces the viewer (a sprite, so it never looks squashed), with a soft warm halo around it
+    const sunTex = new THREE.CanvasTexture(art.sun);
+    sunTex.colorSpace = THREE.NoColorSpace;
+    const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunTex, transparent: true, fog: false, depthWrite: false }));
+    sun.scale.set(92, 92, 1);
     sun.position.x = 320;
-    sun.rotation.y = -Math.PI / 2;
     this.pivot.add(sun);
     this.sun = sun;
+    const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(art.glow), color: 0xffcf6a, transparent: true, depthWrite: false, fog: false,
+      blending: THREE.AdditiveBlending, opacity: 0.5,
+    }));
+    sunHalo.scale.set(210, 210, 1);
+    sunHalo.position.x = 318;
+    this.pivot.add(sunHalo);
+    this.sunHalo = sunHalo;
 
     // moon: a lit sphere with a crater texture, a soft halo, and phases
     const moonTex = new THREE.CanvasTexture(art.moon);
@@ -268,6 +275,7 @@ export class Sky {
     // the moon is faintly visible by day and brilliant at night
     this.moonMat.uniforms.uAlpha.value = 0.3 + 0.7 * night;
     this.halo.material.opacity = 0.4 * night;
+    this.sunHalo.material.opacity = 0.5 * (1 - night); // the sun's glow is gone once it has set
 
     // clouds drift with the wind but stay locked to world space
     const wind = elapsed * 1.6;
