@@ -1,6 +1,6 @@
 {
   "name": "voxelcraft",
-  "version": "0.1.0",
+  "version": "0.12.0",
   "description": "A tiny Minecraft-style voxel sandbox: Node server + WebGL client with procedural terrain, art and music.",
   "type": "module",
   "main": "server.js",
