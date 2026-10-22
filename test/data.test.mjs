@@ -25,6 +25,15 @@ reg.tileNames.forEach((n, i) => {
   assert.equal(px.length, T * T * 4);
   assert.ok(px.some((v, o) => o % 4 === 3 && v > 0), `tile ${n} is not blank`);
 });
+// water is an animation: its frames share one ripple pattern (same seed) and only the phase moves, looping back to the start
+{
+  const anim = reg.animations.water;
+  assert.ok(anim && anim.frames.length >= 4 && anim.frames[0] === 'water', 'water is animated');
+  const frames = anim.frames.map((n) => paintTile(n, 0, reg.tiles, {})); // (the tile's index is not used: the wave seed is in its data)
+  for (let i = 1; i < frames.length; i++) assert.notDeepEqual(frames[i], frames[i - 1], `water frame ${i} moves`);
+  const wrapped = paintSpec({ ...reg.tiles.water, phase: 2 * Math.PI }, 7, {}, {}), start = paintSpec({ ...reg.tiles.water, phase: 0 }, 99, {}, {});
+  assert.deepEqual(wrapped, start, 'a full turn of phase is the first frame again, whatever the tile index');
+}
 for (const it of reg.items) assert.ok(paintSprite(it.key, it, reg.textures, {}).some((v, o) => o % 4 === 3 && v > 0), `sprite ${it.key} is not blank`);
 // painting is deterministic (same seed -> same pixels)
 assert.deepEqual(paintTile('stone', 3, reg.tiles, {}), paintTile('stone', 3, reg.tiles, {}));

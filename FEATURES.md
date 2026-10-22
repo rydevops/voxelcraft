@@ -13,6 +13,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Biome-style variety of trees: oak, apple, birch, spruce, tall oak, bush; forests and clearings |
 | ✔ | Caves: winding tunnels, wide caverns and openings onto the surface; coal and iron ore veins |
 | ✔ | Flowing water that spreads over level ground and pours down slopes; sources and streams that retreat |
+| ✔ | Animated water: the surface ripples |
 | ✔ | Grass that spreads onto dirt; tall grass with three growth stages and wind sway |
 | ✔ | Day and night cycle with a round sun, a lit 3D moon with 8 phases, twinkling stars and volumetric clouds |
 | ✔ | Light levels 0–15: sealed rooms and deep tunnels are dark, torches and lit furnaces give light, held torches follow you |
@@ -64,7 +65,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 ## Controls and settings
 | | Feature |
 |---|---|
-| ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view, invert Y, raw input, volumes |
+| ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view (the menus fade away while you adjust it, so you see the result), invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
 | ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Torch / Bag / Pause buttons, hotbar by tap |
 | ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |

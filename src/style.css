@@ -138,6 +138,12 @@ button.wide { min-width: 304px; }
 .opt-tabs button.active { background: #6c7fbd; }
 .opt-body { overflow-y: auto; padding: 4px 8px; display: flex; flex-direction: column; gap: 8px; min-height: 280px; }
 .opt-body[hidden] { display: none; }
+/* peek (see options.js): while the field of view is being adjusted only its slider stays, so the world behind shows */
+#overlay, #title { transition: opacity 0.15s; }
+body.peek #overlay, body.peek #title { opacity: 0; pointer-events: none; }
+body.peek #options { background: transparent; }
+body.peek .opt-panel { visibility: hidden; }
+body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px; background: rgba(20, 20, 24, 0.82); border: 3px solid #111; }
 .opt-row { display: grid; grid-template-columns: 210px 1fr 56px; align-items: center; gap: 12px; font-size: 14px; }
 .opt-row.toggle { grid-template-columns: 24px 1fr; }
 .opt-row input[type=range] { width: 100%; accent-color: #ffe27a; }

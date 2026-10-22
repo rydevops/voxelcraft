@@ -8,9 +8,11 @@ released those lines move under a new version heading. The list of everything th
 ## [Unreleased]
 
 ### Added
+- **Animated water.** The water surface ripples: eight frames of the wave texture play in a loop (also on the title screen). It is data: `waves` textures take a `seed` and a `phase`, and `water` is listed under `animations` in `textures.json`.
 - **The version is shown on the title screen** (bottom left), e.g. `v1.0.0-8726a41cae`: the package version plus the build.
 
 ### Changed
+- **Adjusting the field of view shows the world.** While you drag the Field of view slider (or use the arrow keys on it) the pause menu and the rest of Options fade away, so you see the view you paused in with the new angle immediately; they return a moment after you let go. The title screen's fly-around follows the field of view too.
 - **Updates load by themselves.** Every time the app is opened or brought back to the front it checks for a newer version; if one is found while you are on the title screen the game reloads into it at once. In a world it waits and tells you, and the update loads when you quit to the title. The service worker also fetches new files past the browser's HTTP cache, so an update never caches stale copies.
 
 ## [1.0.0]
