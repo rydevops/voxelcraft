@@ -313,7 +313,8 @@ audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
 const storage = await openStorage(); // the dev server's worlds folder, or this browser's own storage (installed / hosted app)
 const startup = await runStartup({
   params, autoplay: AUTOPLAY, atlasCanvas, titleLogo: logoArt, openOptions: () => options.open(),
-  renderer, scene, camera, materials, sky, windTime, audio, storage,
+  renderer, scene, camera, materials, sky, windTime, audio, storage, settings,
+  tickAtlas: (t) => { if (animateAtlas(t)) atlasTex.needsUpdate = true; }, // water and flames animate on the title screen too
 });
 inWorld = true;
 held.visible = true;

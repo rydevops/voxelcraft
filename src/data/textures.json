@@ -237,7 +237,9 @@
         1,
         0.5
       ],
-      "frequency": 0.9
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 0.0
     },
     "glass": {
       "type": "pixelart",
@@ -1308,6 +1310,125 @@
         ".......sS.......",
         ".......sS......."
       ]
+    },
+    "water_b": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 0.7854
+    },
+    "water_c": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 1.5708
+    },
+    "water_d": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 2.3562
+    },
+    "water_e": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 3.1416
+    },
+    "water_f": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 3.927
+    },
+    "water_g": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 4.7124
+    },
+    "water_h": {
+      "type": "waves",
+      "base": [
+        40,
+        100,
+        210
+      ],
+      "amplitude": 12,
+      "channels": [
+        0.6,
+        1,
+        0.5
+      ],
+      "frequency": 0.9,
+      "seed": 424242,
+      "phase": 5.4978
     }
   },
   "toolHeads": {
@@ -2321,6 +2442,19 @@
         "torch_c"
       ],
       "fps": 8
+    },
+    "water": {
+      "frames": [
+        "water",
+        "water_b",
+        "water_c",
+        "water_d",
+        "water_e",
+        "water_f",
+        "water_g",
+        "water_h"
+      ],
+      "fps": 6
     }
   }
 }

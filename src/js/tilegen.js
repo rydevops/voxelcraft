@@ -103,10 +103,13 @@ const GEN = {
     };
   },
 
+  // `seed` pins the ripple pattern and `phase` (radians) slides the waves along it, so a set of tiles with the same seed and
+  // growing phases is a loop of moving water (see "animations" in textures.json)
   waves(s, rand) {
-    const n = tileNoise(rand, 4);
+    const n = tileNoise(s.seed != null ? mulberry32(s.seed) : rand, 4);
     const ch = s.channels || [1, 1, 1];
-    return (x, y) => col(s.base, Math.sin((x + y * 0.7) * s.frequency + n(x, y) * 4) * s.amplitude, ch);
+    const phase = s.phase || 0;
+    return (x, y) => col(s.base, Math.sin((x + y * 0.7) * s.frequency + n(x, y) * 4 + phase) * s.amplitude, ch);
   },
 
   bricks(s, rand) {
