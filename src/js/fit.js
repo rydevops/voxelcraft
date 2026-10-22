@@ -17,14 +17,19 @@ export function hudScale(vw, vh) {
   return Math.max(0.55, Math.min(1, vw / 900, vh / 560));
 }
 
-export function installFit() {
+// The HUD scale with the player's "HUD size" setting applied (1 = as designed, up to 1.8 on any screen)
+export const MAX_HUD = 1.8;
+export const hudScaleFor = (vw, vh, size = 1) => Math.min(MAX_HUD, hudScale(vw, vh) * (Number.isFinite(size) && size > 0 ? size : 1));
+
+// `getSize` returns the current HUD size setting; the returned function re-measures everything (call it when that changes)
+export function installFit(getSize = () => 1) {
   const els = [];
   const fit = (el) => {
     const w = el.offsetWidth, h = el.offsetHeight; // layout size: not affected by the transform we apply
     el.style.setProperty('--fit', String(fitScale(w, h, window.innerWidth, window.innerHeight)));
   };
   const all = () => {
-    document.documentElement.style.setProperty('--hud', hudScale(window.innerWidth, window.innerHeight).toFixed(3));
+    document.documentElement.style.setProperty('--hud', hudScaleFor(window.innerWidth, window.innerHeight, getSize()).toFixed(3));
     for (const el of els) fit(el);
   };
   const ro = typeof ResizeObserver === 'function' ? new ResizeObserver((entries) => { for (const e of entries) fit(e.target); }) : null;
@@ -34,4 +39,5 @@ export function installFit() {
   window.addEventListener('resize', all);
   window.addEventListener('orientationchange', all);
   all();
+  return all;
 }

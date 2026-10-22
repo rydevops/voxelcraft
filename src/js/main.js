@@ -45,7 +45,7 @@ const forcedTouch = urlParams.has('touch') ? true : urlParams.has('desktop') ? f
 const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
 let touchMode = wantsTouch();
 document.body.classList.toggle('touch', touchMode);
-installFit();
+const refitHud = installFit(() => settings.get('hudSize')); // (also called when the HUD size changes, see applySettings)
 const params = new URLSearchParams(location.search);
 
 // A newer build of the game was installed (the registration script in the built index.html checks every time the app is
@@ -302,7 +302,11 @@ function updateParticles(dt) {
 // ---------------------------------------------------------------------------------------
 // Each world is a file on the server (worlds/<id>.json); the startup screens pick one (or create it).
 let optionsOpen = false;
-const options = createOptions(settings, { onClose: () => { optionsOpen = false; } });
+const options = createOptions(settings, {
+  onClose: () => { optionsOpen = false; },
+  // moving the touch buttons: only in a world on a touch device; afterwards the Options screen comes back
+  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }) },
+});
 held.visible = false;
 // The audio engine exists from the start so the title screen can play its theme. Browsers keep it silent until the first
 // click or key press; it starts then.
@@ -630,6 +634,7 @@ const touchCtl = createTouchControls({
   offhand: () => { if (playing) useOffhand(); },
   inventory: () => { if (playing && !screen) openScreen(creative ? 'palette' : 'inv'); },
   closeScreen: () => closeScreen(),
+  layoutChanged: (l) => settings.set('touchLayout', l),
   menu: () => { if (!playing) return; setPlaying(false); $('play').textContent = 'Resume'; save_(); },
 });
 touchCtl.setEnabled(touchMode);
@@ -839,7 +844,7 @@ document.addEventListener('pointerlockchange', () => {
 // Back into the game from the pause menu. Browsers want a click or key press to capture the mouse again, and Esc
 // does not count, so we resume right away and capture it on the next key press or click (see ensureLock).
 function resumeGame() {
-  if (playing || dead || screen || optionsOpen) return;
+  if (playing || dead || screen || optionsOpen || touchCtl.editing) return;
   audio.start();
   setPlaying(true);
   if (!AUTOPLAY) { suppressUnlockUntil = performance.now() + 700; lock(); lastLockTry = performance.now(); }
@@ -911,6 +916,10 @@ function renderControlsTable() {
 
 function applySettings() {
   audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
+  refitHud();
+  const goalsHome = touchMode ? document.body : $('hud-right'); // on a phone the goals sit top left, out of the crowded right column
+  if ($('goals').parentNode !== goalsHome) goalsHome.appendChild($('goals'));
+  touchCtl.setLayout(settings.get('touchLayout'));
   const was = touchMode;
   touchMode = wantsTouch();
   if (touchMode !== was) {

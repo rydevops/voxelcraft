@@ -58,6 +58,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | All textures and item sprites are generated or drawn in code/data: no downloaded art |
 | ✔ | Chunky three-dimensional held tools with a swing animation; flickering furnace and torch flames |
 | ✔ | Smooth lighting with ambient occlusion; sky light and warm untinted block light |
+| ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |
 | ✔ | Generated music: six in-game tracks in shuffled order and a looping title theme; generated sound effects |
 | ✔ | Developer logo, animated title screen (showing the version), world selection |
@@ -67,7 +68,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view (the menus fade away while you adjust it, so you see the result), invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
-| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Torch / Bag / Pause buttons, hotbar by tap |
+| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Torch / Bag / Pause buttons, hotbar by tap; every button can be dragged to a place you like (Options), and the layout is saved |
 | ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |
 | ✔ | Screens scale to fit small displays (HUD, inventory, options, menus), respect notches and safe areas, and ask for landscape |
 | ◐ | Controllers / gamepads are not supported |

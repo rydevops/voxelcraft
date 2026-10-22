@@ -1,7 +1,7 @@
 // On-screen controls for phones and tablets: a floating move stick on the left, drag-to-look on the right, and buttons for
 // everything the mouse and keyboard do. This file only handles fingers and drawing; main.js decides what the buttons mean
 // (the `hooks`) and reads the stick / held buttons from `state`.
-import { stickVector, stickSprints, dragBase, STICK_RADIUS } from './touchmath.js';
+import { stickVector, stickSprints, dragBase, STICK_RADIUS, cleanLayout, clampCenter } from './touchmath.js';
 
 const el = (tag, cls, text, parent) => {
   const e = document.createElement(tag);
@@ -23,6 +23,9 @@ export function createTouchControls(hooks) {
   let enabled = false;
   let shown = false;
   const held = new Set(); // hold-buttons currently pressed (so a reset can release them)
+  const buttons = {};     // name -> element, for the buttons the player can move
+  let layout = {};        // name -> { x, y } centre as fractions of the screen; missing = the built-in place (style.css)
+  let editing = false, editDone = null;
 
   const root = el('div');
   root.id = 'touch';
@@ -89,7 +92,42 @@ export function createTouchControls(hooks) {
   function button(name, label, parent = root) {
     const b = el('div', 'tb ' + name, label, parent);
     b.setAttribute('role', 'button');
+    if (parent === root) { buttons[name] = b; makeMovable(name, b); }
     return b;
+  }
+
+  // ---- moving the buttons (layout edit mode, see edit() below) ----
+  function place(name) {
+    const b = buttons[name], p = layout[name];
+    if (!b) return;
+    // (the transform centres the button on the point; the built-in right/bottom anchoring is switched off)
+    Object.assign(b.style, p ? { left: p.x * 100 + '%', top: p.y * 100 + '%', right: 'auto', bottom: 'auto', transform: 'translate(-50%, -50%)' } : { left: '', top: '', right: '', bottom: '', transform: '' });
+  }
+  function makeMovable(name, b) {
+    b.addEventListener('pointerdown', (e) => {
+      if (!editing) return;
+      e.preventDefault();
+      e.stopImmediatePropagation(); // the button does nothing while it is being placed
+      const r = b.getBoundingClientRect();
+      const grabX = e.clientX - (r.left + r.width / 2), grabY = e.clientY - (r.top + r.height / 2);
+      const id = e.pointerId;
+      b.setPointerCapture(id);
+      b.classList.add('moving');
+      const move = (ev) => {
+        if (ev.pointerId !== id) return;
+        layout = { ...layout, [name]: clampCenter(ev.clientX - grabX, ev.clientY - grabY, r.width, r.height, window.innerWidth, window.innerHeight) };
+        place(name);
+      };
+      const end = (ev) => {
+        if (ev.pointerId !== id) return;
+        for (const t of ['pointermove', 'pointerup', 'pointercancel']) b.removeEventListener(t, t === 'pointermove' ? move : end);
+        b.classList.remove('moving');
+        hooks.layoutChanged?.(layout);
+      };
+      b.addEventListener('pointermove', move);
+      b.addEventListener('pointerup', end);
+      b.addEventListener('pointercancel', end);
+    });
   }
   // pressed while a finger is on it
   function holdButton(name, label, onDown, onUp) {
@@ -97,7 +135,7 @@ export function createTouchControls(hooks) {
     let id = null;
     const release = () => { if (id === null) return; id = null; held.delete(release); b.classList.remove('on'); onUp?.(); };
     b.addEventListener('pointerdown', (e) => {
-      if (id !== null) return;
+      if (editing || id !== null) return;
       e.preventDefault();
       id = e.pointerId;
       b.setPointerCapture(e.pointerId);
@@ -111,13 +149,14 @@ export function createTouchControls(hooks) {
   // one tap does one thing
   function tapButton(name, label, fn, parent = root) {
     const b = button(name, label, parent);
-    b.addEventListener('pointerdown', (e) => { e.preventDefault(); fn(); });
+    b.addEventListener('pointerdown', (e) => { if (editing) return; e.preventDefault(); fn(); });
     return b;
   }
   // tap to switch on, tap again to switch off
   function toggleButton(name, label, key) {
     const b = button(name, label);
     b.addEventListener('pointerdown', (e) => {
+      if (editing) return;
       e.preventDefault();
       state[key] = !state[key];
       b.classList.toggle('on', state[key]);
@@ -156,6 +195,25 @@ export function createTouchControls(hooks) {
     e.target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: m.button, shiftKey: m.shift, clientX: e.clientX, clientY: e.clientY }));
   }, true);
 
+  // ---- the layout editor's bar (top centre) ----
+  const bar = el('div', 'tedit', '', document.body);
+  bar.hidden = true;
+  el('span', '', 'Drag the buttons where you want them', bar);
+  const resetBtn = el('button', 'small', 'Reset', bar);
+  const doneBtn = el('button', 'small', 'Done', bar);
+  resetBtn.addEventListener('click', () => { layout = {}; for (const n of Object.keys(buttons)) place(n); hooks.layoutChanged?.(layout); });
+  doneBtn.addEventListener('click', () => endEdit());
+  function endEdit() {
+    if (!editing) return;
+    editing = false;
+    bar.hidden = true;
+    root.classList.remove('editing');
+    document.body.classList.remove('peek');
+    root.hidden = !shown;
+    const done = editDone; editDone = null;
+    done?.();
+  }
+
   document.body.appendChild(root);
 
   function reset() {
@@ -173,11 +231,29 @@ export function createTouchControls(hooks) {
     get enabled() { return enabled; },
     setEnabled(on) {
       enabled = !!on;
-      if (!enabled) { reset(); root.hidden = true; shown = false; closeBtn.hidden = true; modeBtn.hidden = true; }
+      if (!enabled) { endEdit(); reset(); root.hidden = true; shown = false; closeBtn.hidden = true; modeBtn.hidden = true; }
+    },
+    get editing() { return editing; },
+    // the saved layout (see touchmath.js cleanLayout)
+    setLayout(raw) {
+      layout = cleanLayout(raw);
+      for (const n of Object.keys(buttons)) place(n);
+    },
+    // Layout edit mode: every button is shown (even Fly) and can be dragged; the pause menu fades away so the screen is free.
+    // `done` runs when the player taps Done.
+    edit(done) {
+      if (!enabled || editing) return;
+      reset();
+      editing = true; editDone = done;
+      root.hidden = false;
+      root.classList.add('editing');
+      document.body.classList.add('peek');
+      bar.hidden = false;
+      flyBtn.hidden = false; flyBtn.classList.remove('on');
     },
     // called every frame with what the game is doing; cheap when nothing changed
     sync({ show, screen, creative, flying }) {
-      if (!enabled) return;
+      if (!enabled || editing) return;
       const want = !!show;
       if (want !== shown) { shown = want; root.hidden = !want; if (!want) reset(); }
       flyBtn.hidden = !creative;
