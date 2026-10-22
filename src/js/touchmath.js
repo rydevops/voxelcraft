@@ -32,6 +32,31 @@ export function lookDelta(dx, dy, rate, invertY = false) {
   return { yaw: -dx * rate * LOOK_BOOST, pitch: -dy * rate * LOOK_BOOST * (invertY ? -1 : 1) };
 }
 
+// ---- where the player has put the buttons ----
+// A layout maps a button name to the centre of the button as fractions of the screen ({ x: 0.9, y: 0.8 }), so it survives
+// turning the phone or a different screen size. Anything missing keeps the button's built-in place.
+export const LAYOUT_BUTTONS = ['attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'inv', 'off', 'menu'];
+
+// Whatever came out of storage -> a layout with only known buttons and sane numbers
+export function cleanLayout(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const name of LAYOUT_BUTTONS) {
+    const p = raw[name];
+    if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) out[name] = { x: Math.min(1, Math.max(0, p.x)), y: Math.min(1, Math.max(0, p.y)) };
+  }
+  return out;
+}
+
+// A button dragged so its centre is at (cx, cy) px: keep the whole button on screen and return the centre as fractions
+export function clampCenter(cx, cy, w, h, vw, vh, margin = 4) {
+  const lo = (size, view) => Math.min(0.5, (size / 2 + margin) / view), hi = (size, view) => 1 - lo(size, view);
+  return {
+    x: Math.min(hi(w, vw), Math.max(lo(w, vw), cx / vw)),
+    y: Math.min(hi(h, vh), Math.max(lo(h, vh), cy / vh)),
+  };
+}
+
 // Should the touch controls be on? The primary pointer being coarse (a finger) means a phone or tablet; a laptop with a
 // touch screen has a mouse as its primary pointer and keeps the desktop controls. ?touch and ?desktop force either.
 export function detectTouch({ coarse = false, search = '' } = {}) {

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { fitScale, hudScale } from '../src/js/fit.js';
+import { fitScale, hudScale, hudScaleFor, MAX_HUD } from '../src/js/fit.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -91,6 +91,13 @@ t('the page fits small screens: windows shrink, never grow, and the HUD scales d
   assert.ok(fitScale(5000, 5000, 100, 100) >= 0.25);
   assert.equal(hudScale(1920, 1080), 1);
   assert.ok(hudScale(740, 340) < 0.7 && hudScale(320, 200) >= 0.55);
+});
+
+t('the HUD size setting scales the HUD (and cannot run away or break it)', () => {
+  assert.equal(hudScaleFor(1920, 1080, 1), 1);
+  assert.ok(Math.abs(hudScaleFor(844, 390, 1.5) - hudScale(844, 390) * 1.5) < 1e-9);
+  assert.equal(hudScaleFor(1920, 1080, 5), MAX_HUD);
+  assert.equal(hudScaleFor(1920, 1080, NaN), 1); assert.equal(hudScaleFor(1920, 1080, -2), 1);
 });
 
 t('the project layout: source in src/, dev tools in scripts/, nothing else is loaded from the root but the build', () => {

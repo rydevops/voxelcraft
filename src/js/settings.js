@@ -32,6 +32,8 @@ const DEFAULTS = {
   musicVolume: 0.8,
   sfxVolume: 0.9,
   touchControls: browserWantsTouch(), // on-screen sticks and buttons: on by default on phones and tablets
+  hudSize: browserWantsTouch() ? 1.3 : 1, // multiplier on the HUD (hotbar, hearts, minimap, clock, goals): bigger by default on a phone
+  touchLayout: {}, // where the player moved the touch buttons to (see touchmath.js cleanLayout); empty = the built-in places
 };
 
 export const BASE_TURN_RATE = 0.0022; // radians of rotation per pixel of mouse movement at sensitivity 1.0
@@ -61,7 +63,7 @@ export class Settings {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
       if (raw) {
-        for (const k of Object.keys(DEFAULTS)) if (typeof raw.values?.[k] === typeof DEFAULTS[k]) this.values[k] = raw.values[k];
+        for (const k of Object.keys(DEFAULTS)) if (typeof raw.values?.[k] === typeof DEFAULTS[k] && raw.values[k] !== null) this.values[k] = raw.values[k];
         for (const a of ACTIONS) if (raw.binds && a.id in raw.binds) this.binds[a.id] = raw.binds[a.id];
         // before crouching existed Shift was the sprint key: move saved settings to the new layout (Tab sprints, Shift crouches)
         if (raw.binds && !('crouch' in raw.binds) && raw.binds.sprint === 'ShiftLeft') this.binds.sprint = 'Tab';
@@ -109,7 +111,7 @@ export class Settings {
   }
 
   resetAll() {
-    this.values = { ...DEFAULTS };
+    this.values = { ...DEFAULTS, touchLayout: {} };
     this.resetBinds();
   }
 }

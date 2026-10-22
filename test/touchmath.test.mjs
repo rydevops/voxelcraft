@@ -1,6 +1,6 @@
 // The pure maths of the touch controls: stick, dragging base, look, detection.
 import assert from 'node:assert/strict';
-import { stickVector, stickSprints, dragBase, lookDelta, detectTouch, STICK_RADIUS, STICK_DEADZONE, LOOK_BOOST } from '../src/js/touchmath.js';
+import { stickVector, stickSprints, dragBase, lookDelta, detectTouch, cleanLayout, clampCenter, LAYOUT_BUTTONS, STICK_RADIUS, STICK_DEADZONE, LOOK_BOOST } from '../src/js/touchmath.js';
 
 let n = 0;
 const t = (name, fn) => { fn(); n++; };
@@ -70,6 +70,22 @@ t('detecting a touch device', () => {
   assert.equal(detectTouch({ coarse: false, search: '?touch' }), true);
   assert.equal(detectTouch({ coarse: true, search: '?desktop' }), false);
   assert.equal(detectTouch({ coarse: true, search: '?world=abc' }), true);
+});
+
+t('a saved layout keeps only known buttons and sane numbers', () => {
+  assert.deepEqual(cleanLayout(null), {});
+  assert.deepEqual(cleanLayout('junk'), {});
+  const l = cleanLayout({ attack: { x: 0.3, y: 0.4 }, jump: { x: 5, y: -2 }, bogus: { x: 0.5, y: 0.5 }, use: { x: 'a', y: 1 }, fly: null });
+  assert.deepEqual(l, { attack: { x: 0.3, y: 0.4 }, jump: { x: 1, y: 0 } });
+  for (const n of ['attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'inv', 'off', 'menu']) assert.ok(LAYOUT_BUTTONS.includes(n), n);
+});
+
+t('a dragged button always stays fully on screen', () => {
+  const c = clampCenter(-50, 9999, 60, 60, 800, 400);
+  assert.ok(c.x >= (30 + 4) / 800 - 1e-12 && c.y <= 1 - (30 + 4) / 400 + 1e-12, JSON.stringify(c));
+  assert.deepEqual(clampCenter(400, 200, 60, 60, 800, 400), { x: 0.5, y: 0.5 });
+  const big = clampCenter(1, 1, 5000, 5000, 800, 400); // wider than the screen: centred, not NaN
+  assert.deepEqual(big, { x: 0.5, y: 0.5 });
 });
 
 console.log(`touchmath: ${n} checks passed`);
