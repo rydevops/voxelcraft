@@ -32,7 +32,7 @@ test/       Node tests
 2. **Settings → Pages → Build and deployment → Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, and save.
 3. The game is live at `https://<user>.github.io/<repository>/`. Everything uses relative paths, so it works under that sub-path.
 
-On first visit the service worker caches the whole game (under 1 MB of code), so afterwards it starts instantly and works offline. Chrome / Edge offer **Install** in the address bar; on iOS use **Share → Add to Home Screen**, on Android **⋮ → Install app**. After you publish a new version, players get it the next time they open the game (a message asks them to reload).
+On first visit the service worker caches the whole game (under 1 MB of code), so afterwards it starts instantly and works offline. Chrome / Edge offer **Install** in the address bar; on iOS use **Share → Add to Home Screen**, on Android **⋮ → Install app**. After you publish a new version, players get it the next time they open the game: it checks for an update on every launch and reloads into it from the title screen (in a world it waits until you quit to the title). The version is shown in the bottom left of the title screen.
 
 **Where worlds are saved.** With the Node dev server (`npm start`) each world is a file in `worlds/`. On GitHub Pages or when installed there is no server, so worlds are saved in the browser's own storage (IndexedDB) on that device; the game asks the browser to keep it, and warns on the title screen if the browser would not. Clearing site data deletes the worlds.
 

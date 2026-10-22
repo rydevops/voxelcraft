@@ -59,7 +59,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Smooth lighting with ambient occlusion; sky light and warm untinted block light |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |
 | ✔ | Generated music: six in-game tracks in shuffled order and a looping title theme; generated sound effects |
-| ✔ | Developer logo, animated title screen, world selection |
+| ✔ | Developer logo, animated title screen (showing the version), world selection |
 
 ## Controls and settings
 | | Feature |
@@ -76,7 +76,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Runs from GitHub Pages (or any static host) as a flat set of files in the repository root; no server needed |
 | ✔ | Installable web app (PWA): home-screen / desktop icon, full-screen landscape, own window |
-| ✔ | Works offline after the first visit; new versions install themselves and ask for a reload |
+| ✔ | Works offline after the first visit; checks for a new version every time it opens and reloads into it from the title screen (in a world it waits until you quit to the title) |
 | ✔ | Worlds saved in the browser (IndexedDB) with a request for persistent storage; warns if the browser cannot keep them |
 | ✔ | Node dev server saves worlds as files instead (`npm start`) |
 | ◐ | No cloud saves or sharing worlds between devices yet (copy the files from `worlds/` when using the dev server) |

@@ -48,6 +48,19 @@ document.body.classList.toggle('touch', touchMode);
 installFit();
 const params = new URLSearchParams(location.search);
 
+// A newer build of the game was installed (the registration script in the built index.html checks every time the app is
+// opened). Before a world is loaded, reload into it straight away, skipping the developer logo; during play just say so:
+// quitting to the title reloads the page, which picks it up.
+let inWorld = false;
+function onUpdate() {
+  if (inWorld) { toast('A new version is ready: it loads when you quit to the title.'); return; }
+  const url = new URL(location.href);
+  url.searchParams.set('title', '');
+  location.replace(url);
+}
+window.addEventListener('vc-update', onUpdate);
+if (window.__vcUpdated) onUpdate(); // it arrived before this script ran
+
 // Only one VoxelCraft tab can run at a time: two tabs would fight over the same saved world.
 async function claimGameSlot() {
   if (!navigator.locks) return true;
@@ -302,6 +315,7 @@ const startup = await runStartup({
   params, autoplay: AUTOPLAY, atlasCanvas, titleLogo: logoArt, openOptions: () => options.open(),
   renderer, scene, camera, materials, sky, windTime, audio, storage,
 });
+inWorld = true;
 held.visible = true;
 audio.setScene('game'); // from here on the shuffled soundtrack plays
 const worldId = startup.id;
@@ -909,8 +923,6 @@ function applySettings() {
 }
 settings.onChange(applySettings);
 applySettings();
-// the service worker installed a newer build of the game (see the registration script in the built index.html)
-window.addEventListener('vc-update', () => toast('A new version is ready. Reload to play it.'));
 
 // ---- armor: a row of shield icons above the health bar, one icon per two armor points worn ----
 let shownArmor = -1;
