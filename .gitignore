@@ -1,0 +1,8 @@
+node_modules/
+# your saved worlds (and the pre-multi-world save) stay on your machine
+worlds/
+world.json
+*.tmp
+.voxelcraft.lock
+.DS_Store
+Thumbs.db

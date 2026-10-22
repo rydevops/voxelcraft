@@ -1,0 +1,194 @@
+{
+  "_comment": "Loot tables. A block with no table (see \"loot\" in blocks.json) drops itself. entry: { item, chance (0-1, default 1), count (number or [min,max], default 1) }. An empty list drops nothing.",
+  "tables": {
+    "grass": [
+      {
+        "item": "dirt"
+      }
+    ],
+    "snow": [
+      {
+        "item": "dirt"
+      }
+    ],
+    "farmland": [
+      {
+        "item": "dirt"
+      }
+    ],
+    "stone": [
+      {
+        "item": "cobble"
+      }
+    ],
+    "coal_ore": [
+      {
+        "item": "coal"
+      }
+    ],
+    "glass": [],
+    "leaves": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "oak_sapling",
+        "chance": 0.1
+      }
+    ],
+    "leaves_shatter": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "oak_sapling",
+        "chance": 0.1
+      }
+    ],
+    "grass_s": [
+      {
+        "item": "wheat_seeds",
+        "chance": 0.1
+      }
+    ],
+    "grass_m": [
+      {
+        "item": "wheat_seeds",
+        "chance": 0.16
+      }
+    ],
+    "grass_l": [
+      {
+        "item": "wheat_seeds",
+        "chance": 0.28
+      }
+    ],
+    "wheat_s": [
+      {
+        "item": "wheat_seeds"
+      }
+    ],
+    "wheat_m": [
+      {
+        "item": "wheat_seeds"
+      }
+    ],
+    "wheat_l": [
+      {
+        "item": "wheat"
+      },
+      {
+        "item": "wheat_seeds"
+      },
+      {
+        "item": "wheat_seeds",
+        "chance": 0.5
+      }
+    ],
+    "iron_ore": [
+      {
+        "item": "raw_iron"
+      }
+    ],
+    "torch_floor": [
+      {
+        "item": "torch"
+      }
+    ],
+    "furnace_lit": [
+      {
+        "item": "furnace"
+      }
+    ],
+    "apple_leaves": [
+      {
+        "item": "apple",
+        "chance": 0.15
+      },
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "apple_sapling",
+        "chance": 0.1
+      }
+    ],
+    "apple_leaves_shatter": [
+      {
+        "item": "apple",
+        "chance": 0.15
+      },
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "apple_sapling",
+        "chance": 0.1
+      }
+    ],
+    "birch_leaves": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "birch_sapling",
+        "chance": 0.1
+      }
+    ],
+    "birch_leaves_shatter": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "birch_sapling",
+        "chance": 0.1
+      }
+    ],
+    "spruce_leaves": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "spruce_sapling",
+        "chance": 0.1
+      }
+    ],
+    "spruce_leaves_shatter": [
+      {
+        "item": "stick",
+        "chance": 0.15
+      },
+      {
+        "item": "spruce_sapling",
+        "chance": 0.1
+      }
+    ],
+    "young_oak": [
+      {
+        "item": "oak_sapling"
+      }
+    ],
+    "young_birch": [
+      {
+        "item": "birch_sapling"
+      }
+    ],
+    "young_spruce": [
+      {
+        "item": "spruce_sapling"
+      }
+    ],
+    "young_apple": [
+      {
+        "item": "apple_sapling"
+      }
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "_comment": "Survival rules and tuning numbers.",
+  "player": {
+    "maxHealth": 20,
+    "maxFood": 20,
+    "reach": 6,
+    "lookAtReach": 5
+  },
+  "hunger": {
+    "drainPerSecond": 0.03,
+    "sprintDrainPerSecond": 0.12,
+    "jumpCost": 0.05,
+    "sprintJumpCost": 0.1,
+    "miningCost": 0.05,
+    "miningDrainPerSecond": 0.06,
+    "maxSaturation": 20,
+    "healEverySeconds": 1.5,
+    "saturationPerHeal": 1,
+    "emptySaturationCost": 1,
+    "respawnSaturation": 5,
+    "noSprintAtOrBelow": 6,
+    "starveEverySeconds": 15,
+    "starveDamage": 1,
+    "starvingSpeed": 0.75
+  },
+  "eating": {
+    "seconds": 1.4
+  },
+  "fall": {
+    "safeDistance": 4,
+    "damageOffset": 3,
+    "tolerance": 0.05,
+    "kick": 1.3
+  },
+  "tilling": {
+    "radius": 4,
+    "waterBelow": 4,
+    "waterAbove": 1
+  },
+  "time": {
+    "dayLengthSeconds": 480,
+    "startTime": 0.08
+  },
+  "treeFall": {
+    "mode": "shatter",
+    "leafReach": 4
+  },
+  "creativeHotbar": [
+    "grass",
+    "dirt",
+    "stone",
+    "cobble",
+    "planks",
+    "log",
+    "glass",
+    "brick",
+    "sand"
+  ],
+  "spread": {
+    "chance": 0.5,
+    "samplesPerChunk": 12,
+    "chunkRadius": 3
+  },
+  "plants": {
+    "growthChunkRadius": 4
+  },
+  "studio": {
+    "_comment": "The developer logo screen at startup. Letters, digits, space and - . ! & ' only.",
+    "name": "Pixel Pilots Studio",
+    "tagline": "presents"
+  },
+  "lighting": {
+    "minBrightness": 0.14,
+    "gamma": 1.5,
+    "skyLevel": 15
+  },
+  "equipment": {
+    "_comment": "Equipment slots shown in the inventory (the order here is the order on screen). Armor points reduce damage from falls by armorReduction each (starvation ignores armor).",
+    "armorReduction": 0.04,
+    "maxArmor": 20,
+    "slots": [
+      {
+        "id": "helmet",
+        "label": "Helmet"
+      },
+      {
+        "id": "chestplate",
+        "label": "Chestplate"
+      },
+      {
+        "id": "leggings",
+        "label": "Leggings"
+      },
+      {
+        "id": "boots",
+        "label": "Boots"
+      },
+      {
+        "id": "shield",
+        "label": "Shield"
+      },
+      {
+        "id": "backpack",
+        "label": "Backpack"
+      },
+      {
+        "id": "quiver",
+        "label": "Quiver"
+      }
+    ]
+  },
+  "tools": {
+    "_comment": "wrongToolWear: how many uses a tool loses when it breaks a block it is not made for (a pickaxe on dirt, a shovel on stone); the right tool loses 1.",
+    "wrongToolWear": 3
+  }
+}

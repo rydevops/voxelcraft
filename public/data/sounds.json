@@ -1,0 +1,183 @@
+{
+  "_comment": "Block sound materials. Each is a stack of layers played together: filtered noise and/or swept tones. A block picks one with \"sound\". Phases scale loudness and length.",
+  "phases": {
+    "break": {
+      "loud": 1,
+      "length": 0.16
+    },
+    "place": {
+      "loud": 0.8,
+      "length": 0.16
+    },
+    "tick": {
+      "loud": 0.35,
+      "length": 0.05
+    },
+    "step": {
+      "loud": 0.22,
+      "length": 0.07
+    }
+  },
+  "materials": {
+    "default": [
+      {
+        "type": "noise",
+        "filter": "lowpass",
+        "freq": 1000,
+        "q": 0.8,
+        "gain": 0.55
+      },
+      {
+        "type": "tone",
+        "from": 120,
+        "to": 60,
+        "gain": 0.22
+      }
+    ],
+    "stone": [
+      {
+        "type": "noise",
+        "filter": "bandpass",
+        "freq": 1900,
+        "q": 1.2,
+        "gain": 0.55
+      },
+      {
+        "type": "tone",
+        "from": 160,
+        "to": 70,
+        "gain": 0.3,
+        "lengthScale": 1.2
+      }
+    ],
+    "wood": [
+      {
+        "type": "noise",
+        "filter": "bandpass",
+        "freq": 700,
+        "q": 2,
+        "gain": 0.4
+      },
+      {
+        "type": "tone",
+        "from": 260,
+        "to": 110,
+        "gain": 0.45,
+        "wave": "triangle",
+        "lengthScale": 1.4
+      }
+    ],
+    "glass": [
+      {
+        "type": "noise",
+        "filter": "highpass",
+        "freq": 4500,
+        "q": 1,
+        "gain": 0.3
+      },
+      {
+        "type": "tone",
+        "from": 2600,
+        "to": 2340,
+        "gain": 0.08,
+        "seconds": 0.25,
+        "skipPhases": [
+          "step"
+        ],
+        "delayJitter": 0.03
+      },
+      {
+        "type": "tone",
+        "from": 3900,
+        "to": 3510,
+        "gain": 0.08,
+        "seconds": 0.25,
+        "skipPhases": [
+          "step"
+        ],
+        "delayJitter": 0.03
+      },
+      {
+        "type": "tone",
+        "from": 5200,
+        "to": 4680,
+        "gain": 0.08,
+        "seconds": 0.25,
+        "skipPhases": [
+          "step"
+        ],
+        "delayJitter": 0.03
+      }
+    ],
+    "sand": [
+      {
+        "type": "noise",
+        "filter": "highpass",
+        "freq": 1800,
+        "q": 0.5,
+        "gain": 0.35,
+        "lengthScale": 1.3
+      }
+    ],
+    "leaves": [
+      {
+        "type": "noise",
+        "filter": "highpass",
+        "freq": 3000,
+        "q": 0.4,
+        "gain": 0.28,
+        "lengthScale": 1.2
+      }
+    ],
+    "snow": [
+      {
+        "type": "noise",
+        "filter": "lowpass",
+        "freq": 1500,
+        "q": 0.6,
+        "gain": 0.4,
+        "lengthScale": 1.4
+      }
+    ],
+    "water": [
+      {
+        "type": "noise",
+        "filter": "bandpass",
+        "freq": 900,
+        "q": 0.8,
+        "gain": 0.35,
+        "seconds": 0.3
+      }
+    ],
+    "grass": [
+      {
+        "type": "noise",
+        "filter": "lowpass",
+        "freq": 1000,
+        "q": 0.8,
+        "gain": 0.55
+      },
+      {
+        "type": "tone",
+        "from": 120,
+        "to": 60,
+        "gain": 0.22
+      }
+    ],
+    "dirt": [
+      {
+        "type": "noise",
+        "filter": "lowpass",
+        "freq": 1000,
+        "q": 0.8,
+        "gain": 0.55
+      },
+      {
+        "type": "tone",
+        "from": 120,
+        "to": 60,
+        "gain": 0.22
+      }
+    ]
+  }
+}

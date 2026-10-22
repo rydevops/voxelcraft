@@ -1,0 +1,952 @@
+{
+  "_comment": "Every block in the game. See data/README.md for the fields. ids must be unique (1-255) and never change once worlds exist.",
+  "blocks": [
+    {
+      "id": 1,
+      "key": "grass",
+      "name": "Grass Block",
+      "tiles": {
+        "top": "grass_top",
+        "bottom": "dirt",
+        "side": "grass_side"
+      },
+      "hardness": 1,
+      "tool": "shovel",
+      "sound": "grass",
+      "creative": true,
+      "tillsInto": "farmland",
+      "spreadsOnto": "dirt",
+      "loot": "grass"
+    },
+    {
+      "id": 2,
+      "key": "dirt",
+      "name": "Dirt",
+      "tiles": {
+        "top": "dirt",
+        "bottom": "dirt",
+        "side": "dirt"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "dirt",
+      "creative": true,
+      "tillsInto": "farmland"
+    },
+    {
+      "id": 3,
+      "key": "stone",
+      "name": "Stone",
+      "tiles": {
+        "top": "stone",
+        "bottom": "stone",
+        "side": "stone"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true,
+      "loot": "stone"
+    },
+    {
+      "id": 4,
+      "key": "sand",
+      "name": "Sand",
+      "tiles": {
+        "top": "sand",
+        "bottom": "sand",
+        "side": "sand"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "sand",
+      "creative": true,
+      "gravity": true
+    },
+    {
+      "id": 5,
+      "key": "log",
+      "name": "Oak Log",
+      "tiles": {
+        "top": "log_top",
+        "bottom": "log_top",
+        "side": "log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "role": "log",
+      "creative": true,
+      "fuel": 20
+    },
+    {
+      "id": 6,
+      "key": "leaves",
+      "name": "Leaves",
+      "tiles": {
+        "top": "leaves",
+        "bottom": "leaves",
+        "side": "leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "leaves",
+      "shatterLoot": "leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 7,
+      "key": "planks",
+      "name": "Oak Planks",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "creative": true,
+      "fuel": 15
+    },
+    {
+      "id": 8,
+      "key": "water",
+      "name": "Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 7
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 9,
+      "key": "cobble",
+      "name": "Cobblestone",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 10,
+      "key": "glass",
+      "name": "Glass",
+      "tiles": {
+        "top": "glass",
+        "bottom": "glass",
+        "side": "glass"
+      },
+      "hardness": 0.35,
+      "sound": "glass",
+      "opaque": false,
+      "loot": "glass",
+      "creative": true
+    },
+    {
+      "id": 11,
+      "key": "brick",
+      "name": "Bricks",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 12,
+      "key": "snow",
+      "name": "Snowy Grass",
+      "tiles": {
+        "top": "snow_top",
+        "bottom": "dirt",
+        "side": "snow_side"
+      },
+      "hardness": 0.7,
+      "tool": "shovel",
+      "sound": "snow",
+      "loot": "snow",
+      "creative": true
+    },
+    {
+      "id": 13,
+      "key": "coal_ore",
+      "name": "Coal Ore",
+      "tiles": {
+        "top": "coal_ore",
+        "bottom": "coal_ore",
+        "side": "coal_ore"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "loot": "coal_ore",
+      "creative": true,
+      "glow": 0.22
+    },
+    {
+      "id": 14,
+      "key": "iron_ore",
+      "name": "Iron Ore",
+      "tiles": {
+        "top": "iron_ore",
+        "bottom": "iron_ore",
+        "side": "iron_ore"
+      },
+      "hardness": 5,
+      "tool": "pickaxe",
+      "need": 2,
+      "sound": "stone",
+      "creative": true,
+      "glow": 0.22
+    },
+    {
+      "id": 15,
+      "key": "crafting",
+      "name": "Crafting Table",
+      "tiles": {
+        "top": "crafting_top",
+        "bottom": "planks",
+        "side": "crafting_side"
+      },
+      "hardness": 1.6,
+      "tool": "axe",
+      "sound": "wood",
+      "opens": "table",
+      "creative": true
+    },
+    {
+      "id": 16,
+      "key": "furnace",
+      "name": "Furnace",
+      "tiles": {
+        "top": "furnace_top",
+        "bottom": "furnace_top",
+        "side": "furnace_side"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "opens": "furnace",
+      "creative": true
+    },
+    {
+      "id": 17,
+      "key": "farmland",
+      "name": "Dry Farmland",
+      "tiles": {
+        "top": "farmland_top",
+        "bottom": "dirt",
+        "side": "dirt"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "dirt",
+      "loot": "farmland",
+      "creative": true,
+      "hydration": {
+        "wet": "farmland_wet",
+        "decay": {
+          "into": "dirt",
+          "chancePerSecond": 0.012
+        }
+      }
+    },
+    {
+      "id": 18,
+      "key": "grass_s",
+      "name": "Short Grass",
+      "tiles": {
+        "top": "grass_s",
+        "bottom": "grass_s",
+        "side": "grass_s"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "cross",
+        "height": 0.35,
+        "growth": {
+          "next": "grass_m",
+          "chancePerSecond": 0.008333333333333333,
+          "soil": "grass"
+        },
+        "stage": {
+          "label": "Grass",
+          "step": 1,
+          "name": "Short"
+        }
+      },
+      "loot": "grass_s"
+    },
+    {
+      "id": 19,
+      "key": "grass_m",
+      "name": "Tall Grass",
+      "tiles": {
+        "top": "grass_m",
+        "bottom": "grass_m",
+        "side": "grass_m"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "growth": {
+          "next": "grass_l",
+          "chancePerSecond": 0.0058823529411764705,
+          "soil": "grass"
+        },
+        "stage": {
+          "label": "Grass",
+          "step": 2,
+          "name": "Tall"
+        }
+      },
+      "loot": "grass_m"
+    },
+    {
+      "id": 20,
+      "key": "grass_l",
+      "name": "Lush Grass",
+      "tiles": {
+        "top": "grass_l",
+        "bottom": "grass_l",
+        "side": "grass_l"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "cross",
+        "height": 0.9,
+        "stage": {
+          "label": "Grass",
+          "step": 3,
+          "name": "Lush",
+          "ripe": true
+        },
+        "spreads": {
+          "block": "grass_s",
+          "chancePerSecond": 0.002,
+          "onto": "grass",
+          "range": 2
+        }
+      },
+      "loot": "grass_l"
+    },
+    {
+      "id": 21,
+      "key": "wheat_s",
+      "name": "Wheat Sprout",
+      "tiles": {
+        "top": "wheat_s",
+        "bottom": "wheat_s",
+        "side": "wheat_s"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "hash",
+        "height": 0.3,
+        "growth": {
+          "next": "wheat_m",
+          "chancePerSecond": 0.025,
+          "soil": "farmland_wet"
+        },
+        "stage": {
+          "label": "Wheat",
+          "step": 1,
+          "name": "Sprout",
+          "crop": true
+        }
+      },
+      "loot": "wheat_s"
+    },
+    {
+      "id": 22,
+      "key": "wheat_m",
+      "name": "Young Wheat",
+      "tiles": {
+        "top": "wheat_m",
+        "bottom": "wheat_m",
+        "side": "wheat_m"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "hash",
+        "height": 0.6,
+        "growth": {
+          "next": "wheat_l",
+          "chancePerSecond": 0.01818181818181818,
+          "soil": "farmland_wet"
+        },
+        "stage": {
+          "label": "Wheat",
+          "step": 2,
+          "name": "Growing",
+          "crop": true
+        }
+      },
+      "loot": "wheat_m"
+    },
+    {
+      "id": 23,
+      "key": "wheat_l",
+      "name": "Ripe Wheat",
+      "tiles": {
+        "top": "wheat_l",
+        "bottom": "wheat_l",
+        "side": "wheat_l"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "plant": {
+        "kind": "hash",
+        "height": 0.9,
+        "stage": {
+          "label": "Wheat",
+          "step": 3,
+          "name": "Ripe",
+          "ripe": true,
+          "crop": true
+        }
+      },
+      "loot": "wheat_l"
+    },
+    {
+      "id": 24,
+      "key": "flow1",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 1
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 25,
+      "key": "flow2",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 2
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 26,
+      "key": "flow3",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 3
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 27,
+      "key": "flow4",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 4
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 28,
+      "key": "flow5",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 5
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 29,
+      "key": "flow6",
+      "name": "Flowing Water",
+      "tiles": {
+        "top": "water",
+        "bottom": "water",
+        "side": "water"
+      },
+      "hardness": 0,
+      "sound": "water",
+      "opaque": false,
+      "solid": false,
+      "water": {
+        "level": 6
+      },
+      "lightFilter": 2
+    },
+    {
+      "id": 30,
+      "key": "farmland_wet",
+      "name": "Moist Farmland",
+      "tiles": {
+        "top": "farmland_wet_top",
+        "bottom": "dirt",
+        "side": "dirt"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "dirt",
+      "loot": "farmland",
+      "hydration": {
+        "dry": "farmland"
+      }
+    },
+    {
+      "id": 31,
+      "key": "torch_floor",
+      "name": "Torch",
+      "tiles": {
+        "top": "torch",
+        "bottom": "torch",
+        "side": "torch"
+      },
+      "hardness": 0.05,
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "light": 14,
+      "loot": "torch_floor",
+      "model": {
+        "type": "torch",
+        "height": 0.75
+      },
+      "support": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "id": 32,
+      "key": "torch_e",
+      "name": "Torch",
+      "tiles": {
+        "top": "torch",
+        "bottom": "torch",
+        "side": "torch"
+      },
+      "hardness": 0.05,
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "light": 14,
+      "loot": "torch_floor",
+      "model": {
+        "type": "torch",
+        "height": 0.75,
+        "lean": [
+          1,
+          0
+        ]
+      },
+      "support": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 33,
+      "key": "torch_w",
+      "name": "Torch",
+      "tiles": {
+        "top": "torch",
+        "bottom": "torch",
+        "side": "torch"
+      },
+      "hardness": 0.05,
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "light": 14,
+      "loot": "torch_floor",
+      "model": {
+        "type": "torch",
+        "height": 0.75,
+        "lean": [
+          -1,
+          0
+        ]
+      },
+      "support": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 34,
+      "key": "torch_s",
+      "name": "Torch",
+      "tiles": {
+        "top": "torch",
+        "bottom": "torch",
+        "side": "torch"
+      },
+      "hardness": 0.05,
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "light": 14,
+      "loot": "torch_floor",
+      "model": {
+        "type": "torch",
+        "height": 0.75,
+        "lean": [
+          0,
+          1
+        ]
+      },
+      "support": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "id": 35,
+      "key": "torch_n",
+      "name": "Torch",
+      "tiles": {
+        "top": "torch",
+        "bottom": "torch",
+        "side": "torch"
+      },
+      "hardness": 0.05,
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "light": 14,
+      "loot": "torch_floor",
+      "model": {
+        "type": "torch",
+        "height": 0.75,
+        "lean": [
+          0,
+          -1
+        ]
+      },
+      "support": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 36,
+      "key": "furnace_lit",
+      "name": "Furnace",
+      "tiles": {
+        "top": "furnace_top",
+        "bottom": "furnace_top",
+        "side": "furnace_side_lit"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "opens": "furnace",
+      "light": 13
+    },
+    {
+      "id": 37,
+      "key": "birch_log",
+      "name": "Birch Log",
+      "tiles": {
+        "top": "birch_log_top",
+        "bottom": "birch_log_top",
+        "side": "birch_log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "role": "log",
+      "creative": true,
+      "fuel": 20
+    },
+    {
+      "id": 38,
+      "key": "spruce_log",
+      "name": "Spruce Log",
+      "tiles": {
+        "top": "spruce_log_top",
+        "bottom": "spruce_log_top",
+        "side": "spruce_log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "role": "log",
+      "creative": true,
+      "fuel": 20
+    },
+    {
+      "id": 39,
+      "key": "birch_leaves",
+      "name": "Birch Leaves",
+      "tiles": {
+        "top": "birch_leaves",
+        "bottom": "birch_leaves",
+        "side": "birch_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "birch_leaves",
+      "shatterLoot": "birch_leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 40,
+      "key": "spruce_leaves",
+      "name": "Spruce Leaves",
+      "tiles": {
+        "top": "spruce_leaves",
+        "bottom": "spruce_leaves",
+        "side": "spruce_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "spruce_leaves",
+      "shatterLoot": "spruce_leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 41,
+      "key": "apple_leaves",
+      "name": "Apple Tree Leaves",
+      "tiles": {
+        "top": "apple_leaves",
+        "bottom": "apple_leaves",
+        "side": "apple_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "apple_leaves",
+      "shatterLoot": "apple_leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 42,
+      "key": "young_oak",
+      "name": "Oak Sapling",
+      "tiles": {
+        "top": "young_oak",
+        "bottom": "young_oak",
+        "side": "young_oak"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "loot": "young_oak",
+      "plant": {
+        "kind": "cross",
+        "height": 0.7,
+        "grows": {
+          "trees": [
+            "oak",
+            "oak",
+            "oak",
+            "tall_oak",
+            "bush"
+          ],
+          "chancePerSecond": 0.012,
+          "soil": [
+            "grass",
+            "dirt"
+          ]
+        },
+        "stage": {
+          "label": "Oak Sapling",
+          "step": 1,
+          "name": "Growing",
+          "ripe": false,
+          "crop": false
+        }
+      }
+    },
+    {
+      "id": 43,
+      "key": "young_birch",
+      "name": "Birch Sapling",
+      "tiles": {
+        "top": "young_birch",
+        "bottom": "young_birch",
+        "side": "young_birch"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "loot": "young_birch",
+      "plant": {
+        "kind": "cross",
+        "height": 0.7,
+        "grows": {
+          "trees": [
+            "birch"
+          ],
+          "chancePerSecond": 0.012,
+          "soil": [
+            "grass",
+            "dirt"
+          ]
+        },
+        "stage": {
+          "label": "Birch Sapling",
+          "step": 1,
+          "name": "Growing",
+          "ripe": false,
+          "crop": false
+        }
+      }
+    },
+    {
+      "id": 44,
+      "key": "young_spruce",
+      "name": "Spruce Sapling",
+      "tiles": {
+        "top": "young_spruce",
+        "bottom": "young_spruce",
+        "side": "young_spruce"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "loot": "young_spruce",
+      "plant": {
+        "kind": "cross",
+        "height": 0.7,
+        "grows": {
+          "trees": [
+            "spruce"
+          ],
+          "chancePerSecond": 0.012,
+          "soil": [
+            "grass",
+            "dirt"
+          ]
+        },
+        "stage": {
+          "label": "Spruce Sapling",
+          "step": 1,
+          "name": "Growing",
+          "ripe": false,
+          "crop": false
+        }
+      }
+    },
+    {
+      "id": 45,
+      "key": "young_apple",
+      "name": "Apple Sapling",
+      "tiles": {
+        "top": "young_apple",
+        "bottom": "young_apple",
+        "side": "young_apple"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "loot": "young_apple",
+      "plant": {
+        "kind": "cross",
+        "height": 0.7,
+        "grows": {
+          "trees": [
+            "apple"
+          ],
+          "chancePerSecond": 0.012,
+          "soil": [
+            "grass",
+            "dirt"
+          ]
+        },
+        "stage": {
+          "label": "Apple Sapling",
+          "step": 1,
+          "name": "Growing",
+          "ripe": false,
+          "crop": false
+        }
+      }
+    }
+  ]
+}

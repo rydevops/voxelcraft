@@ -1,0 +1,417 @@
+{
+  "_comment": "Crafting recipes. in: [item, count] or [\"@group\", count] for any item of a group. at: the station (omit for by-hand). smelting: what a furnace turns one item into (seconds to cook one). Fuel burn times are \"fuel\" (seconds) on items and blocks.",
+  "groups": {
+    "coals": [
+      "charcoal",
+      "coal"
+    ],
+    "logs": [
+      "log",
+      "birch_log",
+      "spruce_log"
+    ]
+  },
+  "stations": {
+    "table": {
+      "label": "Crafting Table"
+    }
+  },
+  "windows": {
+    "hand": {
+      "title": "Crafting",
+      "stations": [
+        null
+      ]
+    },
+    "table": {
+      "title": "Crafting Table",
+      "stations": [
+        null,
+        "table"
+      ]
+    },
+    "furnace": {
+      "title": "Furnace",
+      "furnace": true
+    }
+  },
+  "recipes": [
+    {
+      "out": "planks",
+      "n": 4,
+      "in": [
+        [
+          "@logs",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "stick",
+      "n": 4,
+      "in": [
+        [
+          "planks",
+          2
+        ]
+      ]
+    },
+    {
+      "out": "crafting",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          4
+        ]
+      ]
+    },
+    {
+      "out": "bread",
+      "n": 1,
+      "in": [
+        [
+          "wheat",
+          3
+        ]
+      ]
+    },
+    {
+      "out": "wood_pickaxe",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_axe",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_shovel",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          1
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_pickaxe",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_axe",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_shovel",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          1
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_pickaxe",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_axe",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          3
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_shovel",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          1
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_hoe",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          2
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_hoe",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          2
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_hoe",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          2
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "furnace",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          8
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "brick",
+      "n": 4,
+      "in": [
+        [
+          "cobble",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "torch",
+      "n": 4,
+      "in": [
+        [
+          "@coals",
+          1
+        ],
+        [
+          "stick",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "iron_helmet",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          5
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_chestplate",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          8
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_leggings",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          7
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_boots",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_shield",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          1
+        ],
+        [
+          "planks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "backpack",
+      "n": 1,
+      "in": [
+        [
+          "wheat",
+          6
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "quiver",
+      "n": 1,
+      "in": [
+        [
+          "planks",
+          3
+        ],
+        [
+          "stick",
+          3
+        ]
+      ],
+      "at": "table"
+    }
+  ],
+  "smelting": [
+    {
+      "in": "raw_iron",
+      "out": "iron_ingot",
+      "seconds": 10
+    },
+    {
+      "in": "sand",
+      "out": "glass",
+      "seconds": 8
+    },
+    {
+      "in": "cobble",
+      "out": "stone",
+      "seconds": 8
+    },
+    {
+      "in": "log",
+      "out": "charcoal",
+      "seconds": 10
+    },
+    {
+      "in": "birch_log",
+      "out": "charcoal",
+      "seconds": 10
+    },
+    {
+      "in": "spruce_log",
+      "out": "charcoal",
+      "seconds": 10
+    }
+  ]
+}

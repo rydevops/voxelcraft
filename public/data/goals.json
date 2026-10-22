@@ -1,0 +1,95 @@
+{
+  "_comment": "The goals shown in the HUD, in order. Conditions: { collected: item } | { collectedAny: [items] } | { crafted: item } | { craftedAny: [items] } | { flag: \"tilled\" | \"planted\" | \"ate\" }.",
+  "goals": [
+    {
+      "text": "Punch a tree to collect Wood",
+      "collectedAny": [
+        "log",
+        "birch_log",
+        "spruce_log"
+      ]
+    },
+    {
+      "text": "Craft Planks",
+      "crafted": "planks"
+    },
+    {
+      "text": "Craft a Crafting Table",
+      "crafted": "crafting"
+    },
+    {
+      "text": "Craft a Wooden Pickaxe",
+      "crafted": "wood_pickaxe"
+    },
+    {
+      "text": "Mine Cobblestone",
+      "collected": "cobble"
+    },
+    {
+      "text": "Craft a Stone Pickaxe",
+      "crafted": "stone_pickaxe"
+    },
+    {
+      "text": "Craft a Hoe",
+      "craftedAny": [
+        "wood_hoe",
+        "stone_hoe",
+        "iron_hoe"
+      ]
+    },
+    {
+      "text": "Find Wheat Seeds in the tall grass",
+      "collected": "wheat_seeds"
+    },
+    {
+      "text": "Till soil within 4 blocks of water",
+      "flag": "tilled"
+    },
+    {
+      "text": "Plant Wheat Seeds on farmland",
+      "flag": "planted"
+    },
+    {
+      "text": "Harvest ripe Wheat",
+      "collected": "wheat"
+    },
+    {
+      "text": "Bake Bread and eat it",
+      "flag": "ate"
+    },
+    {
+      "text": "Find Coal",
+      "collected": "coal"
+    },
+    {
+      "text": "Craft a Furnace",
+      "crafted": "furnace"
+    },
+    {
+      "text": "Mine Iron Ore",
+      "collected": "raw_iron"
+    },
+    {
+      "text": "Smelt an Iron Ingot",
+      "crafted": "iron_ingot"
+    },
+    {
+      "text": "Craft an Iron Pickaxe",
+      "crafted": "iron_pickaxe"
+    },
+    {
+      "text": "Forge a piece of Iron Armor",
+      "craftedAny": [
+        "iron_helmet",
+        "iron_chestplate",
+        "iron_leggings",
+        "iron_boots",
+        "iron_shield"
+      ]
+    },
+    {
+      "text": "Wear a piece of equipment",
+      "flag": "equipped"
+    }
+  ]
+}

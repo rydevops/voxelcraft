@@ -1,0 +1,323 @@
+{
+  "_comment": "Non-block items (blocks are items automatically). Tools reference a tier below. ids must not clash with any block id.",
+  "tiers": {
+    "wood": {
+      "level": 1,
+      "speed": 2,
+      "durability": 30,
+      "head": "wood"
+    },
+    "stone": {
+      "level": 2,
+      "speed": 3.5,
+      "durability": 66,
+      "head": "stone"
+    },
+    "iron": {
+      "level": 3,
+      "speed": 5.5,
+      "durability": 125,
+      "head": "iron"
+    }
+  },
+  "items": [
+    {
+      "id": 100,
+      "key": "stick",
+      "name": "Stick",
+      "fuel": 5
+    },
+    {
+      "id": 101,
+      "key": "coal",
+      "name": "Coal",
+      "fuel": 80
+    },
+    {
+      "id": 102,
+      "key": "iron_ingot",
+      "name": "Iron Ingot"
+    },
+    {
+      "id": 103,
+      "key": "wheat_seeds",
+      "name": "Wheat Seeds",
+      "plants": {
+        "block": "wheat_s",
+        "on": [
+          "farmland",
+          "farmland_wet"
+        ]
+      }
+    },
+    {
+      "id": 104,
+      "key": "wheat",
+      "name": "Wheat"
+    },
+    {
+      "id": 105,
+      "key": "bread",
+      "name": "Bread",
+      "food": 6,
+      "saturation": 7.2
+    },
+    {
+      "id": 106,
+      "key": "charcoal",
+      "name": "Charcoal",
+      "fuel": 80
+    },
+    {
+      "id": 107,
+      "key": "apple",
+      "name": "Apple",
+      "food": 4,
+      "saturation": 2.4
+    },
+    {
+      "id": 108,
+      "key": "raw_iron",
+      "name": "Raw Iron"
+    },
+    {
+      "id": 110,
+      "key": "wood_pickaxe",
+      "name": "Wooden Pickaxe",
+      "tool": {
+        "type": "pickaxe",
+        "tier": "wood"
+      }
+    },
+    {
+      "id": 111,
+      "key": "wood_axe",
+      "name": "Wooden Axe",
+      "tool": {
+        "type": "axe",
+        "tier": "wood"
+      }
+    },
+    {
+      "id": 112,
+      "key": "wood_shovel",
+      "name": "Wooden Shovel",
+      "tool": {
+        "type": "shovel",
+        "tier": "wood"
+      }
+    },
+    {
+      "id": 113,
+      "key": "stone_pickaxe",
+      "name": "Stone Pickaxe",
+      "tool": {
+        "type": "pickaxe",
+        "tier": "stone"
+      }
+    },
+    {
+      "id": 114,
+      "key": "stone_axe",
+      "name": "Stone Axe",
+      "tool": {
+        "type": "axe",
+        "tier": "stone"
+      }
+    },
+    {
+      "id": 115,
+      "key": "stone_shovel",
+      "name": "Stone Shovel",
+      "tool": {
+        "type": "shovel",
+        "tier": "stone"
+      }
+    },
+    {
+      "id": 116,
+      "key": "iron_pickaxe",
+      "name": "Iron Pickaxe",
+      "tool": {
+        "type": "pickaxe",
+        "tier": "iron"
+      }
+    },
+    {
+      "id": 117,
+      "key": "iron_axe",
+      "name": "Iron Axe",
+      "tool": {
+        "type": "axe",
+        "tier": "iron"
+      }
+    },
+    {
+      "id": 118,
+      "key": "iron_shovel",
+      "name": "Iron Shovel",
+      "tool": {
+        "type": "shovel",
+        "tier": "iron"
+      }
+    },
+    {
+      "id": 119,
+      "key": "wood_hoe",
+      "name": "Wooden Hoe",
+      "tool": {
+        "type": "hoe",
+        "tier": "wood"
+      }
+    },
+    {
+      "id": 120,
+      "key": "stone_hoe",
+      "name": "Stone Hoe",
+      "tool": {
+        "type": "hoe",
+        "tier": "stone"
+      }
+    },
+    {
+      "id": 121,
+      "key": "iron_hoe",
+      "name": "Iron Hoe",
+      "tool": {
+        "type": "hoe",
+        "tier": "iron"
+      }
+    },
+    {
+      "id": 122,
+      "key": "torch",
+      "name": "Torch",
+      "creative": true,
+      "places": {
+        "up": "torch_floor",
+        "east": "torch_e",
+        "west": "torch_w",
+        "south": "torch_s",
+        "north": "torch_n"
+      },
+      "offhand": true
+    },
+    {
+      "id": 123,
+      "key": "iron_helmet",
+      "name": "Iron Helmet",
+      "stack": 1,
+      "equip": {
+        "slot": "helmet",
+        "armor": 2
+      }
+    },
+    {
+      "id": 124,
+      "key": "iron_chestplate",
+      "name": "Iron Chestplate",
+      "stack": 1,
+      "equip": {
+        "slot": "chestplate",
+        "armor": 6
+      }
+    },
+    {
+      "id": 125,
+      "key": "iron_leggings",
+      "name": "Iron Leggings",
+      "stack": 1,
+      "equip": {
+        "slot": "leggings",
+        "armor": 5
+      }
+    },
+    {
+      "id": 126,
+      "key": "iron_boots",
+      "name": "Iron Boots",
+      "stack": 1,
+      "equip": {
+        "slot": "boots",
+        "armor": 2
+      }
+    },
+    {
+      "id": 127,
+      "key": "iron_shield",
+      "name": "Iron Shield",
+      "stack": 1,
+      "equip": {
+        "slot": "shield",
+        "armor": 2
+      }
+    },
+    {
+      "id": 128,
+      "key": "backpack",
+      "name": "Backpack",
+      "stack": 1,
+      "equip": {
+        "slot": "backpack",
+        "slots": 9
+      }
+    },
+    {
+      "id": 129,
+      "key": "quiver",
+      "name": "Quiver",
+      "stack": 1,
+      "equip": {
+        "slot": "quiver"
+      }
+    },
+    {
+      "id": 130,
+      "key": "oak_sapling",
+      "name": "Oak Sapling",
+      "plants": {
+        "block": "young_oak",
+        "on": [
+          "grass",
+          "dirt"
+        ]
+      }
+    },
+    {
+      "id": 131,
+      "key": "birch_sapling",
+      "name": "Birch Sapling",
+      "plants": {
+        "block": "young_birch",
+        "on": [
+          "grass",
+          "dirt"
+        ]
+      }
+    },
+    {
+      "id": 132,
+      "key": "spruce_sapling",
+      "name": "Spruce Sapling",
+      "plants": {
+        "block": "young_spruce",
+        "on": [
+          "grass",
+          "dirt"
+        ]
+      }
+    },
+    {
+      "id": 133,
+      "key": "apple_sapling",
+      "name": "Apple Sapling",
+      "plants": {
+        "block": "young_apple",
+        "on": [
+          "grass",
+          "dirt"
+        ]
+      }
+    }
+  ]
+}

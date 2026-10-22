@@ -1,0 +1,207 @@
+{
+  "_comment": "Terrain, ores, caves, trees and ground cover. Block names refer to blocks.json keys. Ores: minY is inclusive, maxY exclusive. beachAboveSea: columns at most this far above the sea are beach.",
+  "seaLevel": 22,
+  "snowLine": 44,
+  "blocks": {
+    "sea": "water",
+    "stone": "stone",
+    "surface": "grass",
+    "filler": "dirt",
+    "fillerDepth": 3,
+    "beach": "sand",
+    "beachFiller": "sand",
+    "snowSurface": "snow",
+    "snowFiller": "stone"
+  },
+  "terrain": {
+    "continentScale": 0.0045,
+    "continentHeight": 22,
+    "hillScale": 0.014,
+    "hillHeight": 7,
+    "ridgeScale": 0.011,
+    "ridgeHeight": 24,
+    "baseAboveSea": 5
+  },
+  "rivers": {
+    "scale": 0.0065,
+    "coreWidth": 0.016,
+    "bankWidth": 0.07,
+    "warp": 14,
+    "lowlandFrom": 8,
+    "lowlandTo": 20,
+    "bedBelowSea": 2
+  },
+  "caves": {
+    "scale": [
+      0.045,
+      0.07,
+      0.045
+    ],
+    "threshold": 0.1,
+    "minY": 3,
+    "surfaceDepth": 4,
+    "caverns": {
+      "scale": [
+        0.022,
+        0.04,
+        0.022
+      ],
+      "threshold": 0.4,
+      "minY": 4,
+      "maxY": 34,
+      "surfaceDepth": 6
+    },
+    "entrances": {
+      "scale": 0.035,
+      "threshold": 0.25
+    }
+  },
+  "ores": [
+    {
+      "block": "iron_ore",
+      "scale": 0.16,
+      "offset": [
+        40,
+        7,
+        -20
+      ],
+      "threshold": 0.6,
+      "minY": 3,
+      "maxY": 36
+    },
+    {
+      "block": "coal_ore",
+      "scale": 0.14,
+      "offset": [
+        5,
+        0,
+        9
+      ],
+      "threshold": 0.56,
+      "minY": 0,
+      "maxY": 64
+    }
+  ],
+  "trees": {
+    "_comment": "Trees: every spot that grows a tree picks one variant, weighted by \"weight\" among those whose \"heights\" range (terrain height) fits. shape: round (the classic ball of leaves), tall (a big crown on a long trunk), cone (a spruce) or bush (a low shrub). Saplings grow into these by key (blocks.json plant.grows).",
+    "baseDensity": 0.003,
+    "forestDensity": 0.05,
+    "minAboveSea": 2,
+    "belowSnowLine": 2,
+    "variants": [
+      {
+        "key": "oak",
+        "weight": 6,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "round",
+        "trunk": [
+          4,
+          6
+        ],
+        "log": "log",
+        "leaves": "leaves"
+      },
+      {
+        "key": "apple",
+        "weight": 1.2,
+        "heights": [
+          24,
+          36
+        ],
+        "shape": "round",
+        "trunk": [
+          3,
+          5
+        ],
+        "log": "log",
+        "leaves": "apple_leaves"
+      },
+      {
+        "key": "birch",
+        "weight": 3,
+        "heights": [
+          25,
+          40
+        ],
+        "shape": "round",
+        "trunk": [
+          5,
+          7
+        ],
+        "log": "birch_log",
+        "leaves": "birch_leaves"
+      },
+      {
+        "key": "spruce",
+        "weight": 4,
+        "heights": [
+          30,
+          99
+        ],
+        "shape": "cone",
+        "trunk": [
+          6,
+          9
+        ],
+        "log": "spruce_log",
+        "leaves": "spruce_leaves"
+      },
+      {
+        "key": "tall_oak",
+        "weight": 1,
+        "heights": [
+          24,
+          38
+        ],
+        "shape": "tall",
+        "trunk": [
+          8,
+          11
+        ],
+        "log": "log",
+        "leaves": "leaves"
+      },
+      {
+        "key": "bush",
+        "weight": 1.6,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "bush",
+        "trunk": [
+          1,
+          2
+        ],
+        "log": "log",
+        "leaves": "leaves"
+      }
+    ]
+  },
+  "groundCover": {
+    "chance": 0.24,
+    "variants": [
+      {
+        "block": "grass_s",
+        "weight": 0.45
+      },
+      {
+        "block": "grass_m",
+        "weight": 0.35
+      },
+      {
+        "block": "grass_l",
+        "weight": 0.2
+      }
+    ]
+  },
+  "spawn": {
+    "minTrees": 3,
+    "treeRadius": 10,
+    "waterRadius": 28
+  },
+  "beachAboveSea": 1
+}

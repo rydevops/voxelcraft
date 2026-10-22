@@ -1,0 +1,17 @@
+{
+  "name": "voxelcraft",
+  "version": "0.1.0",
+  "description": "A tiny Minecraft-style voxel sandbox: Node server + WebGL client with procedural terrain, art and music.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/data.test.mjs && node test/world.test.mjs && node test/items.test.mjs && node test/farming.test.mjs && node test/crafting.test.mjs && node test/physics.test.mjs && node test/lighting.test.mjs && node test/torch.test.mjs && node test/furnace.test.mjs && node test/survival.test.mjs && node test/equipment.test.mjs && node test/music.test.mjs && node test/trees.test.mjs && node test/worlds.test.mjs && node test/minimap.test.mjs && node test/server.test.mjs",
+    "stop": "node scripts/stop.js",
+    "validate": "node scripts/validate-data.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.186.1"
+  }
+}
