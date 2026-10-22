@@ -1,0 +1,26 @@
+- BUGFIX: Saturation should only go down when a player is hurt (i.e. the health bar isn't full)
+- FEATURE: When pressing M on the keyboard, the minimap will go to a fullscreen map allowing the player to drag around the map and see areas that have been generated. For areas that haven't been generated, they will see just grayed out blocks. 
+- FEATURE: Add ocean biomes
+- FEATURE: While under water, show a oxygen level. The longer under water the less oxygen you have and if that oyxgen is all gone you start to loss health. 
+- FEATURE: Create other biomes based on real world geography
+- FEATURE: Whenever an item is selected in the hotbar, you should still see an arm and hand holding the item. 
+- FEATURE: Weather; there should be weather events such as rain, snowing, hurricane, thunderstorm, etc. 
+- FEATURE: Add animals. Cows for beef, pigs for pork, sheep for wool and lamb chops. 
+- FEATURE: Wool and planks can create beds. There should be a variety of beds such as single, double, queen, king and colors. To get colors, you need dyes which come from plants. Beds should allow you to go to sleep in the day or night and depending on when you do this, it switches you to the opposite. For example, day becomes night and night becomes day. These also change your respawn point if you die. If the bed is broken, your respawn point is set back to your default spawn point when you started the game. 
+- FEATURE: add plants such as rose, dandielion, etc. These can either be planted to give visual looks or converted into dies of the same color (e.g. rose is red dye, dandielion yellow, etc.). 
+- FEATURE: Add villages randomly spawned throughout the world. 
+    - Each villager should contain 5 to 7 villagers with their own houses and beds.
+    - Each villager should have a purpose based on an item block placed such as a librian with a bookshelf
+    - Each villager, with a job, can be traded with by obtaining select materials. 
+    - Each villager, will upgrade their trades the more you trade with them. 
+- Add some enemy mobs:
+    - They should attack you when they see you
+    - The better your armour the less damanage you take
+    - The better your weapons the more damage you cause against them. 
+    - They drop random loot based on who they are
+    - They give you experience, for a feature yet to come called enchantments. 
+    - They only spawn when the light level is below 6 and shouldn't be too many as to overwhelm the player. They can respawn once a player kills them. 
+- The lowest y layer should contain an unbreakable block and gives you nothing if you try to mine it. 
+- The highest y layer should not be capped but nothing happens after y level 120 in terms of ticks. It's just something the player can climb to for fun. 
+- Building materials: I want you to create assets that allow me to build bases. This includes stairs, roof pieces, doors, columns, floors, windows, etc. There should be a variety of options allowing the player to build their base as they see fit. 
+- Storage containers: We should be able to craft chests that can be upgraded to fit more items. This includes expanding the number of slots the chest has and also increasing the slot capacity past what you can hold within your own inventory. There should also be a way to access these chests as a group so that players don't need to look into each chest when they need to craft an item. It should automatically look at each chest within a range and if the items are found, it will pull from those inventories to craft said item. 
