@@ -89,7 +89,24 @@ export function createTouchControls(hooks) {
   function button(name, label, parent = root) {
     const b = el('div', 'tb ' + name, label, parent);
     b.setAttribute('role', 'button');
+    if (parent === root) lookWhileHeld(b);
     return b;
+  }
+  // A finger resting on a button can still turn the camera: while it is down, moving it looks around (the button stays pressed)
+  function lookWhileHeld(b) {
+    let id = null, at = { x: 0, y: 0 };
+    b.addEventListener('pointerdown', (e) => {
+      if (id !== null) return;
+      id = e.pointerId;
+      at = { x: e.clientX, y: e.clientY };
+      b.setPointerCapture(e.pointerId);
+    });
+    b.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== id) return;
+      hooks.look(e.clientX - at.x, e.clientY - at.y);
+      at = { x: e.clientX, y: e.clientY };
+    });
+    for (const type of ['pointerup', 'pointercancel']) b.addEventListener(type, (e) => { if (e.pointerId === id) id = null; });
   }
   // pressed while a finger is on it
   function holdButton(name, label, onDown, onUp) {

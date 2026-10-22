@@ -2,7 +2,7 @@
 // The whole game is a handful of static files, so they are all cached when the app is first opened: after that it starts
 // instantly and works with no network. A new build has a new version, which makes the browser install the new worker; it
 // takes over at once, removes the old cache, and the next launch runs the new game.
-const VERSION = '1.0.0-8726a41cae';
+const VERSION = '1.0.0-43e6399824';
 const CACHE = 'voxelcraft-' + VERSION;
 const FILES = ["./","index.html","app.js","style.css","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable-512.png","apple-touch-icon.png","favicon.png"];
 
