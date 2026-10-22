@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#15110e">
   <title>VoxelCraft</title>
+  <!--pwa:head-->
   <link rel="stylesheet" href="style.css">
+  <!--dev:start-->
   <script type="importmap">
-    { "imports": { "three": "/vendor/three.module.js" } }
+    { "imports": { "three": "./vendor/three.module.js" } }
   </script>
+  <!--dev:end-->
 </head>
 <body class="startup">
   <canvas id="game"></canvas>
@@ -41,7 +45,8 @@
         <div id="inv-grid"></div>
         <div id="backpack-box" hidden><span class="fur-label">Backpack</span><div id="backpack-grid"></div></div>
         <div id="inv-hotbar"></div>
-        <p class="hint">Click: pick up / place &middot; Right-click: split / place one &middot; Shift-click: quick move &middot; Click outside: throw</p>
+        <p class="hint touch-only">Tap a slot to pick up / place. The button at the top switches a tap to <b>split</b> or <b>quick move</b>. Tap outside the window to throw what you hold.</p>
+        <p class="hint pc-only">Click: pick up / place &middot; Right-click: split / place one &middot; Shift-click: quick move &middot; Click outside: throw</p>
       </div>
       <div class="inv-col craft-col">
         <h2 id="craft-title">Crafting</h2>
@@ -75,15 +80,19 @@
   <div id="item-tip" hidden></div>
 
   <div id="palette" hidden>
-    <h2>Creative palette</h2>
-    <p>Click a block to put it in your selected hotbar slot. Press <b>E</b> to close.</p>
-    <div id="palette-grid"></div>
+    <div class="pal-panel">
+      <h2>Creative palette</h2>
+      <p><span class="pc-only">Click a block to put it in your selected hotbar slot. Press <b>E</b> to close.</span><span class="touch-only">Tap a block to put it in your selected hotbar slot.</span></p>
+      <div id="palette-grid"></div>
+    </div>
   </div>
 
   <div id="death" hidden>
-    <h1>You died</h1>
-    <p id="death-cause"></p>
-    <button id="respawn">Respawn</button>
+    <div id="death-box">
+      <h1>You died</h1>
+      <p id="death-cause"></p>
+      <button id="respawn">Respawn</button>
+    </div>
   </div>
 
   <!-- pause menu -->
@@ -120,7 +129,7 @@
       <button id="t-options">Options &amp; Key Bindings</button>
       <button id="t-quit">Quit Game</button>
     </div>
-    <p id="music-hint" hidden>&#9835; Click or press any key to start the music</p>
+    <p id="music-hint" hidden>&#9835; <span class="pc-only">Click or press any key</span><span class="touch-only">Tap anywhere</span> to start the music</p>
     <p id="title-credit"></p>
   </div>
   <div id="worlds" hidden>
@@ -147,6 +156,7 @@
       </form>
     </div>
   </div>
+  <div id="rotate"><p>Turn your device sideways to play</p></div>
   <div id="loading" hidden><p>Loading world&hellip;</p></div>
 
   <div id="options" hidden>

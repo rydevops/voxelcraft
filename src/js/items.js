@@ -1,4 +1,4 @@
-// Items, tools, loot, recipes and goals for the engine, built from the data files (public/data/*.json).
+// Items, tools, loot, recipes and goals for the engine, built from the data files (src/data/*.json).
 // Nothing here is hand-written content: add an item, recipe or loot table in the JSON and it appears in the game.
 import { REG } from './registry.js';
 import { BLOCKS, EMIT } from './blocks.js';

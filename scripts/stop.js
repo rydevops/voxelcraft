@@ -20,7 +20,7 @@ const request = (port, method, route, headers = {}) =>
   });
 
 const alive = async (port) => {
-  const r = await request(port, 'GET', '/api/ping');
+  const r = await request(port, 'GET', '/__voxelcraft/ping');
   try { return JSON.parse(r?.body)?.game === 'voxelcraft'; } catch { return false; }
 };
 
@@ -37,7 +37,7 @@ if (!(await alive(lock.port))) {
   process.exit(0);
 }
 
-await request(lock.port, 'POST', '/api/shutdown', { 'x-voxelcraft-stop': '1' });
+await request(lock.port, 'POST', '/__voxelcraft/shutdown', { 'x-voxelcraft-stop': '1' });
 for (let i = 0; i < 30; i++) { // wait up to ~3s for it to go away
   await new Promise((r) => setTimeout(r, 100));
   if (!(await alive(lock.port))) {

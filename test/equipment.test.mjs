@@ -1,11 +1,11 @@
 // Equipment slots (helmet, chestplate, leggings, boots, shield, backpack, quiver), armor, the backpack's extra slots,
 // and the iron set. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { I, RECIPES, EQUIP_SLOTS, equipOf, armorOf, maxStack } from '../public/js/items.js';
-import { REG } from '../public/js/registry.js';
-import { Inventory, SLOTS, BACKPACK_MAX } from '../public/js/inventory.js';
-import { reduceDamage } from '../public/js/survival.js';
+import { B } from '../src/js/blocks.js';
+import { I, RECIPES, EQUIP_SLOTS, equipOf, armorOf, maxStack } from '../src/js/items.js';
+import { REG } from '../src/js/registry.js';
+import { Inventory, SLOTS, BACKPACK_MAX } from '../src/js/inventory.js';
+import { reduceDamage } from '../src/js/survival.js';
 
 // ---- the seven slots exist and each has something to wear ----
 assert.deepEqual(EQUIP_SLOTS.map((s) => s.id), ['helmet', 'chestplate', 'leggings', 'boots', 'shield', 'backpack', 'quiver']);

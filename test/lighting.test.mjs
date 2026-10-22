@@ -1,10 +1,10 @@
 // Light levels: sky light, tunnels, sealed rooms, filtering blocks, emitters, and that incremental updates
 // always match a from-scratch calculation. Run with: npm test
 import assert from 'node:assert/strict';
-import { B, EMIT, FILTER, OPAQUE } from '../public/js/blocks.js';
-import { World, CS, CH, idx } from '../public/js/world.js';
-import { brightness, MAX_LIGHT } from '../public/js/light.js';
-import { REG } from '../public/js/registry.js';
+import { B, EMIT, FILTER, OPAQUE } from '../src/js/blocks.js';
+import { World, CS, CH, idx } from '../src/js/world.js';
+import { brightness, MAX_LIGHT } from '../src/js/light.js';
+import { REG } from '../src/js/registry.js';
 
 const G = 30;
 function arena() {

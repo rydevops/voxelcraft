@@ -5,8 +5,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { loadData, buildRegistry, DataError } from '../public/js/registry.js';
-import { paintTile, paintSprite, paintSpec, T } from '../public/js/tilegen.js';
+import { loadData, buildRegistry, DataError } from '../src/js/registry.js';
+import { paintTile, paintSprite, paintSpec, T } from '../src/js/tilegen.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mod = (p) => pathToFileURL(path.join(ROOT, p)).href; // a file:// URL, which Node needs on Windows
@@ -95,9 +95,9 @@ function addRuby(d) {
   const moddedFiles = addRuby(await fresh());
   for (const [name, content] of Object.entries(moddedFiles)) fs.writeFileSync(path.join(dir, name + '.json'), JSON.stringify(content));
   const probe = `
-    import { B, PALETTE, OPAQUE } from '${mod('public/js/blocks.js')}';
-    import { I, dropsFor, miningInfo, RECIPES } from '${mod('public/js/items.js')}';
-    import { World } from '${mod('public/js/world.js')}';
+    import { B, PALETTE, OPAQUE } from '${mod('src/js/blocks.js')}';
+    import { I, dropsFor, miningInfo, RECIPES } from '${mod('src/js/items.js')}';
+    import { World } from '${mod('src/js/world.js')}';
     const w = new World(5); let ore = 0;
     for (let cx = -3; cx <= 3; cx++) for (let cz = -3; cz <= 3; cz++) for (const b of w.generateChunk(cx, cz).data) if (b === B.RUBY_ORE) ore++;
     const drops = dropsFor(B.RUBY_ORE, true, () => 0);
@@ -118,7 +118,7 @@ function addRuby(d) {
   const bad = structuredClone(moddedFiles);
   bad.recipes.recipes[0].in = [['nothing_here', 1]];
   fs.writeFileSync(path.join(dir, 'recipes.json'), JSON.stringify(bad.recipes));
-  const failed = spawnSync(process.execPath, ['--input-type=module', '-e', `import '${mod('public/js/blocks.js')}'`], { env: { ...process.env, VOXELCRAFT_DATA: dir }, encoding: 'utf8' });
+  const failed = spawnSync(process.execPath, ['--input-type=module', '-e', `import '${mod('src/js/blocks.js')}'`], { env: { ...process.env, VOXELCRAFT_DATA: dir }, encoding: 'utf8' });
   assert.notEqual(failed.status, 0);
   assert.match(failed.stderr, /recipes\.json #1 \(planks\): unknown block\/item "nothing_here"/);
   fs.rmSync(dir, { recursive: true, force: true });

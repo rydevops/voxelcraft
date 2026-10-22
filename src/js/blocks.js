@@ -1,4 +1,4 @@
-// Block tables for the engine, built from the data files (public/data/blocks.json) by the registry.
+// Block tables for the engine, built from the data files (src/data/blocks.json) by the registry.
 // Nothing here is hand-written content: add or change a block in the JSON and these tables follow.
 import { REG } from './registry.js';
 

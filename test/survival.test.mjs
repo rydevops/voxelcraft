@@ -1,13 +1,13 @@
 // Hunger rules, sprinting limits, starvation, crouching, and the minimap's water colours. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { REG } from '../public/js/registry.js';
-import { World, CS, idx } from '../public/js/world.js';
-import { Player } from '../public/js/player.js';
-import { canSprint, isStarving, tickHunger, eat, barFull, fallDamage, jumpCost } from '../public/js/survival.js';
-import { foodValue, saturationValue, I } from '../public/js/items.js';
-import { ACTIONS, Settings } from '../public/js/settings.js';
-import { MinimapData } from '../public/js/minimap.js';
+import { B } from '../src/js/blocks.js';
+import { REG } from '../src/js/registry.js';
+import { World, CS, idx } from '../src/js/world.js';
+import { Player } from '../src/js/player.js';
+import { canSprint, isStarving, tickHunger, eat, barFull, fallDamage, jumpCost } from '../src/js/survival.js';
+import { foodValue, saturationValue, I } from '../src/js/items.js';
+import { ACTIONS, Settings } from '../src/js/settings.js';
+import { MinimapData } from '../src/js/minimap.js';
 
 const H = REG.game.hunger;
 const state = (food, health = 20, saturation = 0) => ({ food, saturation, health, regenTimer: 0, starveTimer: 0 });

@@ -29,7 +29,7 @@ async function waitFor(fn, ms = 5000) {
   return false;
 }
 const start = () => {
-  const child = spawn(process.execPath, ['server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, ['scripts/server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   child.out = '';
   child.stdout.on('data', (d) => (child.out += d));
   child.stderr.on('data', (d) => (child.out += d));
@@ -41,12 +41,12 @@ const stopCmd = () => spawnSync(process.execPath, ['scripts/stop.js'], { cwd: RO
 try {
   console.log("- first instance starts and writes the lock");
   const a = start();
-  assert.ok(await waitFor(async () => (await get('/api/ping'))?.status === 200), 'server came up');
+  assert.ok(await waitFor(async () => (await get('/__voxelcraft/ping'))?.status === 200), 'server came up');
   assert.ok(fs.existsSync(env.VOXELCRAFT_LOCK), 'lock file written');
   assert.equal(JSON.parse(fs.readFileSync(env.VOXELCRAFT_LOCK, 'utf8')).pid, a.pid);
 
   console.log("- a second instance refuses to start, even on a different port, and says why");
-  const b = spawn(process.execPath, ['server.js'], { cwd: ROOT, env: { ...env, PORT: String(PORT + 100) }, encoding: 'utf8' });
+  const b = spawn(process.execPath, ['scripts/server.js'], { cwd: ROOT, env: { ...env, PORT: String(PORT + 100) }, encoding: 'utf8' });
   let bOut = '';
   b.stdout.on('data', (d) => (bOut += d));
   b.stderr.on('data', (d) => (bOut += d));
@@ -54,17 +54,17 @@ try {
   assert.equal(bCode, 1, 'second instance exits with an error');
   assert.match(bOut, /already running/);
   assert.match(bOut, /npm run stop/);
-  assert.equal((await get('/api/ping')).status, 200, 'the first instance is unaffected');
+  assert.equal((await get('/__voxelcraft/ping')).status, 200, 'the first instance is unaffected');
 
   console.log("- the stop endpoint cannot be triggered by a plain web request");
-  assert.equal((await get('/api/shutdown')).status, 403, 'GET refused');
-  assert.equal((await get('/api/shutdown', 'POST')).status, 403, 'POST without the stop header refused');
-  assert.equal((await get('/api/ping')).status, 200, 'still running');
+  assert.equal((await get('/__voxelcraft/shutdown')).status, 403, 'GET refused');
+  assert.equal((await get('/__voxelcraft/shutdown', 'POST')).status, 403, 'POST without the stop header refused');
+  assert.equal((await get('/__voxelcraft/ping')).status, 200, 'still running');
 
   console.log("- npm run stop (scripts/stop.js) shuts it down from another process");
   const r = stopCmd();
   assert.match(r.stdout, /stopped/);
-  assert.ok(await waitFor(async () => (await get('/api/ping')) === null), 'server is gone');
+  assert.ok(await waitFor(async () => (await get('/__voxelcraft/ping')) === null), 'server is gone');
   assert.equal(await Promise.race([a.exited, sleep(3000).then(() => 'timeout')]), 0, 'process exited cleanly');
   assert.ok(!fs.existsSync(env.VOXELCRAFT_LOCK), 'lock removed on shutdown');
   assert.match(stopCmd().stdout, /not running/, 'stopping when nothing runs is harmless');
@@ -72,7 +72,7 @@ try {
   console.log("- a stale lock (crashed server) does not block a new start");
   fs.writeFileSync(env.VOXELCRAFT_LOCK, JSON.stringify({ pid: 999999, port: PORT + 200 }));
   const c = start();
-  assert.ok(await waitFor(async () => (await get('/api/ping'))?.status === 200), 'starts despite a stale lock');
+  assert.ok(await waitFor(async () => (await get('/__voxelcraft/ping'))?.status === 200), 'starts despite a stale lock');
   assert.equal(JSON.parse(fs.readFileSync(env.VOXELCRAFT_LOCK, 'utf8')).pid, c.pid, 'lock replaced');
   stopCmd();
   await c.exited;

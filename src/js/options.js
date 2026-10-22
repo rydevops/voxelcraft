@@ -4,7 +4,7 @@ import { ACTIONS, keyLabel } from './settings.js';
 const $ = (id) => document.getElementById(id);
 
 const SLIDERS = [
-  { key: 'sensitivity', label: 'Mouse sensitivity', min: 0.1, max: 3, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
+  { key: 'sensitivity', label: 'Look sensitivity (mouse / touch)', min: 0.1, max: 3, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
   { key: 'fov', label: 'Field of view', min: 60, max: 110, step: 1, fmt: (v) => v + '°' },
   { key: 'musicVolume', label: 'Music volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
   { key: 'sfxVolume', label: 'Sound effects volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
@@ -12,6 +12,7 @@ const SLIDERS = [
 const TOGGLES = [
   { key: 'invertY', label: 'Invert mouse Y axis' },
   { key: 'rawInput', label: 'Raw mouse input (no OS acceleration)' },
+  { key: 'touchControls', label: 'On-screen touch controls (sticks and buttons)' },
 ];
 
 export function createOptions(settings, { onClose }) {
