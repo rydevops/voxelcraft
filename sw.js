@@ -1,13 +1,15 @@
 // VoxelCraft service worker (the build fills in the version and the file list).
 // The whole game is a handful of static files, so they are all cached when the app is first opened: after that it starts
 // instantly and works with no network. A new build has a new version, which makes the browser install the new worker; it
-// takes over at once, removes the old cache, and the next launch runs the new game.
-const VERSION = '1.0.0-8726a41cae';
+// takes over at once and removes the old cache; the page reloads into it if you are still on the title screen, otherwise the
+// next launch (or quitting to the title) runs the new game. The files are fetched past the browser's HTTP cache so a new
+// version never caches stale copies.
+const VERSION = '1.0.0-eadf2587a4';
 const CACHE = 'voxelcraft-' + VERSION;
 const FILES = ["./","index.html","app.js","style.css","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable-512.png","apple-touch-icon.png","favicon.png"];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

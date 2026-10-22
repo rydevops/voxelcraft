@@ -71,6 +71,17 @@ t('the service worker precaches every file the page needs, and only files that e
   assert.ok(sw.includes(pkg.version), 'the cache name carries the version');
 });
 
+t('the title screen shows the build version, and the app checks for an update every time it is opened', () => {
+  const html = read('index.html');
+  const sw = read('sw.js');
+  const version = /const VERSION = '([^']+)'/.exec(sw)[1];
+  assert.ok(html.includes(`<p id="title-version">v${version}</p>`), 'the title shows the same version as the service worker');
+  assert.match(html, /reg\.update\(\)/, 'asks for a newer build on launch');
+  assert.match(html, /visibilitychange/, 'and when the app comes back to the front');
+  assert.match(html, /controllerchange[\s\S]*vc-update/, 'tells the game when a new build has taken over');
+  assert.match(sw, /cache: 'reload'/, 'a new build is fetched past the HTTP cache');
+});
+
 t('the page fits small screens: windows shrink, never grow, and the HUD scales down', () => {
   assert.equal(fitScale(900, 600, 1920, 1080), 1);
   assert.ok(fitScale(900, 600, 740, 340) < 0.6);

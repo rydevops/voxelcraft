@@ -235,6 +235,7 @@ body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #deb
 #title-tag { margin: 0 0 14px; color: #ffe27a; text-shadow: 2px 2px 0 #3a3000; font-size: 15px; text-align: center; }
 #title-menu button { min-width: 320px; }
 #title-credit { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; text-align: center; color: rgba(255, 255, 255, 0.7); text-shadow: 1px 1px 0 #000; font-size: 13px; }
+#title-version { position: absolute; bottom: 14px; left: max(14px, env(safe-area-inset-left)); margin: 0; color: rgba(255, 255, 255, 0.55); text-shadow: 1px 1px 0 #000; font-size: 12px; }
 
 #worlds { position: fixed; inset: 0; z-index: 21; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.8)), var(--dirt, #5a4030); background-size: auto, 64px 64px; image-rendering: pixelated; }
 .world-panel { width: min(92vw, 640px); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px; background: rgba(15, 15, 18, 0.78); border: 3px solid #111; }

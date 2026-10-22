@@ -132,6 +132,7 @@
     </div>
     <p id="music-hint" hidden>&#9835; <span class="pc-only">Click or press any key</span><span class="touch-only">Tap anywhere</span> to start the music</p>
     <p id="title-credit"></p>
+    <p id="title-version">v1.0.0-eadf2587a4</p>
   </div>
   <div id="worlds" hidden>
     <div class="world-panel">
@@ -178,11 +179,16 @@
 
   <script type="module" src="app.js"></script>
   <script>
-    // offline support + installability: the service worker caches the app; tell the game when a newer one is ready
+    // offline support + installability: the service worker caches the app. Every time the app is opened (or brought back
+    // to the front) ask the server for a newer build; when one has been installed and taken over, tell the game
     if ('serviceWorker' in navigator) {
       const hadController = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.register('sw.js').catch(() => {});
-      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) window.dispatchEvent(new Event('vc-update')); });
+      // (a first visit came straight from the network, so there is nothing newer to look for until a worker is in charge)
+      const check = () => navigator.serviceWorker.ready.then((reg) => reg.update()).catch(() => {});
+      if (hadController) check();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && navigator.serviceWorker.controller) check(); });
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) { window.__vcUpdated = true; window.dispatchEvent(new Event('vc-update')); } });
     }
   </script>
 </body>
