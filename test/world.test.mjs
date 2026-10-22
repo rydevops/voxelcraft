@@ -1,8 +1,8 @@
 // Run with: npm test
 import assert from 'node:assert/strict';
-import { World, CS, CH, SEA, idx } from '../public/js/world.js';
-import { meshChunk } from '../public/js/mesher.js';
-import { B } from '../public/js/blocks.js';
+import { World, CS, CH, SEA, idx } from '../src/js/world.js';
+import { meshChunk } from '../src/js/mesher.js';
+import { B } from '../src/js/blocks.js';
 
 const world = new World(1337);
 

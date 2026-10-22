@@ -1,12 +1,12 @@
 // Torches: placement data, hanging on blocks, giving light (untinted block light), and the mesh. Run with: npm test
 import assert from 'node:assert/strict';
-import { B, EMIT, PLANT, SOLID, HAS_SUPPORT, SUPPORT, LEAN, PLANT_H } from '../public/js/blocks.js';
-import { I, placesOf, dropsFor } from '../public/js/items.js';
-import { World, CS, idx } from '../public/js/world.js';
-import { AttachSim } from '../public/js/attach.js';
-import { meshChunk } from '../public/js/mesher.js';
-import { raycast } from '../public/js/player.js';
-import { brightness, skyBrightness, blockBrightness, MIN_BRIGHTNESS } from '../public/js/light.js';
+import { B, EMIT, PLANT, SOLID, HAS_SUPPORT, SUPPORT, LEAN, PLANT_H } from '../src/js/blocks.js';
+import { I, placesOf, dropsFor } from '../src/js/items.js';
+import { World, CS, idx } from '../src/js/world.js';
+import { AttachSim } from '../src/js/attach.js';
+import { meshChunk } from '../src/js/mesher.js';
+import { raycast } from '../src/js/player.js';
+import { brightness, skyBrightness, blockBrightness, MIN_BRIGHTNESS } from '../src/js/light.js';
 
 const G = 30;
 function arena() {

@@ -7,8 +7,25 @@ released those lines move under a new version heading. The list of everything th
 
 ## [Unreleased]
 
+## [1.0.0]
+
+VoxelCraft is now an installable web app (a PWA) that runs straight from GitHub Pages, on a computer or on a phone or tablet.
+
+### Added
+- **Installable and offline.** A web app manifest and a service worker let you install the game ("Install" in Chrome / Edge, "Add to Home Screen" on phones) and play with no network. It opens full screen in landscape, and a new version is picked up automatically (a message tells you to reload).
+- **Touch controls** on phones and tablets: a floating move stick (push it to the rim to sprint), drag anywhere on the right to look, and buttons for Break, Use, Jump, Run, Sneak, Fly (creative), Torch (offhand), Bag (inventory) and Pause. In the inventory a button chooses what a tap does: pick up / place, split / place one, or quick move / wear. A close button leaves the window. Touch controls switch on by themselves on a touch device and can be turned on or off in Options (`?touch` and `?desktop` in the address force either).
+- **Screens fit small displays**: the hotbar, hearts, minimap, inventory, options and menus scale down to fit a phone, honour the notch and rounded corners, and a "turn your device sideways" message shows in portrait.
+- **Worlds are saved in the browser** (IndexedDB) when there is no server, so the installed / hosted game keeps your worlds. The Node dev server still saves them as files in `worlds/`.
+- `npm run build` turns the source into the flat web app in the repository root (`index.html`, `app.js`, `style.css`, `manifest.webmanifest`, `sw.js`, icons); `npm run build:check` verifies it is up to date and `npm run preview` serves it the way GitHub Pages does.
+- An app icon (a grass block) in all the sizes browsers and phones ask for, drawn by the build with no image files in the source.
+- A GitHub Actions workflow that runs the tests and checks the built app on every pull request.
+- CHANGELOG.md and FEATURES.md.
+
 ### Changed
+- **Project layout:** the game source moved from `public/` to `src/`, the dev server to `scripts/server.js`. The repository root now holds the built app as a flat set of files with no folders (what GitHub Pages serves); source, scripts and tests stay in folders.
+- The pause menu no longer mentions Esc on touch devices, and "Quit Game" is only shown when there is a dev server to stop.
 - The sun is now a round, glowing disc (like the moon is round) that always faces you, with a soft warm halo that fades at sunset, instead of a flat square.
+- Analog movement: the move stick walks at the speed the stick is pushed.
 
 ## [0.12.0]
 

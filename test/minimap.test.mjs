@@ -1,8 +1,8 @@
 // Minimap data and clocks. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { World, CS, idx } from '../public/js/world.js';
-import { MinimapData, gameClock, gameDayPart } from '../public/js/minimap.js';
+import { B } from '../src/js/blocks.js';
+import { World, CS, idx } from '../src/js/world.js';
+import { MinimapData, gameClock, gameDayPart } from '../src/js/minimap.js';
 
 const G = 30;
 function arena() {

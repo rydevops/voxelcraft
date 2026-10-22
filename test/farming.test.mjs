@@ -1,12 +1,12 @@
 // Farming, plants, raycasting through foliage, and settings. Run with: npm test
 import assert from 'node:assert/strict';
-import { B, PLANT } from '../public/js/blocks.js';
-import { I, RECIPES, dropsFor, miningInfo } from '../public/js/items.js';
-import { World, CS, SEA } from '../public/js/world.js';
-import { growPlants, GROWTH } from '../public/js/plants.js';
-import { raycast } from '../public/js/player.js';
-import { meshChunk } from '../public/js/mesher.js';
-import { Settings, ACTIONS, keyLabel } from '../public/js/settings.js';
+import { B, PLANT } from '../src/js/blocks.js';
+import { I, RECIPES, dropsFor, miningInfo } from '../src/js/items.js';
+import { World, CS, SEA } from '../src/js/world.js';
+import { growPlants, GROWTH } from '../src/js/plants.js';
+import { raycast } from '../src/js/player.js';
+import { meshChunk } from '../src/js/mesher.js';
+import { Settings, ACTIONS, keyLabel } from '../src/js/settings.js';
 
 const world = new World(1337);
 for (let cx = -3; cx <= 3; cx++) for (let cz = -3; cz <= 3; cz++) world.generateChunk(cx, cz);

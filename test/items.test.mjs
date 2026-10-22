@@ -1,10 +1,10 @@
 // Inventory, mining rules and crafting progression. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { I, RECIPES, GOALS, miningInfo, dropsFor, toolOf, maxStack, smeltFor } from '../public/js/items.js';
-import { Inventory } from '../public/js/inventory.js';
-import { newFurnace, autoFill, tickFurnace, OUTPUT } from '../public/js/furnace.js';
-import { World } from '../public/js/world.js';
+import { B } from '../src/js/blocks.js';
+import { I, RECIPES, GOALS, miningInfo, dropsFor, toolOf, maxStack, smeltFor } from '../src/js/items.js';
+import { Inventory } from '../src/js/inventory.js';
+import { newFurnace, autoFill, tickFurnace, OUTPUT } from '../src/js/furnace.js';
+import { World } from '../src/js/world.js';
 
 // ---- inventory basics ----
 const inv = new Inventory();

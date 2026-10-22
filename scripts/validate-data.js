@@ -1,6 +1,6 @@
-// `npm run validate`: check the content files in public/data/ (blocks, items, loot, recipes, ...) for mistakes.
-import { loadData, buildRegistry, DataError } from '../public/js/registry.js';
-import { paintTile, paintSprite } from '../public/js/tilegen.js';
+// `npm run validate`: check the content files in src/data/ (blocks, items, loot, recipes, ...) for mistakes.
+import { loadData, buildRegistry, DataError } from '../src/js/registry.js';
+import { paintTile, paintSprite } from '../src/js/tilegen.js';
 
 try {
   const data = await loadData();

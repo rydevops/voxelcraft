@@ -1,7 +1,7 @@
 // The soundtrack: track data, the shuffled playlist (random order, no repeats) and what each track plays. Run with: npm test
 import assert from 'node:assert/strict';
-import { MUSIC, GAME_TRACKS, TITLE_TRACK, Playlist, planBar, chordOf, secondsPerBeat, trackSeconds, gapSeconds } from '../public/js/music.js';
-import { loadData, buildRegistry, DataError } from '../public/js/registry.js';
+import { MUSIC, GAME_TRACKS, TITLE_TRACK, Playlist, planBar, chordOf, secondsPerBeat, trackSeconds, gapSeconds } from '../src/js/music.js';
+import { loadData, buildRegistry, DataError } from '../src/js/registry.js';
 
 // ---- several tracks, plus a title theme ----
 assert.ok(GAME_TRACKS.length >= 5, 'a handful of in-game tracks (' + GAME_TRACKS.length + ')');

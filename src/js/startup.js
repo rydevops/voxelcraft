@@ -12,13 +12,6 @@ const nextPaint = () => new Promise((r) => requestAnimationFrame(() => requestAn
 const TITLE_SEED = 20260;   // the world shown behind the title
 const INTRO_HOLD_MS = 2400; // how long the developer logo stays up
 
-// ---- server calls ----
-async function api(route, method = 'GET', body) {
-  const r = await fetch(route, { method, headers: body === undefined ? {} : { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
-  if (!r.ok) throw new Error(`${method} ${route}: ${r.status} ${await r.text()}`);
-  return r.json();
-}
-
 // Free-form seed text -> a number: digits are used as they are, anything else is hashed (like Minecraft's seed box)
 function seedFromText(text) {
   const t = text.trim();
@@ -92,7 +85,8 @@ class TitleScene {
 // ---- the screens ----
 export async function runStartup(ctx) {
   const { params, atlasCanvas, titleLogo, openOptions } = ctx;
-  if (ctx.autoplay) return directStart(params);
+  const { storage } = ctx; // where worlds live: the dev server's folder or this browser's storage (see storage.js)
+  if (ctx.autoplay) return directStart(params, storage);
 
   // the title theme (silent until your first click or key press: browsers do not allow sound before that)
   const { audio } = ctx;
@@ -131,7 +125,8 @@ export async function runStartup(ctx) {
     $('title-credit').textContent = REG.game.studio.name;
     $('t-play').addEventListener('click', () => { show('worlds'); refresh(); });
     $('t-options').addEventListener('click', openOptions);
-    confirmButton($('t-quit'), 'Click again: stop the game server', quitGame);
+    // Quit Game only makes sense with the local dev server (it stops it); an installed or hosted app is just closed like any app
+    if (storage.kind === 'server') confirmButton($('t-quit'), 'Click again: stop the game server', () => quitGame(storage)); else $('t-quit').hidden = true;
     show('title');
 
     // --- worlds ---
@@ -158,7 +153,8 @@ export async function runStartup(ctx) {
     }
     async function refresh() {
       $('world-error').textContent = '';
-      try { worlds = await api('/api/worlds'); } catch (e) { worlds = []; $('world-error').textContent = 'Could not reach the game server: ' + e.message; }
+      try { worlds = await storage.list(); } catch (e) { worlds = []; $('world-error').textContent = 'Could not read your worlds: ' + e.message; }
+      if (!storage.persistent) $('world-error').textContent = 'Your browser is not allowing saved games here: worlds will be lost when you close this tab.';
       if (!worlds.some((w) => w.id === selected)) selected = worlds[0]?.id ?? null;
       render();
       if (!worlds.length && !$('world-error').textContent) openCreate();
@@ -170,7 +166,7 @@ export async function runStartup(ctx) {
       try {
         $('loading').hidden = false;
         await nextPaint();
-        const save = await api('/api/worlds/' + id);
+        const save = await storage.load(id);
         resolve({ id, save });
       } catch (e) {
         busy = false;
@@ -183,7 +179,7 @@ export async function runStartup(ctx) {
     $('w-back').addEventListener('click', () => show('title'));
     confirmButton($('w-del'), 'Click again to delete forever', async () => {
       if (!selected) return;
-      try { await api('/api/worlds/' + selected, 'DELETE'); selected = null; } catch (e) { $('world-error').textContent = e.message; }
+      try { await storage.remove(selected); selected = null; } catch (e) { $('world-error').textContent = e.message; }
       refresh();
     });
 
@@ -207,7 +203,7 @@ export async function runStartup(ctx) {
     async function create() {
       if (busy) return;
       try {
-        const made = await api('/api/worlds', 'POST', { name: $('wc-name').value, mode, seed: seedFromText($('wc-seed').value) });
+        const made = await storage.create({ name: $('wc-name').value, mode, seed: seedFromText($('wc-seed').value) });
         await start(made.id);
       } catch (e) { $('world-error').textContent = 'Could not create the world: ' + e.message; }
     }
@@ -243,13 +239,13 @@ function finish() {
 }
 
 // Test hook: ?autoplay[&world=<id>][&mode=creative][&seed=n] goes straight into a world with no menus
-async function directStart(params) {
+async function directStart(params, storage) {
   let id = params.get('world');
   if (!id) {
     const seed = params.has('seed') ? Number(params.get('seed')) : undefined;
-    id = (await api('/api/worlds', 'POST', { name: 'Autoplay', mode: params.get('mode') || 'survival', seed })).id;
+    id = (await storage.create({ name: 'Autoplay', mode: params.get('mode') || 'survival', seed })).id;
   }
-  return { id, save: await api('/api/worlds/' + id), done: finish };
+  return { id, save: await storage.load(id), done: finish };
 }
 
 async function intro(ctx) {
@@ -280,8 +276,8 @@ async function intro(ctx) {
 }
 
 // Stop the game server (it is a local dev server: quitting the game means closing it down), then say goodbye
-async function quitGame() {
-  try { await fetch('/api/shutdown', { method: 'POST', headers: { 'x-voxelcraft-stop': '1' } }); } catch { /* already gone */ }
+async function quitGame(storage) {
+  await storage.quitGame();
   document.body.innerHTML = '<div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#15110e;color:#fff;font-family:Consolas,monospace;text-align:center"><h1 style="margin:0">Thanks for playing!</h1><p style="color:#bbb;margin:0">The game server has stopped. You can close this tab.<br>Run <b>npm start</b> to play again.</p></div>';
   window.close();
 }

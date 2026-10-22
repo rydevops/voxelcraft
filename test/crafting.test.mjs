@@ -1,9 +1,9 @@
 // Charcoal, fuel alternatives, break timing and crack pacing. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { I, RECIPES, COALS, specIds, specName, miningInfo, WINDOWS } from '../public/js/items.js';
-import { Inventory } from '../public/js/inventory.js';
-import { BreakTimer, crackPixels, crackStage, CRACK_STAGES, BREAK_COOLDOWN } from '../public/js/mining.js';
+import { B } from '../src/js/blocks.js';
+import { I, RECIPES, COALS, specIds, specName, miningInfo, WINDOWS } from '../src/js/items.js';
+import { Inventory } from '../src/js/inventory.js';
+import { BreakTimer, crackPixels, crackStage, CRACK_STAGES, BREAK_COOLDOWN } from '../src/js/mining.js';
 
 // ---- windows: hand, crafting table and furnace; the furnace has slots instead of crafting recipes ----
 assert.deepEqual([...new Set(RECIPES.map((r) => r.station))].map(String).sort(), ['null', 'table'], 'crafting recipes need a table or nothing');

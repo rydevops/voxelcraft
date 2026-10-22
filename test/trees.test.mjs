@@ -1,14 +1,14 @@
 // Tree variants, saplings that regrow them, leaf drops, plus the smaller changes from the same round: tool wear,
 // ore glow, a torch carried in the hand (offhand slot) and placing at the top of the world. Run with: npm test
 import assert from 'node:assert/strict';
-import { B, GLOW, ROLE_LOG, ROLE_LEAF, PLANT } from '../public/js/blocks.js';
-import { I, dropsFor, shatterDrops, toolWear, miningInfo, heldLight, canWear, isOffhand, GOALS, placesOf } from '../public/js/items.js';
-import { REG } from '../public/js/registry.js';
-import { World, CS, CH, SEA, idx } from '../public/js/world.js';
-import { VARIANTS, variantByKey, pickVariant, treeBlocks, growSapling, trunkHeight } from '../public/js/trees.js';
-import { growPlants } from '../public/js/plants.js';
-import { meshChunk } from '../public/js/mesher.js';
-import { Inventory } from '../public/js/inventory.js';
+import { B, GLOW, ROLE_LOG, ROLE_LEAF, PLANT } from '../src/js/blocks.js';
+import { I, dropsFor, shatterDrops, toolWear, miningInfo, heldLight, canWear, isOffhand, GOALS, placesOf } from '../src/js/items.js';
+import { REG } from '../src/js/registry.js';
+import { World, CS, CH, SEA, idx } from '../src/js/world.js';
+import { VARIANTS, variantByKey, pickVariant, treeBlocks, growSapling, trunkHeight } from '../src/js/trees.js';
+import { growPlants } from '../src/js/plants.js';
+import { meshChunk } from '../src/js/mesher.js';
+import { Inventory } from '../src/js/inventory.js';
 
 const count = (w, id) => { let n = 0; for (const c of w.chunks.values()) for (const b of c.data) if (b === id) n++; return n; };
 

@@ -1,14 +1,57 @@
 # VoxelCraft
 
-A small Minecraft-style voxel sandbox: a Node.js server plus a WebGL client. All art and audio is generated, with no downloaded assets, and **all game content is data**: blocks, items, loot, recipes, goals, textures, sounds and world generation are JSON files in `public/data/` (see [public/data/README.md](public/data/README.md)). Add a block, a recipe or a loot drop by editing JSON; no code changes needed.
+A small Minecraft-style voxel sandbox that runs in the browser, on a computer or a phone, and installs as an app (a PWA). All art and audio is generated, with no downloaded assets, and **all game content is data**: blocks, items, loot, recipes, goals, textures, sounds and world generation are JSON files in `src/data/` (see [src/data/README.md](src/data/README.md)). Add a block, a recipe or a loot drop by editing JSON; no code changes needed. What the game can do is listed in [FEATURES.md](FEATURES.md); what changed in each version is in [CHANGELOG.md](CHANGELOG.md).
 
 ```
 npm install
-npm start          # http://localhost:3000  (only one instance can run at a time)
-npm run stop       # stop the running game from another terminal
-npm run validate   # check the content files in public/data/ for mistakes
-npm test           # content, world, items, farming, crafting, physics, lighting, torches, furnaces, survival, equipment, music, worlds-API and server tests (no browser needed)
+npm start          # dev server: http://localhost:3000  (only one instance can run at a time)
+npm run stop       # stop the running dev server from another terminal
+npm run build      # build the web app into the repo root (index.html, app.js, ...)
+npm run preview    # serve the built app the way GitHub Pages does: http://localhost:3000
+npm run validate   # check the content files in src/data/ for mistakes
+npm test           # all the Node tests (no browser needed)
 ```
+
+## Project layout
+
+```
+index.html app.js style.css      the built web app: a FLAT set of files, no folders (this is what GitHub Pages serves)
+manifest.webmanifest sw.js       what makes it installable and offline-capable
+icon-*.png apple-touch-icon.png favicon.png  the app icons
+.nojekyll
+src/        the source: index.html, style.css, js/ (the game), data/ (the content), sw.template.js
+scripts/    server.js (dev server), build.mjs, make-icons.mjs, stop.js, validate-data.js
+test/       Node tests
+```
+
+**Never edit the files in the root by hand**: they are generated from `src/` by `npm run build`, and the tests and CI fail if they are out of date. After changing anything in `src/`, run `npm run build` and commit the result together with the change.
+
+## Hosting on GitHub Pages
+
+1. Push the repository to GitHub (the built files are already in the root).
+2. **Settings → Pages → Build and deployment → Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, and save.
+3. The game is live at `https://<user>.github.io/<repository>/`. Everything uses relative paths, so it works under that sub-path.
+
+On first visit the service worker caches the whole game (under 1 MB of code), so afterwards it starts instantly and works offline. Chrome / Edge offer **Install** in the address bar; on iOS use **Share → Add to Home Screen**, on Android **⋮ → Install app**. After you publish a new version, players get it the next time they open the game (a message asks them to reload).
+
+**Where worlds are saved.** With the Node dev server (`npm start`) each world is a file in `worlds/`. On GitHub Pages or when installed there is no server, so worlds are saved in the browser's own storage (IndexedDB) on that device; the game asks the browser to keep it, and warns on the title screen if the browser would not. Clearing site data deletes the worlds.
+
+## Phones and tablets
+
+On a touch device (primary pointer is a finger) the game switches to on-screen controls by itself; the switch is also in **Options** (and `?touch` / `?desktop` on the address force either way).
+
+| Control | What it does |
+|---|---|
+| Left thumb, anywhere on the left | Floating move stick (analog: walk slowly or fast); push it to the rim to sprint |
+| Drag on the right | Look around |
+| **Break** (hold) / **Use** (hold) | Left click / right click: mine, attack, place, open, till, plant, eat |
+| **Jump** (tap twice in creative to fly) · **Run** · **Sneak** | Jump / swim up, latch sprint, crouch / fly down |
+| **Fly** (creative) · **Torch** | Toggle flying; place the torch held in the shield slot |
+| **Bag** · **II** | Inventory (or the creative palette) · pause menu |
+| Tap the hotbar | Pick a slot |
+| Inventory button at the top | What a tap does: pick up / place, split / place one, quick move / wear |
+
+The game asks for full screen and landscape when you press Resume.
 
 ## Starting up
 
@@ -60,7 +103,7 @@ The menu has a **Mode** button: **Creative** gives a block palette (E), unlimite
 
 ## Content is data
 
-Everything below is described in `public/data/*.json` and read at startup (the page shows a clear message if a file is wrong):
+Everything below is described in `src/data/*.json` and read at startup (the page shows a clear message if a file is wrong):
 `blocks.json` (look, hardness, tool, sound, loot, plant growth, what a block opens/tills into/spreads onto), `items.json` (tools, food, seeds, tool tiers),
 `loot.json`, `recipes.json` (recipes, stations, crafting windows), `goals.json`, `textures.json` (procedural generators with parameters, hand-drawn
 pixel art, or PNG files), `sounds.json`, `worldgen.json` (terrain, ores, trees...) and `game.json` (health, hunger, falling, tilling, day length...).
@@ -87,7 +130,7 @@ so new content needs no code. Tests prove it by adding a whole new ore, item, to
 - **Hunger and healing**: standing still costs nothing; walking drains the bar slowly, **sprinting about five times faster**, **every jump costs a little (more when sprinting)** and **mining slowly drains it** too, per block broken and for as long as you are working at one (`jumpCost`, `sprintJumpCost`, `miningCost`, `miningDrainPerSecond` in `game.json`). Bread restores 3 icons; hold right-click to eat (the food shrinks as you chew, with crumbs and juice flying off it). At 3 icons or fewer you can no longer sprint. At zero you move more slowly and **lose half a heart every 15 seconds until you die**. **Saturation** is what heals you: eating also fills a hidden reserve (the thin gold line above the hunger icons), capped at what your bar holds. Once the hunger bar is full, healing spends saturation (half a heart every 1.5 seconds, one unit each); when the reserve runs dry half an icon of hunger disappears and healing stops until you eat again. An empty reserve on its own never drains the hunger bar. A loaf of bread heals a few hearts. All tunable in `game.json` -> `hunger`; what each food gives is `food` and `saturation` on the item.
 - **Shovels**: grass, dirt, sand and snow are slow to dig by hand; wood/stone/iron shovels speed this up 2x / 3.5x / 5.5x.
 - **Goals tracker**: shows your latest achievement and the next two goals.
-- **Persistence** (`server.js`): the Node server keeps each world (seed, edits, inventory, tool wear, health, progress, position) as `worlds/<id>.json`, written atomically. API: `GET/POST /api/worlds`, `GET/POST/DELETE /api/worlds/<id>`.
+- **Persistence** (`scripts/server.js`, `src/js/storage.js`): the dev server keeps each world (seed, edits, inventory, tool wear, health, progress, position) as `worlds/<id>.json`, written atomically. API: `GET/POST /api/worlds`, `GET/POST/DELETE /api/worlds/<id>`. Without the server the game keeps the same data in the browser (IndexedDB) behind the same interface; the game picks one at startup by asking `api/ping`.
 - **One instance at a time**: the server writes `.voxelcraft.lock` and refuses to start a second copy (it checks the old one really responds, so a crash never blocks you). In the browser, only one tab can run the game; a second tab shows a message instead of loading. `npm run stop` asks the server to shut down (loopback only, and it needs a header a web page can't send).
 
 ## Under the hood

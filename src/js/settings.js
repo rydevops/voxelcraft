@@ -1,5 +1,6 @@
 // Player settings (mouse sensitivity, FOV, volume...) and remappable key bindings.
 // Stored in the browser's localStorage so they follow the player between worlds.
+import { browserWantsTouch } from './touchmath.js';
 
 // Every rebindable action: id, label shown in the options panel, group, default key (KeyboardEvent.code)
 export const ACTIONS = [
@@ -30,6 +31,7 @@ const DEFAULTS = {
   fov: 75,
   musicVolume: 0.8,
   sfxVolume: 0.9,
+  touchControls: browserWantsTouch(), // on-screen sticks and buttons: on by default on phones and tablets
 };
 
 export const BASE_TURN_RATE = 0.0022; // radians of rotation per pixel of mouse movement at sensitivity 1.0

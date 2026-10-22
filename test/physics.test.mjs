@@ -1,13 +1,13 @@
 // Water flow, tree felling, step-assist, fall damage and grass spreading. Run with: npm test
 import assert from 'node:assert/strict';
-import { B, IS_WATER, WATER_LEVEL, TILLS_INTO } from '../public/js/blocks.js';
-import { World, CS, idx } from '../public/js/world.js';
-import { WaterSim } from '../public/js/water.js';
-import { Player } from '../public/js/player.js';
-import { findFallingTree, removeTree, landTree, shatterTree, fallDirection, landingCell } from '../public/js/physics.js';
-import { shatterDrops, I } from '../public/js/items.js';
-import { growPlants, trySpreadGrass, spreadGrass, updateHydration } from '../public/js/plants.js';
-import { GravitySim } from '../public/js/gravity.js';
+import { B, IS_WATER, WATER_LEVEL, TILLS_INTO } from '../src/js/blocks.js';
+import { World, CS, idx } from '../src/js/world.js';
+import { WaterSim } from '../src/js/water.js';
+import { Player } from '../src/js/player.js';
+import { findFallingTree, removeTree, landTree, shatterTree, fallDirection, landingCell } from '../src/js/physics.js';
+import { shatterDrops, I } from '../src/js/items.js';
+import { growPlants, trySpreadGrass, spreadGrass, updateHydration } from '../src/js/plants.js';
+import { GravitySim } from '../src/js/gravity.js';
 
 // A flat test arena: stone up to y=29, grass at y=30, air above, 3x3 chunks around the origin
 const G = 30;

@@ -116,8 +116,11 @@ export class Player {
     if (input.back) { mx += sin; mz += cos; }
     if (input.left) { mx -= cos; mz += sin; }
     if (input.right) { mx += cos; mz -= sin; }
+    // the touch stick is analog: pushing it half way walks at half speed
+    if (input.ahead) { mx -= sin * input.ahead; mz -= cos * input.ahead; }
+    if (input.strafe) { mx += cos * input.strafe; mz -= sin * input.strafe; }
     const len = Math.hypot(mx, mz);
-    if (len > 0) { mx /= len; mz /= len; }
+    if (len > 1) { mx /= len; mz /= len; }
 
     let speed = input.sprint && !this.crouching ? 6.4 : 4.4;
     if (this.crouching) speed *= CROUCH_SPEED;

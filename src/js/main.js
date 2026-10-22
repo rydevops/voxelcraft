@@ -26,6 +26,10 @@ import { WaterSim } from './water.js';
 import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
 import { runStartup } from './startup.js';
+import { openStorage } from './storage.js';
+import { createTouchControls } from './touch.js';
+import { lookDelta } from './touchmath.js';
+import { installFit } from './fit.js';
 import { findFallingTree, removeTree, landTree, shatterTree, fallDirection } from './physics.js';
 
 const GAME = REG.game;      // survival rules and tuning numbers from data/game.json
@@ -35,6 +39,13 @@ THREE.ColorManagement.enabled = false; // author colours exactly as written (ret
 
 const $ = (id) => document.getElementById(id);
 const settings = new Settings();
+// Phones and tablets get on-screen controls (?touch / ?desktop in the address force either way; the Options screen has a switch)
+const urlParams = new URLSearchParams(location.search);
+const forcedTouch = urlParams.has('touch') ? true : urlParams.has('desktop') ? false : null;
+const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
+let touchMode = wantsTouch();
+document.body.classList.toggle('touch', touchMode);
+installFit();
 const params = new URLSearchParams(location.search);
 
 // Only one VoxelCraft tab can run at a time: two tabs would fight over the same saved world.
@@ -286,14 +297,14 @@ const audio = new AudioEngine();
 window.__audio = audio; // for poking at from the console / tests
 window.__atlas = atlasCanvas;
 audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
+const storage = await openStorage(); // the dev server's worlds folder, or this browser's own storage (installed / hosted app)
 const startup = await runStartup({
   params, autoplay: AUTOPLAY, atlasCanvas, titleLogo: logoArt, openOptions: () => options.open(),
-  renderer, scene, camera, materials, sky, windTime, audio,
+  renderer, scene, camera, materials, sky, windTime, audio, storage,
 });
 held.visible = true;
 audio.setScene('game'); // from here on the shuffled soundtrack plays
 const worldId = startup.id;
-const WORLD_URL = '/api/worlds/' + worldId;
 
 // ---------------------------------------------------------------------------------------
 // Game state
@@ -570,16 +581,57 @@ let mouseDown = { left: false, right: false };
 
 // Key bindings live in `settings`, so every check goes through the action name, never a hard-coded key.
 const isDown = (action) => keys.has(settings.key(action));
+
+// Touch controls: the buttons do what the mouse and keys do, through the same state the rest of the game already reads
+function turnBy(dYaw, dPitch) {
+  player.yaw += dYaw;
+  player.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, player.pitch + dPitch));
+}
+function goFullscreen() {
+  const de = document.documentElement;
+  if (document.fullscreenElement || !de.requestFullscreen || matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches) return;
+  de.requestFullscreen({ navigationUI: 'hide' }).then(() => window.screen.orientation?.lock?.('landscape')).catch(() => {});
+}
+const touchCtl = createTouchControls({
+  changed: () => syncInput(),
+  look: (dx, dy) => {
+    if (!playing) return;
+    const r = lookDelta(dx, dy, BASE_TURN_RATE * settings.get('sensitivity'), settings.get('invertY'));
+    turnBy(r.yaw, r.pitch);
+  },
+  attack: (on) => { if (!playing) return; mouseDown.left = on; if (!on) resetBreak(); },
+  use: (on) => {
+    if (!playing) return;
+    mouseDown.right = on;
+    rightFresh = on;
+    if (on) placeTimer = 0;
+  },
+  jump: () => {
+    const now = performance.now();
+    if (creative && now - lastJump < 300) setFlying(!player.flying); // double-tap to fly
+    lastJump = now;
+  },
+  fly: () => setFlying(!player.flying),
+  offhand: () => { if (playing) useOffhand(); },
+  inventory: () => { if (playing && !screen) openScreen(creative ? 'palette' : 'inv'); },
+  closeScreen: () => closeScreen(),
+  menu: () => { if (!playing) return; setPlaying(false); $('play').textContent = 'Resume'; save_(); },
+});
+touchCtl.setEnabled(touchMode);
+
 function syncInput() {
+  const t = touchCtl.state;
   input.forward = isDown('forward');
   input.back = isDown('back');
   input.left = isDown('left');
   input.right = isDown('right');
-  input.jump = isDown('jump');
-  sprintHeld = isDown('sprint');
+  input.strafe = t.strafe;   // the move stick: -1..1 sideways and ahead, scaled by how far it is pushed
+  input.ahead = t.forward;
+  input.jump = isDown('jump') || t.jump;
+  sprintHeld = isDown('sprint') || t.sprint || t.edge;
   input.sprint = sprintHeld && sprintAllowed();
-  input.crouch = isDown('crouch');
-  input.down = isDown('crouch') || isDown('down'); // flying: crouch key goes down
+  input.crouch = isDown('crouch') || t.crouch;
+  input.down = isDown('crouch') || isDown('down') || t.crouch; // flying: crouch key goes down
 }
 
 // Advance the clock; every full day the moon moves on to its next phase
@@ -601,7 +653,7 @@ function openScreen(kind, context = 'hand', at = null) {
   if (kind === 'inv') ui.openInventory(slot, context, at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
   else ui.openPalette();
   document.exitPointerLock();
-  if (AUTOPLAY) setPlaying(false);
+  if (AUTOPLAY || touchMode) setPlaying(false); // (no pointer lock to lose, so there is no unlock event to pause us)
 }
 function hideScreen() {
   if (screen === 'inv') ui.closeInventory(); else if (screen === 'palette') ui.closePalette();
@@ -682,22 +734,22 @@ function dropOne() {
 }
 
 window.addEventListener('wheel', (e) => {
-  if (!playing) return;
+  if (!playing || touchMode) return;
   selectSlot(slot + (e.deltaY > 0 ? 1 : -1));
 }, { passive: true });
 
 window.addEventListener('mousemove', (e) => {
-  if (!playing) return;
+  if (!playing || touchMode) return;
   const rate = BASE_TURN_RATE * settings.get('sensitivity');
   // browsers occasionally report one huge bogus delta when the pointer lock engages; ignore those
   const mx = Math.abs(e.movementX) > 500 ? 0 : e.movementX;
   const my = Math.abs(e.movementY) > 500 ? 0 : e.movementY;
-  player.yaw -= mx * rate;
-  player.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, player.pitch - my * rate * (settings.get('invertY') ? -1 : 1)));
+  turnBy(-mx * rate, -my * rate * (settings.get('invertY') ? -1 : 1));
 });
 
 window.addEventListener('contextmenu', (e) => e.preventDefault());
 window.addEventListener('mousedown', (e) => {
+  if (touchMode) return; // taps are handled by the on-screen controls
   ensureLock();
   if (!playing) return;
   if (e.button === 0) { mouseDown.left = true; }
@@ -715,6 +767,7 @@ window.addEventListener('mousedown', (e) => {
   }
 });
 window.addEventListener('mouseup', (e) => {
+  if (touchMode) return;
   if (e.button === 0) { mouseDown.left = false; resetBreak(); }
   if (e.button === 2) { mouseDown.right = false; rightFresh = false; }
 });
@@ -724,6 +777,7 @@ const overlay = $('overlay');
 const canvasEl = $('game');
 function lock() {
   if (AUTOPLAY) return;
+  if (touchMode) { if (!screen && !dead && !optionsOpen) setPlaying(true); return; } // nothing to capture on a touch screen
   // "unadjustedMovement" asks for raw mouse deltas, bypassing OS pointer acceleration (much more consistent aim)
   const plain = () => canvasEl.requestPointerLock?.();
   if (!settings.get('rawInput')) return plain();
@@ -740,7 +794,7 @@ let lastLockTry = 0;
 // If the mouse is not captured while we are playing, capture it on the next key press or click
 // (those are the user gestures browsers require). Retries at most twice a second.
 function ensureLock() {
-  if (AUTOPLAY || !playing || optionsOpen || dead || document.pointerLockElement === canvasEl) return;
+  if (AUTOPLAY || touchMode || !playing || optionsOpen || dead || document.pointerLockElement === canvasEl) return;
   const now = performance.now();
   if (now - lastLockTry < 500) return;
   lastLockTry = now;
@@ -749,7 +803,7 @@ function ensureLock() {
 canvasEl.style.cursor = 'none';
 function setPlaying(on) {
   playing = on;
-  if (!on) { keys.clear(); syncInput(); mouseDown = { left: false, right: false }; resetBreak(); }
+  if (!on) { keys.clear(); touchCtl.reset(); syncInput(); mouseDown = { left: false, right: false }; resetBreak(); }
   overlay.classList.toggle('hidden', on || !!screen || dead);
 }
 document.addEventListener('pointerlockchange', () => {
@@ -777,6 +831,7 @@ function resumeGame() {
 }
 $('play').addEventListener('click', () => {
   audio.start();
+  if (touchMode) goFullscreen();
   if (AUTOPLAY) setPlaying(true); else lock();
 });
 
@@ -791,7 +846,7 @@ async function quitToTitle() {
   flushWorld();
   await save_();
   skipSave = true; // nothing may write to the world again after this
-  location.href = '/?title';
+  location.href = '?title';
 }
 $('quitbtn').addEventListener('click', quitToTitle);
 function toggleMusic() {
@@ -841,10 +896,21 @@ function renderControlsTable() {
 
 function applySettings() {
   audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
+  const was = touchMode;
+  touchMode = wantsTouch();
+  if (touchMode !== was) {
+    document.body.classList.toggle('touch', touchMode);
+    touchCtl.setEnabled(touchMode);
+    mouseDown = { left: false, right: false };
+    if (touchMode) document.exitPointerLock?.();
+  }
+  $('tagline').textContent = touchMode ? 'Game paused' : 'Game paused \u2014 press Esc to resume';
   renderControlsTable();
 }
 settings.onChange(applySettings);
 applySettings();
+// the service worker installed a newer build of the game (see the registration script in the built index.html)
+window.addEventListener('vc-update', () => toast('A new version is ready. Reload to play it.'));
 
 // ---- armor: a row of shield icons above the health bar, one icon per two armor points worn ----
 let shownArmor = -1;
@@ -1394,7 +1460,7 @@ function snapshot() {
 }
 function save_() {
   if (skipSave) return Promise.resolve();
-  const p = fetch(WORLD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: snapshot() }).catch(() => {});
+  const p = Promise.resolve(storage.save(worldId, snapshot())).catch(() => {});
   world.editsDirty = false;
   return p;
 }
@@ -1404,11 +1470,15 @@ function flushWorld() {
   gravitySim.flush();
 }
 setInterval(() => { if (playing) save_(); }, 10000);
-window.addEventListener('beforeunload', () => {
-  if (skipSave) return;
+// Leaving: browsers give a page little time, so save as soon as it is hidden (switching apps on a phone) and again on unload
+function saveOnLeave() {
+  if (skipSave || quitting) return;
   flushWorld();
-  navigator.sendBeacon(WORLD_URL, new Blob([snapshot()], { type: 'application/json' }));
-});
+  storage.saveOnExit(worldId, snapshot());
+}
+window.addEventListener('beforeunload', saveOnLeave);
+window.addEventListener('pagehide', saveOnLeave);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveOnLeave(); });
 
 // ---------------------------------------------------------------------------------------
 // Main loop
@@ -1429,6 +1499,7 @@ function frame(now) {
   fpsAcc += dt; fpsN++;
   if (fpsAcc > 0.5) { fps = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; }
 
+  touchCtl.sync({ show: playing && !screen && !dead && !optionsOpen, screen, creative, flying: player.flying });
   if (playing) {
     player.speedMul = isStarving() ? HUNGER.starvingSpeed : 1;
     input.sprint = sprintHeld && sprintAllowed();

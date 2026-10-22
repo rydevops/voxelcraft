@@ -2,7 +2,7 @@
 
 A living list of what VoxelCraft can do, grouped by area. When a pull request adds, changes or removes a feature, update this
 file in the same change (and add a line to [CHANGELOG.md](CHANGELOG.md)). Everything about blocks, items, recipes, loot, goals,
-textures, sounds, world generation, music and game rules is data in `data/*.json`, described in `data/README.md`.
+textures, sounds, world generation, music and game rules is data in `src/data/*.json`, described in `src/data/README.md`.
 
 Legend: **✔** works today · **◐** partly there / limited · **✘** not built yet.
 
@@ -66,6 +66,20 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view, invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
+| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Torch / Bag / Pause buttons, hotbar by tap |
+| ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |
+| ✔ | Screens scale to fit small displays (HUD, inventory, options, menus), respect notches and safe areas, and ask for landscape |
+| ◐ | Controllers / gamepads are not supported |
+
+## Install and hosting
+| | Feature |
+|---|---|
+| ✔ | Runs from GitHub Pages (or any static host) as a flat set of files in the repository root; no server needed |
+| ✔ | Installable web app (PWA): home-screen / desktop icon, full-screen landscape, own window |
+| ✔ | Works offline after the first visit; new versions install themselves and ask for a reload |
+| ✔ | Worlds saved in the browser (IndexedDB) with a request for persistent storage; warns if the browser cannot keep them |
+| ✔ | Node dev server saves worlds as files instead (`npm start`) |
+| ◐ | No cloud saves or sharing worlds between devices yet (copy the files from `worlds/` when using the dev server) |
 
 ## Under the hood
 | | Feature |
@@ -73,3 +87,4 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Content as data (JSON) with validation that explains mistakes; `npm run validate` |
 | ✔ | Pure-logic modules tested in Node (`npm test`): world generation, lighting, physics, furnaces, hunger, music, inventory, saves |
 | ✔ | Node dev server with one-instance lock, `npm run stop`, and a multi-world save API |
+| ✔ | `npm run build` bundles the game (three.js, code and all content) into one `app.js` and writes the PWA files; `build:check` and CI keep the committed build current |

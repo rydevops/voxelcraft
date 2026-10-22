@@ -1,17 +1,23 @@
 {
   "name": "voxelcraft",
-  "version": "0.12.0",
-  "description": "A tiny Minecraft-style voxel sandbox: Node server + WebGL client with procedural terrain, art and music.",
+  "version": "1.0.0",
+  "description": "A tiny Minecraft-style voxel sandbox: a WebGL game that runs in the browser, installs as a PWA and hosts on GitHub Pages.",
   "type": "module",
-  "main": "server.js",
+  "main": "scripts/server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "node test/data.test.mjs && node test/world.test.mjs && node test/items.test.mjs && node test/farming.test.mjs && node test/crafting.test.mjs && node test/physics.test.mjs && node test/lighting.test.mjs && node test/torch.test.mjs && node test/furnace.test.mjs && node test/survival.test.mjs && node test/equipment.test.mjs && node test/music.test.mjs && node test/trees.test.mjs && node test/worlds.test.mjs && node test/minimap.test.mjs && node test/server.test.mjs",
+    "start": "node scripts/server.js",
+    "test": "node test/data.test.mjs && node test/world.test.mjs && node test/items.test.mjs && node test/farming.test.mjs && node test/crafting.test.mjs && node test/physics.test.mjs && node test/lighting.test.mjs && node test/torch.test.mjs && node test/furnace.test.mjs && node test/survival.test.mjs && node test/equipment.test.mjs && node test/music.test.mjs && node test/trees.test.mjs && node test/worlds.test.mjs && node test/minimap.test.mjs && node test/storage.test.mjs && node test/touchmath.test.mjs && node test/docs.test.mjs && node test/pwa.test.mjs && node test/server.test.mjs",
     "stop": "node scripts/stop.js",
-    "validate": "node scripts/validate-data.js"
+    "validate": "node scripts/validate-data.js",
+    "build": "node scripts/build.mjs",
+    "build:check": "node scripts/build.mjs --check",
+    "preview": "node scripts/server.js --preview"
   },
   "license": "MIT",
   "dependencies": {
     "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

@@ -21,12 +21,12 @@ const api = async (route, method = 'GET', body) => {
   return { status: r.status, data, text };
 };
 async function up() {
-  const child = spawn(process.execPath, ['server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, ['scripts/server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   child.out = '';
   child.stdout.on('data', (d) => (child.out += d));
   child.stderr.on('data', (d) => (child.out += d));
   child.exited = new Promise((r) => child.on('exit', r));
-  for (let i = 0; i < 60; i++) { try { if ((await fetch(URL + '/api/ping')).ok) return child; } catch { /* not yet */ } await sleep(100); }
+  for (let i = 0; i < 60; i++) { try { if ((await fetch(URL + '/__voxelcraft/ping')).ok) return child; } catch { /* not yet */ } await sleep(100); }
   throw new Error('server did not start: ' + child.out);
 }
 const down = async (child) => { spawnSync(process.execPath, ['scripts/stop.js'], { cwd: ROOT, env }); await child.exited; };

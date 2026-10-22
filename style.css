@@ -283,3 +283,75 @@ body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #deb
 
 #fur-flame.lit i { animation: flicker 0.3s steps(2, end) infinite alternate; filter: brightness(1.1); }
 @keyframes flicker { from { transform: translateY(0) scaleX(1); filter: brightness(1); } to { transform: translateY(-1px) scaleX(0.94); filter: brightness(1.3); } }
+
+/* =====================================================================================================================
+   Small screens and touch.  fit.js sets --hud (the HUD scale) and --fit (per window) from the window size, so the layout
+   above stays the desktop layout and everything simply shrinks to fit on a phone.
+   ===================================================================================================================== */
+html, body { touch-action: none; overscroll-behavior: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+#recipes, #world-list, .opt-body, #palette-grid { touch-action: pan-y; }
+.pc-only { display: revert; }
+.touch-only { display: none; }
+body.touch .touch-only { display: revert; }
+body.touch .pc-only { display: none; }
+
+/* HUD: shrinks from its own anchor so nothing drifts off screen */
+#hotbar { transform: translateX(-50%) scale(var(--hud, 1)); transform-origin: bottom center; bottom: calc(14px + env(safe-area-inset-bottom)); }
+#bars { transform: translateX(-50%) scale(var(--hud, 1)); transform-origin: bottom center; bottom: calc(14px + env(safe-area-inset-bottom) + 66px * var(--hud, 1)); }
+#blockname { bottom: calc(14px + env(safe-area-inset-bottom) + 100px * var(--hud, 1)); }
+#eatbar { transform: translateX(-50%) scale(var(--hud, 1)); }
+#hud-right { transform: scale(var(--hud, 1)); transform-origin: top right; top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right)); }
+#lookat, #toast { transform: translateX(-50%) scale(var(--hud, 1)); transform-origin: top center; }
+
+/* windows: shrunk (never enlarged) to fit; the old height caps are replaced by the scale */
+.inv-panel, .pal-panel, .opt-panel, .world-panel, #menu, #title-menu, #death-box { transform: scale(var(--fit, 1)); transform-origin: center; }
+.inv-panel { max-height: none; }
+#recipes { max-height: max(62vh, 300px); }
+.pal-panel { display: flex; flex-direction: column; align-items: center; }
+.opt-panel { max-height: none; width: 640px; }
+.opt-body { max-height: 52vh; }
+#death-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+#death { align-items: center; }
+
+/* ---- touch mode ---- */
+body.touch #controls, body.touch #debug { display: none; }
+body.touch button:hover:not(:disabled) { background: #7a7a82; }
+body.touch #hotbar { z-index: 6; }
+#rotate { display: none; position: fixed; inset: 0; z-index: 60; align-items: center; justify-content: center; padding: 24px; text-align: center; background: #15110e; color: #ffe27a; font-size: 20px; }
+@media (orientation: portrait) { body.touch #rotate { display: flex; } }
+@media (max-height: 520px) { body.touch #goals { display: none; } }
+
+:root { --tb: clamp(46px, 12vmin, 78px); --big: calc(var(--tb) * 1.3); --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); --sb: env(safe-area-inset-bottom); --st: env(safe-area-inset-top); }
+#touch { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
+body.touch #touch:not([hidden]) { display: block; }
+.tz { position: absolute; top: 0; bottom: 0; pointer-events: auto; touch-action: none; }
+.tz.look { left: 0; right: 0; }
+.tz.move { left: 0; width: 42%; }
+.stick { position: absolute; width: 116px; height: 116px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.07); pointer-events: none; }
+.stick[hidden] { display: none; }
+.stick.ghost { left: calc(12vmin + var(--sl)); bottom: calc(14vmin + var(--sb)); opacity: 0.7; }
+.stick.live { margin: -58px 0 0 -58px; }
+.stick .knob { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.4); border: 3px solid rgba(255, 255, 255, 0.7); transform: translate(-50%, -50%); }
+
+.tb { position: absolute; width: var(--tb); height: var(--tb); display: flex; align-items: center; justify-content: center; border-radius: 50%; box-sizing: border-box;
+  font: bold clamp(11px, calc(var(--tb) * 0.25), 17px) var(--mc-font); color: #fff; text-shadow: 1px 1px 0 #000; text-align: center;
+  background: rgba(20, 20, 26, 0.5); border: 3px solid rgba(255, 255, 255, 0.5); pointer-events: auto; touch-action: none; cursor: default; }
+.tb[hidden] { display: none; }
+.tb.on { background: rgba(255, 226, 122, 0.55); border-color: #ffe27a; color: #1a1400; text-shadow: none; }
+.tb.attack, .tb.use { width: var(--big); height: var(--big); right: calc(3vmin + var(--sr)); }
+.tb.attack { bottom: calc(5vmin + var(--sb)); background: rgba(190, 60, 50, 0.5); }
+.tb.use { bottom: calc(5vmin + var(--sb) + var(--big) + 1.5vmin); background: rgba(50, 120, 190, 0.5); }
+.tb.jump { right: calc(3vmin + var(--sr) + var(--big) + 2vmin); bottom: calc(5vmin + var(--sb)); }
+.tb.fly { right: calc(3vmin + var(--sr) + var(--big) + 2vmin); bottom: calc(5vmin + var(--sb) + var(--tb) + 1.5vmin); }
+.tb.sprint { left: calc(12vmin + var(--sl)); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
+.tb.crouch { left: calc(12vmin + var(--sl) + var(--tb) + 2vmin); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
+.tb.menu, .tb.inv, .tb.off { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); border-radius: 12px; font-size: clamp(10px, calc(var(--tb) * 0.2), 14px); }
+.tb.menu { left: calc(2vmin + var(--sl)); }
+.tb.inv { left: calc(2vmin + var(--sl) + var(--tb) * 0.8 + 1.5vmin); }
+.tb.off { left: calc(2vmin + var(--sl) + (var(--tb) * 0.8 + 1.5vmin) * 2); }
+
+/* above the inventory / creative palette: close it, and choose what a tap does */
+#t-close { position: fixed; z-index: 12; top: calc(10px + var(--st)); right: calc(10px + var(--sr)); font-size: 22px; border-radius: 12px; background: rgba(120, 30, 30, 0.8); }
+#t-invmode { position: static; width: auto; height: auto; align-self: flex-start; padding: 8px 14px; border-radius: 10px; font-size: 14px; background: rgba(20, 20, 26, 0.85); }
+body.touch .inv-col:first-child > h2 { display: none; }
+body:not(.touch) #t-close, body:not(.touch) #t-invmode { display: none; }

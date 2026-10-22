@@ -1,7 +1,7 @@
 // The content registry. Everything about blocks, items, loot, recipes, goals, textures, sounds, world generation
-// and game rules lives in JSON files under public/data/. This module loads them (in the browser or in Node),
+// and game rules lives in JSON files under src/data/. This module loads them (in the browser or in Node),
 // checks that every reference between them is valid, and resolves names to numeric ids for the engine.
-// Adding or changing content = editing JSON; no engine code needs to change. See public/data/README.md.
+// Adding or changing content = editing JSON; no engine code needs to change. See src/data/README.md.
 
 import { GLYPHS } from './pixelfont.js';
 
@@ -16,6 +16,8 @@ const KEY_RE = /^[a-z][a-z0-9_]*$/;
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && !!process.versions?.node;
 
 export async function loadData() {
+  // the built web app has every content file baked into app.js (see scripts/build.mjs): nothing to fetch
+  if (globalThis.__VOXELCRAFT_CONTENT__) return structuredClone(globalThis.__VOXELCRAFT_CONTENT__);
   const out = {};
   const base = new URL('../data/', import.meta.url);
   if (isNode) {
@@ -398,7 +400,7 @@ try {
   if (!isNode && typeof document !== 'undefined') { // show a readable message instead of a blank page
     document.body.innerHTML = '<pre style="margin:0;padding:24px;min-height:100vh;box-sizing:border-box;background:#1b0f0f;color:#ffd6d6;font:14px/1.5 Consolas,monospace;white-space:pre-wrap">' +
       '<b style="font-size:18px">VoxelCraft could not load its content files</b>\n\n' + String(e.message).replace(/</g, '&lt;') +
-      '\n\nFix the file(s) under public/data/ and reload. See public/data/README.md.</pre>';
+      '\n\nFix the file(s) under src/data/ and reload. See src/data/README.md.</pre>';
     await new Promise(() => {});
   }
   throw e;

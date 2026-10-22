@@ -6,8 +6,13 @@ import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC = path.join(ROOT, 'public');
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SRC = path.join(ROOT, 'src');
+// Preview mode (npm run preview) serves the BUILT app from the repo root exactly like GitHub Pages does: flat files, no
+// /api, so the game saves to the browser's own storage. The normal mode serves the source in src/ with the world API.
+const PREVIEW = process.argv.includes('--preview') || process.env.VOXELCRAFT_PREVIEW === '1';
+const PREVIEW_FILE = /^[\w.-]+\.(html|js|css|png|ico|webmanifest|json|txt)$/;
+const PREVIEW_HIDDEN = new Set(['package.json', 'package-lock.json']);
 const THREE_BUILD = path.join(ROOT, 'node_modules', 'three', 'build');
 // The environment overrides exist so automated tests can run a throw-away server without touching a real world.
 const WORLDS_DIR = process.env.VOXELCRAFT_WORLDS || path.join(ROOT, 'worlds');
@@ -24,6 +29,8 @@ const MIME = {
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.webmanifest': 'application/manifest+json',
+  '.txt': 'text/plain; charset=utf-8',
   '.ico': 'image/x-icon',
 };
 
@@ -161,7 +168,7 @@ const isLoopback = (req) => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(re
 // Ask whatever is listening on `port` whether it is VoxelCraft.
 function ping(port, timeoutMs = 800) {
   return new Promise((resolve) => {
-    const req = http.get({ host: '127.0.0.1', port, path: '/api/ping', timeout: timeoutMs }, (res) => {
+    const req = http.get({ host: '127.0.0.1', port, path: '/__voxelcraft/ping', timeout: timeoutMs }, (res) => {
       let body = '';
       res.on('data', (c) => (body += c));
       res.on('end', () => {
@@ -206,8 +213,9 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = decodeURIComponent(url.pathname);
 
-  if (pathname === '/api/ping') return send(res, 200, JSON.stringify({ game: 'voxelcraft', pid: process.pid }), MIME['.json']);
-  if (pathname === '/api/shutdown') {
+  // control endpoints (used by the single-instance check and `npm run stop`); /api/ping is the same thing for the game page
+  if (pathname === '/__voxelcraft/ping' || (!PREVIEW && pathname === '/api/ping')) return send(res, 200, JSON.stringify({ game: 'voxelcraft', pid: process.pid, preview: PREVIEW }), MIME['.json']);
+  if (pathname === '/__voxelcraft/shutdown' || (!PREVIEW && pathname === '/api/shutdown')) {
     // POST only, from this machine only, and with a custom header (a web page can't send one cross-origin)
     if (req.method !== 'POST' || !isLoopback(req) || req.headers[STOP_HEADER] !== '1') return send(res, 403, 'Forbidden');
     send(res, 200, '{"ok":true}', MIME['.json']);
@@ -215,13 +223,18 @@ const server = http.createServer(async (req, res) => {
     setTimeout(() => shutdown(0), 50);
     return;
   }
-  if (pathname === '/api/worlds' || pathname.startsWith('/api/worlds/')) {
+  if (!PREVIEW && (pathname === '/api/worlds' || pathname.startsWith('/api/worlds/'))) {
     return handleWorlds(req, res, pathname).catch((err) => send(res, 500, String(err.message)));
+  }
+  if (PREVIEW) { // the built app: only the flat files in the repo root
+    const name = pathname === '/' ? 'index.html' : pathname.slice(1);
+    if (!PREVIEW_FILE.test(name) || PREVIEW_HIDDEN.has(name)) return send(res, 404, 'Not found');
+    return serveFile(res, ROOT, name);
   }
   if (pathname.startsWith('/vendor/')) {
     return serveFile(res, THREE_BUILD, pathname.slice('/vendor/'.length));
   }
-  return serveFile(res, PUBLIC, pathname === '/' ? 'index.html' : pathname.slice(1));
+  return serveFile(res, SRC, pathname === '/' ? 'index.html' : pathname.slice(1));
 });
 
 function shutdown(code = 0) {
@@ -250,7 +263,7 @@ server.on('error', (err) => {
 
 server.listen(PORT, async () => {
   try {
-    await prepareWorlds();
+    if (!PREVIEW) await prepareWorlds(); // (preview has no world files: the app stores worlds in the browser)
     await acquireLock();
   } catch (err) {
     if (err.code === 'EEXIST') {

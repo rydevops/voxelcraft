@@ -1,9 +1,9 @@
 // Furnaces: input / fuel / output slots, cooking time, fuel burning, lit state and saving. Run with: npm test
 import assert from 'node:assert/strict';
-import { B } from '../public/js/blocks.js';
-import { I, smeltFor, fuelSeconds, SMELTING } from '../public/js/items.js';
-import { Inventory } from '../public/js/inventory.js';
-import { newFurnace, tickFurnace, isLit, clickFurnaceSlot, quickInsert, autoFill, Furnaces, INPUT, FUEL, OUTPUT, isFuel, isSmeltable } from '../public/js/furnace.js';
+import { B } from '../src/js/blocks.js';
+import { I, smeltFor, fuelSeconds, SMELTING } from '../src/js/items.js';
+import { Inventory } from '../src/js/inventory.js';
+import { newFurnace, tickFurnace, isLit, clickFurnaceSlot, quickInsert, autoFill, Furnaces, INPUT, FUEL, OUTPUT, isFuel, isSmeltable } from '../src/js/furnace.js';
 
 const run = (f, seconds, dt = 0.25) => { for (let t = 0; t < seconds - 1e-9; t += dt) tickFurnace(f, dt); };
 
