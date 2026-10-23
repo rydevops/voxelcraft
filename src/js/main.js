@@ -26,6 +26,7 @@ import { WaterSim } from './water.js';
 import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
 import { createFullMap } from './fullmap.js';
+import { createHudPanels } from './hudpanels.js';
 import { createVillagers } from './villagers.js';
 import { villagesNear } from './villages.js';
 import { runStartup } from './startup.js';
@@ -48,6 +49,7 @@ const forcedTouch = urlParams.has('touch') ? true : urlParams.has('desktop') ? f
 const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
 let touchMode = wantsTouch();
 document.body.classList.toggle('touch', touchMode);
+const hud = createHudPanels(settings); // the panels at the top: fold, hide, move (the gear on the clock panel)
 const refitHud = installFit(() => settings.get('hudSize')); // (also called when the HUD size changes, see applySettings)
 const params = new URLSearchParams(location.search);
 
@@ -331,7 +333,7 @@ let optionsOpen = false;
 const options = createOptions(settings, {
   onClose: () => { optionsOpen = false; },
   // moving the touch buttons: only in a world on a touch device; afterwards the Options screen comes back
-  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }) },
+  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }), reset: () => settings.set('touchLayout', {}) },
 });
 held.visible = false;
 // The audio engine exists from the start so the title screen can play its theme. Browsers keep it silent until the first
@@ -679,7 +681,7 @@ function syncInput() {
   input.strafe = t.strafe;   // the move stick: -1..1 sideways and ahead, scaled by how far it is pushed
   input.ahead = t.forward;
   input.jump = isDown('jump') || t.jump;
-  sprintHeld = isDown('sprint') || t.sprint || t.edge;
+  sprintHeld = isDown('sprint') || t.sprint; // (on a touch screen only the sprint button sprints: the stick just walks, faster or slower)
   input.sprint = sprintHeld && sprintAllowed();
   input.crouch = isDown('crouch') || t.crouch;
   input.down = isDown('crouch') || isDown('down') || t.crouch; // flying: crouch key goes down
@@ -954,9 +956,6 @@ function renderControlsTable() {
 
 function applySettings() {
   audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
-  refitHud();
-  const goalsHome = touchMode ? document.body : $('hud-right'); // on a phone the goals sit top left, out of the crowded right column
-  if ($('goals').parentNode !== goalsHome) goalsHome.appendChild($('goals'));
   touchCtl.setLayout(settings.get('touchLayout'));
   const was = touchMode;
   touchMode = wantsTouch();
@@ -966,6 +965,8 @@ function applySettings() {
     mouseDown = { left: false, right: false };
     if (touchMode) document.exitPointerLock?.();
   }
+  hud.apply(); // (the goals sit top left on a touch screen, top right otherwise: after the touch class above)
+  refitHud(); // (after the touch class above: on a touch screen the hotbar is sized to fit between the controls)
   $('tagline').textContent = touchMode ? 'Game paused' : 'Game paused \u2014 press Esc to resume';
   renderControlsTable();
 }

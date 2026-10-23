@@ -86,6 +86,38 @@ class TitleScene {
   }
 }
 
+// ---- full screen: a browser tab keeps its address bar and tabs; this hides them ----
+// Safari on an iPhone has no way to do it from a page at all (no Fullscreen API), so there the button explains the home screen way instead.
+const fsRequest = () => { const de = document.documentElement; return de.requestFullscreen ? de.requestFullscreen({ navigationUI: 'hide' }) : de.webkitRequestFullscreen ? de.webkitRequestFullscreen() : null; };
+const isFullscreen = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function setupFullscreen(button, hint) {
+  const de = document.documentElement;
+  const canFs = !!(de.requestFullscreen || de.webkitRequestFullscreen);
+  const installed = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone === true;
+  const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (installed || !(canFs || iOS)) { button.hidden = true; return; } // (the installed app already is full screen)
+  button.hidden = false;
+  const label = () => { button.textContent = isFullscreen() ? 'Exit Full Screen' : 'Full Screen'; };
+  label();
+  document.addEventListener('fullscreenchange', label);
+  document.addEventListener('webkitfullscreenchange', label);
+  button.addEventListener('click', async () => {
+    if (!canFs) { // an iPhone
+      hint.textContent = 'On an iPhone: tap the Share button in Safari, choose Add to Home Screen, then open VoxelCraft from your home screen. It runs full screen.';
+      hint.hidden = !hint.hidden;
+      return;
+    }
+    try {
+      if (isFullscreen()) await (document.exitFullscreen ?? document.webkitExitFullscreen).call(document);
+      else {
+        await fsRequest();
+        await window.screen.orientation?.lock?.('landscape').catch(() => {}); // (phones: the game is played sideways)
+      }
+    } catch { /* the browser said no: nothing to do */ }
+    label();
+  });
+}
+
 // ---- the screens ----
 export async function runStartup(ctx) {
   const { params, atlasCanvas, titleLogo, openOptions } = ctx;
@@ -127,6 +159,7 @@ export async function runStartup(ctx) {
     tl.width = titleLogo.width; tl.height = titleLogo.height;
     tl.getContext('2d').drawImage(titleLogo, 0, 0);
     $('title-credit').textContent = REG.game.studio.name;
+    setupFullscreen($('t-fullscreen'), $('fs-hint'));
     $('t-play').addEventListener('click', () => { show('worlds'); refresh(); });
     $('t-options').addEventListener('click', openOptions);
     // Quit Game only makes sense with the local dev server (it stops it); an installed or hosted app is just closed like any app

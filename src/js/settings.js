@@ -34,6 +34,9 @@ const DEFAULTS = {
   sfxVolume: 0.9,
   touchControls: browserWantsTouch(), // on-screen sticks and buttons: on by default on phones and tablets
   hudSize: browserWantsTouch() ? 1.3 : 1, // multiplier on the HUD (hotbar, hearts, minimap, clock, goals): bigger by default on a phone
+  hudShow: {},      // parts of the HUD the player switched off (see hudmath.js HUD_ITEMS); empty = everything shown
+  hudCollapsed: {}, // panels folded away by tapping them: { info: true, goals: true }
+  hudLayout: {},    // where the player dragged the HUD panels to (see hudmath.js cleanHudLayout); empty = the built-in places
   touchLayout: {}, // where the player moved the touch buttons to (see touchmath.js cleanLayout); empty = the built-in places
 };
 
@@ -112,7 +115,7 @@ export class Settings {
   }
 
   resetAll() {
-    this.values = { ...DEFAULTS, touchLayout: {} };
+    this.values = { ...DEFAULTS, touchLayout: {}, hudShow: {}, hudCollapsed: {}, hudLayout: {} };
     this.resetBinds();
   }
 }

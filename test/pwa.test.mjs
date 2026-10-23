@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { fitScale, hudScale, hudScaleFor, MAX_HUD } from '../src/js/fit.js';
+import { fitScale, hudScale, hudScaleFor, hotbarScaleFor, MAX_HUD } from '../src/js/fit.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -98,6 +98,29 @@ t('the HUD size setting scales the HUD (and cannot run away or break it)', () =>
   assert.ok(Math.abs(hudScaleFor(844, 390, 1.5) - hudScale(844, 390) * 1.5) < 1e-9);
   assert.equal(hudScaleFor(1920, 1080, 5), MAX_HUD);
   assert.equal(hudScaleFor(1920, 1080, NaN), 1); assert.equal(hudScaleFor(1920, 1080, -2), 1);
+});
+
+t('on a touch screen the hotbar and loot bag always fit between the joystick and the action buttons', () => {
+  for (const [w, h] of [[844, 390], [667, 375], [932, 430], [1024, 768], [1366, 1024], [568, 320]]) {
+    const hud = hudScaleFor(w, h, 1.3);
+    const s = hotbarScaleFor(w, h, hud, true);
+    const vmin = Math.min(w, h), stick = Math.min(176, Math.max(112, vmin * 0.31)), pad = vmin * 0.035;
+    assert.ok(s <= hud + 1e-9 && s >= 0.45, `${w}x${h}: scale ${s.toFixed(2)}`);
+    if (s > 0.46) assert.ok(608 * s <= w - 2 * (stick + pad) + 1e-6, `${w}x${h}: hotbar + bag (${Math.round(608 * s)} px) fits between the controls`);
+  }
+  assert.equal(hotbarScaleFor(1920, 1080, 1, false), 1, 'a desktop is left alone');
+  assert.equal(hotbarScaleFor(1920, 1080, 1.5, true), 1.5, 'plenty of room: no cap');
+});
+
+t('touch: the joystick only walks (sprint is the button), every action button starts on the right, and a stuck finger cannot lock the controls', () => {
+  const main = read('src/js/main.js'), touch = read('src/js/touch.js'), css = read('src/style.css');
+  assert.ok(!/\bt\.edge\b/.test(main) && !/stickSprints|state\.edge/.test(touch), 'the stick has no say in sprinting');
+  for (const b of ['attack', 'use', 'jump', 'sprint', 'crouch', 'fly']) assert.match(css, new RegExp('\\.tb\\.' + b + '[^{]*\\{[^}]*right:'), b + ' is placed from the right edge');
+  assert.ok(/\.stick \{[^}]*left:/.test(css), 'the joystick is on the left');
+  // a new finger takes over from one whose lift was never reported, and a lost pointer capture ends the touch
+  assert.ok(!/if \(lookId !== null\) return/.test(touch) && !/if \(stickId !== null\) return|stickId !== null\) return/.test(touch.replace(/if \(stickId !== null\) stickEnd/g, '')), 'no "already busy" early returns');
+  assert.ok((touch.match(/lostpointercapture/g) || []).length >= 4, 'lost captures are handled everywhere');
+  assert.ok(/SOFT_LOOK/.test(touch), 'a drag that starts on the HUD or hotbar also turns the camera');
 });
 
 t('nothing in the game requires the Pointer Lock API (iPhone Safari has none): Save & Quit and the pause / death screens must still work', () => {
