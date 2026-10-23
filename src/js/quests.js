@@ -59,7 +59,8 @@ export class Quests {
     return { have, need: o.count, ready: have >= o.count };
   }
 
-  accept(key, job) { const s = this.of(key, job); if (s.status === 'offered') { s.status = 'active'; s.kills = 0; } return s; }
+  // `who` is { name, village } of the villager, kept so the quest book can say whose job it is
+  accept(key, job, who = null) { const s = this.of(key, job); if (s.status === 'offered') { s.status = 'active'; s.kills = 0; s.who = who ? { name: who.name, village: who.village, job } : null; } return s; }
   // Turning them down: they will come up with something else next time
   decline(key, job) { const s = this.of(key, job); if (s.status === 'offered') { s.round++; s.offer = null; } }
   abandon(key, job) { const s = this.of(key, job); s.status = 'offered'; s.kills = 0; s.round++; s.offer = null; }
@@ -80,6 +81,18 @@ export class Quests {
   // A monster was defeated: counts towards every open "defeat" quest for that kind
   recordKill(mobType) {
     for (const s of Object.values(this.state)) if (s.status === 'active' && s.offer?.type === 'slay' && s.offer.mob === mobType) s.kills++;
+  }
+
+  // The jobs you have taken on, for the quest book: [{ key, who: { name, village, job } | null, offer, have, need, ready }]
+  activeList(inventory) {
+    const out = [];
+    for (const [key, s] of Object.entries(this.state)) {
+      if (s.status !== 'active' || !s.offer) continue;
+      const o = s.offer;
+      const have = o.type === 'fetch' ? Math.min(o.count, inventory.countAll ? inventory.countAll(o.item) : inventory.count(o.item)) : Math.min(o.count, s.kills);
+      out.push({ key, who: s.who ?? null, offer: o, have, need: o.count, ready: have >= o.count });
+    }
+    return out;
   }
 
   get activeCount() { return Object.values(this.state).filter((s) => s.status === 'active').length; }

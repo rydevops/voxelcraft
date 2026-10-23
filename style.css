@@ -58,15 +58,6 @@ button.small { min-width: 150px; padding: 8px 12px; font-size: 14px; }
 .slot .dura { position: absolute; left: 5px; right: 5px; bottom: 3px; height: 4px; background: #111; }
 .slot .dura i { display: block; height: 100%; }
 
-/* ---- goals ---- */
-#goals { width: 100%; padding: 8px 12px; background: var(--panel); border: 2px solid #111; font-size: 13px; pointer-events: none; }
-#goals h3 { margin: 0 0 6px; font-size: 13px; color: #ffe27a; text-shadow: 1px 1px 0 #000; }
-#goals ul { list-style: none; margin: 0; padding: 0; }
-#goals li { margin: 3px 0; text-shadow: 1px 1px 0 #000; }
-#goals li::before { display: inline-block; width: 18px; }
-#goals li.todo::before { content: "\25A1"; color: #bbb; }
-#goals li.done::before { content: "\2714"; color: #7dff7d; }
-#goals li.done { color: #9a9; }
 
 /* ---- inventory + crafting ---- */
 #inventory { position: fixed; inset: 0; z-index: 9; background: rgba(0, 0, 0, 0.62); display: flex; align-items: center; justify-content: center; }
@@ -203,7 +194,7 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 @keyframes heartbeat { 50% { transform: translateY(-3px); } }
 @keyframes shake { 25% { transform: translateX(1px); } 75% { transform: translateX(-1px); } }
 
-/* ---- top-right HUD: compass minimap, clocks and coordinates, then the goals ---- */
+/* ---- top-right HUD: compass minimap, clocks and coordinates ---- */
 #hud-right { position: fixed; top: 10px; right: 10px; width: 250px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
 #minimap { width: 196px; height: 196px; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35)); }
 #mm-info { width: 100%; padding: 6px 12px; background: var(--panel); border: 2px solid #111; font-size: 13px; text-shadow: 1px 1px 0 #000; }
@@ -231,20 +222,16 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 .mm-row[hidden] { display: none; }
 
 /* ---- the HUD panels can be folded away by tapping them, hidden, and moved (hudpanels.js) ---- */
-#mm-info, #goals { pointer-events: auto; cursor: pointer; position: relative; }
+#mm-info { pointer-events: auto; cursor: pointer; position: relative; }
 #mm-info { padding-right: 34px; }
 #hud-gear { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; min-width: 0; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 #hud-gear img { width: 22px; height: 22px; image-rendering: pixelated; pointer-events: none; opacity: 0.85; }
 #hud-gear:hover { background: rgba(255, 255, 255, 0.12); }
-.chev { display: inline-block; width: 0; height: 0; margin-right: 7px; border: 5px solid transparent; border-top: 7px solid #ffe27a; border-bottom: 0; vertical-align: 2px; }
-#goals.collapsed .chev { border: 5px solid transparent; border-left: 7px solid #ffe27a; border-right: 0; vertical-align: 0; }
-#goals.collapsed ul { display: none; }
-#goals.collapsed h3 { margin-bottom: 0; }
 #mm-info.collapsed { padding-top: 4px; padding-bottom: 4px; min-height: 34px; }
 #mm-info.collapsed .mm-row:not([data-hud="gameTime"]) { display: none; }
 .hud-free { position: fixed !important; transform: translate(-50%, -50%) scale(var(--hud, 1)) !important; transform-origin: center !important; right: auto !important; bottom: auto !important; margin: 0 !important; z-index: 6; }
-#mm-info.hud-free, #goals.hud-free { width: 250px; }
-body.hudedit #minimap, body.hudedit #mm-info, body.hudedit #goals { pointer-events: auto; outline: 2px dashed rgba(255, 226, 122, 0.95); outline-offset: 3px; cursor: grab; z-index: 7; touch-action: none; }
+#mm-info.hud-free { width: 250px; }
+body.hudedit #minimap, body.hudedit #mm-info { pointer-events: auto; outline: 2px dashed rgba(255, 226, 122, 0.95); outline-offset: 3px; cursor: grab; z-index: 7; touch-action: none; }
 #hud-shield { position: fixed; inset: 0; z-index: 6; touch-action: none; }
 #hud-menu { position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; }
 #hud-menu[hidden] { display: none; }
@@ -260,7 +247,7 @@ body.hudedit #minimap, body.hudedit #mm-info, body.hudedit #goals { pointer-even
 #item-tip span { display: block; margin-top: 2px; font-size: 12px; color: #9fd0ff; }
 
 /* ---- startup: developer logo, title, world selection ---- */
-body.startup #fullmap, body.startup #hud-menu, body.startup #minimap, body.startup #mm-info, body.startup .bagbtn, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
+body.startup #fullmap, body.startup #hud-menu, body.startup #minimap, body.startup #mm-info, body.startup .bagbtn, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #blockname, body.startup #lookat,
 body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #debug, body.startup #underwater { display: none !important; }
 #intro { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; align-items: center; justify-content: center; }
 #intro[hidden], #title[hidden], #worlds[hidden], #loading[hidden] { display: none; }
@@ -360,13 +347,10 @@ body.touch .pc-only { display: none; }
 #death { align-items: center; }
 
 /* ---- touch mode ---- */
-/* Phones are short: the minimap shrinks and the goals move to the top left, under
-   the menu buttons (main.js moves #goals out of #hud-right), with larger text than the desktop HUD. */
+/* Phones are short: the minimap shrinks, and the text is larger than on the desktop HUD. */
 body.touch #hud-right { z-index: 6; }
 body.touch #minimap { width: 120px; height: 120px; }
-body.touch #mm-info, body.touch #goals { font-size: 15px; }
-body.touch #goals h3 { font-size: 15px; }
-body.touch > #goals { position: fixed; z-index: 6; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }
+body.touch #mm-info { font-size: 15px; }
 body.touch #controls, body.touch #debug { display: none; }
 body.touch button:hover:not(:disabled) { background: #7a7a82; }
 body.touch #hotbar { z-index: 6; }
@@ -401,6 +385,7 @@ body.touch #touch:not([hidden]) { display: block; }
 .tb.sprint { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin + var(--sm) + 1.5vmin); }
 .tb.crouch { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin + var(--sm) + 1.5vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin); }
 .tb.fly { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin + var(--sm) + 1.5vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin + var(--sm) + 1.5vmin); }
+.tb.book { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); left: calc(2vmin + var(--sl) + var(--tb) * 0.8 + 1.5vmin); border-radius: 12px; }
 .tb.menu { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); left: calc(2vmin + var(--sl)); border-radius: 12px; font-size: calc(14px * var(--btn, 1)); }
 
 /* the loot bag: a square button attached to the right end of the hotbar (the hotbar is 534 px wide, scaled by --hud) */
@@ -474,3 +459,53 @@ body:not(.touch) #t-close, body:not(.touch) #t-invmode { display: none; }
 #sleep[hidden] { display: none; }
 #sleep.on { opacity: 1; }
 #sleep p { color: #cfd8ff; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+
+/* ---- the HUD settings: a key on a computer, the gear only on a touch screen ---- */
+body:not(.touch) #hud-gear { display: none; }
+body:not(.touch) #mm-info { padding-right: 12px; }
+
+/* ---- the quest book ---- */
+#book { position: fixed; inset: 0; z-index: 11; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); }
+#book[hidden] { display: none; }
+.bk-wrap { width: 880px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; transform: scale(var(--fit, 1)); transform-origin: center; font-family: Georgia, 'Times New Roman', serif; }
+.bk-tabs { align-self: flex-start; display: flex; gap: 6px; margin-left: 28px; margin-bottom: -10px; z-index: 1; }
+.bk-tabs button { min-width: 0; padding: 5px 16px 8px; font: bold 14px Georgia, serif; color: #f3e6c8; background: #6b3f1d; border: 3px solid #2c1a0a; border-bottom: 0; border-radius: 8px 8px 0 0; cursor: pointer; text-shadow: 1px 1px 0 #2c1a0a; }
+.bk-tabs button.on { background: #8c5a2b; color: #fff; }
+.bk-spread { width: 100%; height: 470px; display: flex; background: #4a2a12; border: 5px solid #2c1a0a; border-radius: 10px; padding: 10px; box-sizing: border-box; box-shadow: 0 8px 0 rgba(0, 0, 0, 0.4); }
+.bk-spread.turning .bk-side { animation: bk-turn 0.22s ease-out; }
+@keyframes bk-turn { from { opacity: 0.2; transform: translateX(14px) scaleX(0.96); } to { opacity: 1; transform: none; } }
+.bk-side { flex: 1; min-width: 0; position: relative; background: linear-gradient(90deg, #e9d9b0, #f1e4c0 12%, #f1e4c0 88%, #dccb9e); color: #3a2410; padding: 22px 26px 30px; overflow: hidden; }
+#book-left { border-radius: 6px 0 0 6px; box-shadow: inset -14px 0 18px -10px rgba(60, 35, 10, 0.45); }
+#book-right { border-radius: 0 6px 6px 0; box-shadow: inset 14px 0 18px -10px rgba(60, 35, 10, 0.45); }
+.bk-spine { width: 6px; background: #2c1a0a; }
+.bk-page { height: 100%; position: relative; display: flex; flex-direction: column; gap: 8px; }
+.bk-page h3 { margin: 0; font-size: 26px; color: #6b2d0f; text-shadow: none; border-bottom: 2px solid rgba(107, 45, 15, 0.45); padding-bottom: 4px; }
+.bk-sub { margin: 0; font-size: 13px; font-style: italic; color: #7a5a38; }
+.bk-num { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 13px; color: #7a5a38; }
+.bk-goals { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.bk-goals li { display: flex; align-items: flex-start; gap: 10px; font-size: 17px; line-height: 1.25; }
+.bk-box { flex: none; width: 18px; height: 18px; margin-top: 2px; box-sizing: border-box; border: 2px solid #6b4a28; background: rgba(255, 255, 255, 0.35); position: relative; }
+.bk-goals li.done { color: #6a7a4a; }
+.bk-goals li.done span { text-decoration: line-through; text-decoration-color: rgba(90, 110, 60, 0.6); }
+.bk-goals li.done .bk-box { border-color: #4f7a2a; background: #cfe3a8; }
+.bk-goals li.done .bk-box::after { content: "\2714"; position: absolute; left: 1px; top: -4px; font-size: 18px; color: #3f7a1a; }
+.bk-goals li.next { font-weight: bold; color: #5a1f08; }
+.bk-goals li.next .bk-box { border-color: #b3541c; background: #ffe9b0; }
+.bk-goals li em { margin-left: auto; flex: none; font-size: 12px; color: #fff; background: #b3541c; padding: 1px 8px; border-radius: 9px; font-style: normal; align-self: center; }
+.bk-empty { margin: 14px 0 0; font-size: 20px; color: #6b4a28; }
+.bk-job { padding: 10px 12px; border: 2px solid rgba(107, 74, 40, 0.55); background: rgba(255, 250, 235, 0.5); display: flex; flex-direction: column; gap: 5px; }
+.bk-job.ready { border-color: #4f7a2a; background: rgba(207, 227, 168, 0.55); }
+.bk-job-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 15px; }
+.bk-job-head b { font-weight: bold; color: #3a2410; }
+.bk-tier { padding: 0 8px; font-size: 12px; color: #fff; border-radius: 9px; }
+.bk-tier.easy { background: #4f8a2a; } .bk-tier.medium { background: #b08a1c; } .bk-tier.hard { background: #a83a2a; }
+.bk-job-text { margin: 0; font-size: 16px; }
+.bk-bar { height: 8px; background: rgba(60, 35, 10, 0.25); border: 1px solid #6b4a28; }
+.bk-bar i { display: block; height: 100%; background: #6aa83a; }
+.bk-job-progress { margin: 0; font-size: 14px; color: #5a3a18; }
+.bk-job.ready .bk-job-progress { color: #3f6a1a; font-weight: bold; }
+.bk-finished { margin-top: auto; }
+.bk-nav { display: flex; align-items: center; gap: 12px; font-family: var(--mc-font, monospace); }
+#book-count { min-width: 120px; text-align: center; color: #ffe27a; font-size: 14px; text-shadow: 1px 1px 0 #000; }
+.bk-nav button { min-width: 0; }
+.bk-hint { margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.7); font-family: var(--mc-font, monospace); min-height: 14px; }

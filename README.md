@@ -60,7 +60,9 @@ Every control is a picture, not a word:
 
 The five action buttons (pickaxe, hand, jump, sprint, crouch) all sit on the right, in an arc around where the right thumb rests: attack in the corner, use right above it, jump beside them, sprint and crouch a little further out.
 
-**The HUD panels.** Tap the **clock panel** or the **goals** to fold them to one line and tap again to open them: more of the world on a small screen. The **gear** on the clock panel opens a window where you switch each part of the HUD on or off (minimap, real-world time, game time, time of day, coordinates, goals) and **Move panels...**, which lets you drag the minimap, the clock panel and the goals anywhere on the screen. Everything is remembered; *Reset* in that window puts it all back.
+**The HUD panels.** Tap (or click) the **clock panel** to fold it to one line and again to open it: more of the world on a small screen. On a computer the **H** key (rebindable) opens the HUD window; on a phone it is the **gear** on the clock panel. There you switch each part of the HUD on or off (minimap, real-world time, game time, time of day, weather and biome, coordinates) and use **Move panels...**, which lets you drag the minimap and the clock panel anywhere on the screen. Everything is remembered; *Reset* in that window puts it all back.
+
+**The quest book.** Press **L** (rebindable) on a computer, or tap the **book button** next to pause on a phone, to open a two-page book: the **goals** first, a few to a page, with a tick for each one done and the next one marked, then the **jobs** villagers have given you with whose they are and how far along each is. Arrow keys or the Back / Next buttons turn the page; the tabs jump to Goals or Jobs. The game tells you about it when you start a new world.
 
 **Put the controls where your thumbs want them:** *Options -> Move the touch controls...* (from the pause menu, in a world) shows the controls over the world with a **Move the controls** window; drag the joystick or any button anywhere on the screen and tap **Done** to go back to Options. **Reset** in that window, or *Reset controls to default* in Options, puts them back. The loot bag stays on the hotbar.
 
@@ -76,7 +78,7 @@ Each world is its own file in `worlds/` (an older single `world.json` is importe
 
 ## Playing (survival is the default)
 
-You start with **nothing**. The on-screen goals walk you through it:
+You start with **nothing**. The goals in your quest book (**L**) walk you through it:
 
 1. Punch a tree (hold left click) to collect **wood**.
 2. Craft **planks**, **sticks** and a **crafting table** from the inventory (**E**).
@@ -94,6 +96,7 @@ You start with **nothing**. The on-screen goals walk you through it:
 | 1-9 / wheel | Select slot | Middle click | Pick a block you carry |
 | E | Inventory & crafting | Q | Drop one item |
 | T | Skip time of day | M | Full-screen map |
+| L | Quest book: goals and jobs | H | HUD settings: show, hide, move |
 | [ ] | Render distance | F3 | Debug info |
 | N | Toggle music | | |
 
@@ -155,7 +158,7 @@ so new content needs no code. Tests prove it by adding a whole new ore, item, to
 - **Farming**: tall grass grows in three stages (short, tall, lush) and sways in the wind (`plants.js`, wind shader in `main.js`). Larger tufts are likelier to drop seeds. Hoes (wood/stone/iron) till grass or dirt that has water within a 4-block circle (up to 4 blocks below / 1 above the soil). Wheat goes sprout -> young -> ripe on farmland; a ripe crop gives wheat plus seeds. Crops only grow in loaded chunks near you. Rivers are carved into the lowlands so there is always grass beside water.
 - **Hunger and healing**: standing still costs nothing; walking drains the bar slowly, **sprinting about five times faster**, **every jump costs a little (more when sprinting)** and **mining slowly drains it** too, per block broken and for as long as you are working at one (`jumpCost`, `sprintJumpCost`, `miningCost`, `miningDrainPerSecond` in `game.json`). Bread restores 3 icons; hold right-click to eat (the food shrinks as you chew, with crumbs and juice flying off it). At 3 icons or fewer you can no longer sprint. At zero you move more slowly and **lose half a heart every 15 seconds until you die**. **Saturation** is what heals you: eating also fills a hidden reserve (the thin gold line above the hunger icons), capped at what your bar holds when you eat. It **only goes down when it heals you**: walking, sprinting and mining cost hunger, never saturation. Once the hunger bar is full, healing spends saturation (half a heart every 1.5 seconds, one unit each); when the reserve runs dry half an icon of hunger disappears and healing stops until you eat again. An empty reserve on its own never drains the hunger bar. A loaf of bread heals a few hearts. All tunable in `game.json` -> `hunger`; what each food gives is `food` and `saturation` on the item.
 - **Shovels**: grass, dirt, sand and snow are slow to dig by hand; wood/stone/iron shovels speed this up 2x / 3.5x / 5.5x.
-- **Goals tracker**: shows your latest achievement and the next two goals (there are now goals for finding a village and talking to a villager).
+- **Quest book**: the goals (with a tick for each done and the next one marked) and your villager jobs, in a two-page book you open with **L** (or the book button on a phone). A toast tells you when a goal is complete.
 - **Persistence** (`scripts/server.js`, `src/js/storage.js`): the dev server keeps each world (seed, edits, inventory, tool wear, health, progress, position) as `worlds/<id>.json`, written atomically. API: `GET/POST /api/worlds`, `GET/POST/DELETE /api/worlds/<id>`. Without the server the game keeps the same data in the browser (IndexedDB) behind the same interface; the game picks one at startup by asking `api/ping`.
 - **One instance at a time**: the server writes `.voxelcraft.lock` and refuses to start a second copy (it checks the old one really responds, so a crash never blocks you). In the browser, only one tab can run the game; a second tab shows a message instead of loading. `npm run stop` asks the server to shut down (loopback only, and it needs a header a web page can't send).
 

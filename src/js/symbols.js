@@ -80,6 +80,12 @@ const ART = {
     g.rect(2, 2, 4, 4); g.rect(11, 2, 13, 4); g.rect(2, 11, 4, 13); g.rect(11, 11, 13, 13);
     g.erase(7.5, 7.5, 2.2, 2.2);
   },
+  // an open book: two pages with lines of writing
+  book(g) {
+    g.poly([[1, 3], [7.5, 4.5], [7.5, 14], [1, 12.5]]);
+    g.poly([[14.5, 3], [8.5, 4.5], [8.5, 14], [14.5, 12.5]]);
+    for (const [y, x0, x1] of [[6, 2, 6], [8, 2, 6], [10, 2, 6], [6, 9, 13], [8, 9, 13], [10, 9, 13]]) for (let x = x0; x <= x1; x++) g.px[y][x] = null;
+  },
   // two bars: pause
   menu(g) { g.rect(3, 2, 6, 13); g.rect(9, 2, 12, 13); },
   // a loot bag: a plump sack tied at the neck with a flared top, in colour

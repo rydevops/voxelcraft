@@ -8,6 +8,8 @@ released those lines move under a new version heading. The list of everything th
 ## [Unreleased]
 
 ### Added
+- **The quest book.** The goals are no longer a panel on the screen: press **L** (or tap the new **book button** next to pause on a phone) to open a two-page book. The goals come first, seven to a page, each with a box ticked when it is done and the next one marked; then the **jobs** villagers have given you, with whose they are, how hard, and how far along (a bar and a count, and a note when it is ready to hand in). Arrow keys or *Back* / *Next* turn the page, the *Goals* and *Jobs* tabs jump to a section, and it opens at the page with your next goal. A new world tells you about it when you start. The book button can be moved with the other touch buttons.
+- **A key for the HUD window.** **H** (rebindable) opens the window that switches parts of the HUD on and off and moves the panels, from inside the game; Esc, H or Done carry on playing.
 - **Oceans and real-world biomes (new worlds).** Seas with sandy shallows, gravel floors and deep trenches, frozen seas with an ice sheet, and coasts that slope into them. New biomes next to the old six: **savanna** (acacia trees, dry grass), **jungle** (huge trees, ferns), **swamp** (flat and muddy, full of pools), **taiga** (spruce forest on podzol) and **badlands** (red terraces with bands of clay). Mountains are taller. Worlds you were already playing keep their old terrain exactly (tests prove it), so nothing you built moves.
 - **Weather.** Spells of rain, thunderstorms (lightning, thunder that arrives late, a darker sky, a shorter view, stronger wind in the grass and leaves), snow and blizzards in cold biomes, sandstorms in hot ones and rare hurricanes at sea. The weather is the same every time for a world, eases in and out, and only falls where you can see the sky (a roof keeps the rain off). The clock panel shows your biome and the weather. Blizzards, sandstorms and hurricanes slow you down in the open.
 - **Animals.** Cows, pigs and sheep live in herds on grass, graze, wander, run when hurt and are saved with the world. They drop **raw beef, porkchops, lamb chops**, **leather** and **wool**, which cook into steak, cooked porkchop and lamb chop in a furnace. **Iron shears** shear a sheep for wool (it grows back).
@@ -41,6 +43,8 @@ released those lines move under a new version heading. The list of everything th
 - **The version is shown on the title screen** (bottom left), e.g. `v1.0.0-8726a41cae`: the package version plus the build.
 
 ### Changed
+- **The goals panel is gone from the HUD** (the quest book shows them), so the top left of a phone is free and the HUD window no longer lists goals. Saved settings for the old panel are simply ignored.
+- **The gear on the clock panel is only shown on a touch screen** (a computer has the H key instead).
 - **The map is on M and the music on N** (they were the other way round). Anyone who still has the old pair is moved over; custom keys are left alone.
 - **The dev content grew:** blocks.json, items.json, recipes.json, loot.json and the others have the new blocks, items and recipes, and there are three new content files, `mobs.json`, `quests.json` and `weather.json` (documented in `src/data/README.md`).
 - **Longer days and nights.** Daytime (6:00 to 18:00 on the in-game clock) now lasts 10 real minutes and the night lasts another 10, so a full day is 20 minutes instead of 8. It is `time.dayLengthSeconds` in `game.json`.

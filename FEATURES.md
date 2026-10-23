@@ -45,7 +45,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Hunger with sprint, jump and mining costs, no sprinting when very hungry, starvation that can kill |
 | ✔ | Saturation: eating fills a hidden reserve that heals you once the hunger bar is full |
 | ✔ | Eating animation with crumbs and juice |
-| ✔ | Goals tracker that walks you through the first steps |
+| ✔ | **Quest book** (L, or a book button on a phone): a two-page book with the goals that walk you through the first steps (ticks, the next one marked) and the villager jobs you have taken, with progress; page turning and Goals / Jobs bookmarks |
 | ✔ | Creative mode: block palette, unlimited blocks, flying |
 | ✔ | Crouching (no walking off edges), sprinting, step-assist, swimming and hopping out of the water |
 
@@ -80,9 +80,9 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | All textures and item sprites are generated or drawn in code/data: no downloaded art |
 | ✔ | Chunky three-dimensional held tools with a swing animation; flickering furnace and torch flames |
 | ✔ | Smooth lighting with ambient occlusion; sky light and warm untinted block light |
-| ✔ | Fold the clock panel and the goals with a tap; a gear on the clock panel switches parts of the HUD on and off and lets you drag the panels where you like |
+| ✔ | Fold the clock panel with a tap; the **H** key (a gear on a touch screen) opens a window that switches parts of the HUD on and off and lets you drag the minimap and clock panel where you like |
 | ✔ | Full Screen button on the title screen (explains the home-screen way on an iPhone) |
-| ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
+| ✔ | HUD size setting (hotbar, hearts, map, clock), larger by default on phones |
 | ✔ | Hotbar size and touch button size settings, smaller by default on phones |
 | ✔ | Full-screen map (tap the minimap, or press **M**): drag, zoom, remembers the ground you have left |
 | ✔ | **A visible arm and hand** that holds whatever is selected (block, tool, food) and swings, bobs and lifts it to your mouth; a left arm when a torch is in your off hand |

@@ -27,6 +27,7 @@ import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
 import { createFullMap } from './fullmap.js';
 import { createHudPanels } from './hudpanels.js';
+import { createBook } from './book.js';
 import { createVillagers } from './villagers.js';
 import { villagesNear } from './villages.js';
 import { runStartup } from './startup.js';
@@ -60,7 +61,7 @@ const forcedTouch = urlParams.has('touch') ? true : urlParams.has('desktop') ? f
 const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
 let touchMode = wantsTouch();
 document.body.classList.toggle('touch', touchMode);
-const hud = createHudPanels(settings); // the panels at the top: fold, hide, move (the gear on the clock panel)
+const hud = createHudPanels(settings, { onClose: () => { if (screen === 'hud') closeScreen(); } }); // the panels at the top: fold, hide, move (the HUD key; the gear on a touch screen)
 const refitHud = installFit(() => settings.get('hudSize'), () => settings.get('hotbarSize'), () => settings.get('touchButtonSize')); // (also called when the HUD size changes, see applySettings)
 const params = new URLSearchParams(location.search);
 
@@ -543,7 +544,7 @@ function checkGoals() {
   const now = GOALS.map((g) => g.done(progress));
   now.forEach((d, i) => { if (d && !goalDone[i]) { toast('Goal complete: ' + GOALS[i].text); audio.craft(); } });
   goalDone = now;
-  ui.renderGoals(goalDone);
+  book.setGoals(goalDone);
 }
 
 function tossStack(st) {
@@ -598,6 +599,9 @@ const dialog = createDialog({
     checkGoals();
   },
 });
+
+// The quest book: the goals, then the jobs villagers have given you (key on a computer, a button on a phone)
+const book = createBook({ goals: GOALS, jobs: () => quests.activeList(inventory), finished: () => quests.completed, onClose: () => { if (screen === 'book') closeScreen(); } });
 
 let nameTimer = 0;
 function showName() {
@@ -705,6 +709,7 @@ function toast(msg, ms = 2200) {
 
 refreshHotbar();
 checkGoals();
+if (!goalDone.some(Boolean)) setTimeout(() => toast(touchMode ? 'Tap the book button (top left) to see what to do' : `Press ${keyLabel(settings.key('quests'))} to open your quest book: it shows what to do`, 6500), 1800);
 
 // ---------------------------------------------------------------------------------------
 // Input
@@ -751,6 +756,7 @@ const touchCtl = createTouchControls({
   },
   fly: () => setFlying(!player.flying),
   inventory: () => { if (playing && !screen) openScreen(creative ? 'palette' : 'inv'); },
+  book: () => { if (playing && !screen && !dead) openScreen('book'); },
   closeScreen: () => closeScreen(),
   layoutChanged: (l) => settings.set('touchLayout', l),
   menu: () => { if (!playing) return; setPlaying(false); $('play').textContent = 'Resume'; save_(); },
@@ -793,12 +799,14 @@ function openScreen(kind, context = 'hand', at = null) {
     ui.openInventory(slot, context, WINDOWS[context]?.chest ? at : at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
   } else if (kind === 'map') fullMap.open();
   else if (kind === 'talk') { /* the window is already showing */ }
+  else if (kind === 'book') book.show();
+  else if (kind === 'hud') hud.openMenu();
   else ui.openPalette();
   document.exitPointerLock?.(); // (iPhone Safari has no Pointer Lock API at all)
   if (AUTOPLAY || touchMode) setPlaying(false); // (no pointer lock to lose, so there is no unlock event to pause us)
 }
 function hideScreen() {
-  if (screen === 'inv') { ui.closeInventory(); inventory.linked = []; } else if (screen === 'palette') ui.closePalette(); else if (screen === 'map') fullMap.close(); else if (screen === 'talk') dialog.hide();
+  if (screen === 'inv') { ui.closeInventory(); inventory.linked = []; } else if (screen === 'palette') ui.closePalette(); else if (screen === 'map') fullMap.close(); else if (screen === 'talk') dialog.hide(); else if (screen === 'book') book.hide(); else if (screen === 'hud') hud.cancel();
   screen = null;
   refreshHotbar();
 }
@@ -833,8 +841,10 @@ window.addEventListener('keydown', (e) => {
   if (e.repeat) { if (playing) { keys.add(e.code); syncInput(); } return; }
 
   const action = settings.actionFor(e.code);
-  if (screen && (action === 'inventory' || (action === 'map' && screen === 'map') || e.code === 'Escape')) { e.preventDefault(); closeScreen(); return; }
+  if (screen && (action === 'inventory' || (action === 'map' && screen === 'map') || (action === 'quests' && screen === 'book') || (action === 'hudMenu' && screen === 'hud') || e.code === 'Escape')) { e.preventDefault(); closeScreen(); return; }
   if (action === 'map' && playing) { openScreen('map'); return; }
+  if (action === 'quests' && playing) { openScreen('book'); return; }
+  if (action === 'hudMenu' && playing) { openScreen('hud'); return; }
   if (action === 'inventory' && playing) { openScreen(creative ? 'palette' : 'inv'); return; }
   if (action === 'music') { toggleMusic(); return; }
   if (action === 'debug') { $('debug').hidden = !$('debug').hidden; return; }
@@ -1034,7 +1044,8 @@ function renderControlsTable() {
     [k('inventory'), 'Inventory & crafting', k('music'), 'Toggle music'],
     [k('skipTime'), 'Skip time of day', `${k('renderDown')} ${k('renderUp')}`, 'Render distance'],
     [k('fly'), 'Fly (creative only)', k('debug'), 'Debug info'],
-    [k('offhand'), 'Place the torch held in your shield slot', k('map'), 'Full-screen map (drag to explore; or tap the minimap)'],
+    [k('offhand'), 'Place the torch held in your shield slot', k('map'), 'Full-screen map (drag to explore; or click the minimap)'],
+    [k('quests'), 'Quest book: goals and jobs', k('hudMenu'), 'HUD settings: show, hide and move the panels'],
   ];
   $('controls').replaceChildren(...rows.map((r) => {
     const tr = document.createElement('tr');
@@ -1054,7 +1065,7 @@ function applySettings() {
     mouseDown = { left: false, right: false };
     if (touchMode) document.exitPointerLock?.();
   }
-  hud.apply(); // (the goals sit top left on a touch screen, top right otherwise: after the touch class above)
+  hud.apply(); // (after the touch class above)
   refitHud(); // (after the touch class above: on a touch screen the hotbar is sized to fit between the controls)
   $('tagline').textContent = touchMode ? 'Game paused' : 'Game paused \u2014 press Esc to resume';
   renderControlsTable();
@@ -2152,7 +2163,7 @@ window.__vc = {
   get food() { return food; }, set food(v) { food = v; shownFood = -1; renderHunger(); },
   get creative() { return creative; },
   REG, villagers, waterSim, damage, respawn, advanceTime, fallingTrees, startTreeFall, sky,
-  mobs, chests, quests, dialog, mobModels, weatherFx, startSleep, useBed, openChest, attackMob, breakBlock, placeBed, hammerExtras, setDoorFor, mobHitsPlayer,
+  mobs, chests, quests, dialog, book, hud, mobModels, weatherFx, startSleep, useBed, openChest, attackMob, breakBlock, placeBed, hammerExtras, setDoorFor, mobHitsPlayer,
   get weather() { return weatherState; }, get biome() { return biomeNow; }, get spawnBed() { return spawnBed; }, set spawnBed(v) { spawnBed = v; }, get xp() { return xp; }, set xp(v) { xp = v; },
   get air() { return air; }, set air(v) { air = v; shownAir = -1; }, get sleeping() { return sleeping; },
   get health() { return health; }, set health(v) { health = v; shownHealth = -1; renderHealth(); },
