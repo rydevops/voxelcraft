@@ -9,9 +9,18 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 ## World
 | | Feature |
 |---|---|
-| ✔ | Endless procedural terrain from a seed: continents, oceans, beaches, rivers, snow caps |
+| ✔ | Endless procedural terrain from a seed: continents, lakes, beaches, rivers, snow caps |
+| ✔ | **Oceans** (new worlds): warm seas with sandy shallows and gravel floors, deep ocean trenches down to y 5, frozen seas with an ice sheet, and sloping coasts |
+| ✔ | **Real-world biomes** (new worlds): plains, forest, hills, mountains, desert, tundra, plus savanna (acacia trees, dry grass), jungle (huge trees, ferns), swamp (flat, muddy, pooled), taiga (spruce on podzol), badlands (red terraces with clay bands), ocean, deep ocean and frozen ocean |
+| ✔ | **Flowers**: roses, dandelions, cornflowers, orange and pink tulips, alliums, oxeye daisies, ferns and dead bushes grow wild in the right biomes; pick them up, plant them on grass for the look, or make dye |
+| ✔ | **Bedrock**: the bottom layer of the world cannot be dug (gives nothing, even in creative) |
+| ✔ | **No ceiling**: build up to y 250 and beyond the old limit; nothing ticks above y 120 (no plant growth, no flowing water, no falling sand): a place to climb to and build for fun |
+| ✔ | **Weather**: rain, thunderstorms with lightning and thunder, snow and blizzards in cold biomes, sandstorms in the heat, and rare hurricanes at sea; rain particles only fall where there is open sky, storms darken the sky, hide the sun and shorten how far you see, and the grass and leaves sway harder; the clock panel shows biome and weather |
 | ✔ | Villages in new worlds: a well, dirt roads, houses with glass windows, doors and stair roofs, wheat farms, lamp posts, different every time |
-| ✔ | Villagers: wander about their village, look at you, and talk when you right-click / use them |
+| ✔ | **Five to seven villagers per village (new worlds), each with a house of their own and a bed** in it; at night they open their own door, go in, lie down and sleep, and get up at dawn |
+| ✔ | **Villager quests**: right-click a villager to see the job they have for you (bring items, or defeat monsters), **accept or decline** it and hand it in for a reward; the harder the job (easy, medium, hard) the better the loot pool |
+| ✔ | **Animals**: cows (beef, leather), pigs (porkchops) and sheep (wool, lamb chops, and shearing) wander in herds on grass, graze, run when hurt, and are saved with the world |
+| ✔ | **Monsters**: zombies, skeletons (they shoot arrows) and spiders appear only where the light level is below 6 (night, caves), never too many at once, never close, never in villages; they attack when they see you, burn away in daylight, drop loot of their own and give experience |
 | ✔ | Stairs (planks, cobblestone, brick; half-block steps you walk up), openable doors, glass (smelted from sand), dirt paths |
 | ✔ | Biomes: flat plains, forests, rolling hills, tall mountains, deserts and snowy tundra, each with its own ground and trees (new worlds; playing worlds keep their terrain) |
 | ✔ | Biome-style variety of trees: oak, apple, birch, spruce, tall oak, bush; forests and clearings |
@@ -22,13 +31,17 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Day and night cycle with a round sun, a lit 3D moon with 8 phases, twinkling stars and volumetric clouds |
 | ✔ | Light levels 0–15: sealed rooms and deep tunnels are dark, torches and lit furnaces give light, held torches follow you |
 | ✔ | Several worlds, each with its own seed, mode and save; create, play and delete from the world list |
-| ✘ | Mobs, villages, nether / other dimensions, multiplayer |
+| ✘ | Nether / other dimensions, multiplayer |
 
 ## Survival
 | | Feature |
 |---|---|
 | ✔ | Start with nothing: punch trees, craft, mine, farm, smelt, forge |
-| ✔ | Health (10 hearts), fall damage from 4 blocks, armor that softens falls, death drops everything and respawns you at spawn |
+| ✔ | Health (10 hearts), fall damage from 4 blocks, armor that softens falls and monster blows, death drops everything and respawns you at the bed you last slept in (or the world spawn) |
+| ✔ | **Air**: a row of bubbles over the hunger bar under water; when it is gone you take damage every second until you surface |
+| ✔ | **Fighting**: swords hit hardest, then hammers and axes, then other tools, then bare hands; better metals hit harder; hits knock creatures back and wear the weapon; a cooldown between blows |
+| ✔ | **Experience** from monsters (a bar and level by the hotbar), kept for the armour and tool augments to come |
+| ✔ | **Beds and sleep**: right-click a bed to set your respawn point and sleep (day becomes night, night becomes day); not with a monster near; breaking the bed sends your respawn back to the world spawn |
 | ✔ | Hunger with sprint, jump and mining costs, no sprinting when very hungry, starvation that can kill |
 | ✔ | Saturation: eating fills a hidden reserve that heals you once the hunger bar is full |
 | ✔ | Eating animation with crumbs and juice |
@@ -45,6 +58,10 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Farming: hoes, farmland that is damp near water and dries out, seeds, wheat, bread |
 | ✔ | Torches on floors and walls (drop when what they hang on is removed) |
 | ✔ | Ores glow faintly in the dark |
+| ✔ | **Building pieces**: stairs in nine materials, ten slabs for floors and steps, roof tiles (red and slate) with matching stairs and slabs, floor tiles, plaster, stone bricks, sandstone, birch and spruce planks, stone / wood / brick columns, framed windows and glass panes (they turn to fit the way you face), wooden and iron doors |
+| ✔ | **Hammers** (wood, stone, iron): a heavy tool that mines stone like a pickaxe, slower, and breaks the 3x3 patch of stone around the block you hit |
+| ✔ | **Beds** in four sizes (single, double, queen, king) and eight colours; dye comes from flowers; breaking a bed hands the whole bed back |
+| ✔ | **Chests** in three tiers (chest, iron chest, vault) with more slots and stacks bigger than your pockets (up to 1024 of a block); upgrade items turn one into the next and keep what is inside; crafting automatically uses the items in chests within 10 blocks |
 
 ## Crafting and items
 | | Feature |
@@ -54,6 +71,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Furnace with smelt, fuel and result slots, real cooking time, fuel burn times, lit look and light |
 | ✔ | Equipment slots: helmet, chestplate, leggings, boots, shield (also the offhand for torches: a torch there is held in the left hand and lights the way; shift-click sends torches there), backpack, quiver |
 | ✔ | Iron tools and armor set; backpack adds 9 slots |
+| ✔ | Swords, hammers, shears; raw beef, porkchops and lamb chops cooked in the furnace; leather, bones, string, rotten flesh; wool from string; dyes from flowers |
 | ◐ | Quiver and shield have slots and items but nothing to use them on yet |
 
 ## Look and sound
@@ -66,7 +84,9 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Full Screen button on the title screen (explains the home-screen way on an iPhone) |
 | ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
 | ✔ | Hotbar size and touch button size settings, smaller by default on phones |
-| ✔ | Full-screen map (tap the minimap, or N): drag, zoom, remembers the ground you have left |
+| ✔ | Full-screen map (tap the minimap, or press **M**): drag, zoom, remembers the ground you have left |
+| ✔ | **A visible arm and hand** that holds whatever is selected (block, tool, food) and swings, bobs and lifts it to your mouth; a left arm when a torch is in your off hand |
+| ✔ | Creatures built from boxes with walking animation, a red flash when hit and tipping over when defeated |
 | ✔ | Tree leaves rustle in the wind like the grass |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |
 | ✔ | Generated music: six in-game tracks in shuffled order and a looping title theme; generated sound effects |

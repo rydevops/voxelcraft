@@ -93,8 +93,9 @@ You start with **nothing**. The on-screen goals walk you through it:
 | Left click (hold) | Break block | Right click | Place / use table & furnace / till / plant / eat (hold) |
 | 1-9 / wheel | Select slot | Middle click | Pick a block you carry |
 | E | Inventory & crafting | Q | Drop one item |
-| T | Skip time of day | M | Toggle music |
+| T | Skip time of day | M | Full-screen map |
 | [ ] | Render distance | F3 | Debug info |
+| N | Toggle music | | |
 
 **Every keyboard key above can be remapped** in *Options & Key Bindings* (main/pause menu), where you can also set mouse sensitivity, field of view, invert-Y, raw mouse input and music/sound volume. Settings are remembered in your browser.
 
@@ -110,17 +111,28 @@ The menu has a **Mode** button: **Creative** gives a block palette (E), unlimite
 - **Sand falls**: sand (anything with `"gravity": true`) drops when the block under it is removed, and so does everything stacked on top of it: break the bottom of a stack of four and the other three slide down one level together, animated. Sand lands on (and crushes) plants, displaces water, and drops as an item if you build into its path.
 - **Light levels**: every block has a light level from 0 to 15. Open sky is 15 and falls straight down; beyond that light loses one level per block, so the deeper you dig a tunnel the darker it gets, down to a dim floor (never pitch black, set by `lighting.minBrightness` in `game.json`). Sealing yourself in a house or a hole cuts the light off, and opening a gap lets it flow back in. Leaves and water dim light as it passes (`lightFilter`), blocks can glow (`light`, none do yet), and the sky, fog and your hand darken with the light around you. Light is baked into the block faces with smooth shading and updated incrementally when you build or dig.
 - **Damp soil**: tilled soil next to water (the same radius as tilling) turns darker and damp and crops grow on it. If water is not close enough (or is taken away) it dries out to pale farmland; crops do not grow on dry farmland, and empty dry farmland eventually turns back into dirt.
-- **Full-screen map**: tap the minimap (or press **N**) to open a map of the terrain you have seen; the map remembers ground you have left behind. Drag to move around, scroll or pinch to zoom, **Find me** to come back to your arrow.
+- **Full-screen map**: tap the minimap (or press **M**) to open a map of the terrain you have seen; the map remembers ground you have left behind. Drag to move around, scroll or pinch to zoom, **Find me** to come back to your arrow.
 - **Minimap** (top right, also on a phone, with the real-life clock under it): a circular compass-style map of the terrain around you (north is up), outlined with N/E/S/W marks. It scrolls as you move and shows water depth, hills and trees, with an arrow for the way you face. Under it: your real-life clock, the in-game clock with the part of the day and day number, and your X / Y / Z.
 - **What you are looking at**: a HUD at the top centre names the block you are aiming at within 5 blocks and, for growing things (wheat, grass), shows its stage of growth and whether it is ready to harvest.
 - **Sky**: volumetric clouds with real thickness, a lit 3D moon with craters that cycles through 8 phases (one per day) and twinkling stars.
 
+## The living world
+
+- **Oceans and biomes** (new worlds): seas with sandy shallows, gravel floors and deep trenches; frozen seas; savanna, jungle, swamp, taiga and badlands next to the plains, forests, hills, mountains, desert and tundra. Worlds you were already playing keep their old terrain exactly, so your builds never change.
+- **Weather**: spells of rain, thunderstorms (lightning and thunder, a darker sky, shorter view, stronger wind), snow and blizzards in cold biomes, sandstorms in hot ones, and rare hurricanes at sea. The weather is the same every time for a world. Rain only falls where you can see the sky, so a roof keeps you dry. The clock panel shows the biome and the weather.
+- **Animals and monsters**: cows, pigs and sheep live in herds on grass (hit one for beef, porkchops, lamb chops, wool and leather; shear a sheep with iron shears for wool and it grows back). Zombies, skeletons (they shoot) and spiders appear only where the light is below 6, never too many, never close, never in a village; they come for you when they see you, burn away in daylight and drop loot and experience. Armor softens their blows and a better weapon (sword > hammer > axe > pickaxe) hurts them more.
+- **Beds**: single, double, queen and king, in eight dye colours. Right-click one to sleep (day becomes night and night becomes day) and set the place you wake up if you die; break it and you are back at the world spawn.
+- **Villages** (new worlds) have five to seven villagers, each with a house and a bed of their own. Right-click a villager for the job they have for you: accept or decline, and the harder it is the better the reward.
+- **Chests** hold more as they are upgraded and crafting uses what is in the chests near you. **Hammers** break a 3x3 patch of stone. **Air**: your breath runs out under water.
+- **The world has no ceiling** (build as high as you like) and a floor of **bedrock**; nothing grows, flows or falls above y 120.
+
 ## Content is data
 
 Everything below is described in `src/data/*.json` and read at startup (the page shows a clear message if a file is wrong):
-`blocks.json` (look, hardness, tool, sound, loot, plant growth, what a block opens/tills into/spreads onto), `items.json` (tools, food, seeds, tool tiers),
+`blocks.json` (look, hardness, tool, sound, loot, plant growth, what a block opens/tills into/spreads onto, its shape, bed, chest), `items.json` (tools, food, seeds, tool tiers, beds, chest upgrades),
 `loot.json`, `recipes.json` (recipes, stations, crafting windows), `goals.json`, `textures.json` (procedural generators with parameters, hand-drawn
-pixel art, or PNG files), `sounds.json`, `worldgen.json` (terrain, ores, trees...) and `game.json` (health, hunger, falling, tilling, day length...).
+pixel art, or PNG files), `sounds.json`, `worldgen.json` (terrain, oceans, biomes, ores, trees...), `game.json` (health, hunger, falling, breath, combat, tilling, day length...),
+`mobs.json` (animals and monsters and when they spawn), `quests.json` (what villagers ask for) and `weather.json` (rain, storms, snow and the rest).
 The engine only knows generic behaviours (a block with `"role": "log"` topples, one with `"opens": "table"` opens that window, an item with `"plants"` plants seeds),
 so new content needs no code. Tests prove it by adding a whole new ore, item, tool tier, recipe and goal from JSON alone.
 

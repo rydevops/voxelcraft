@@ -7,6 +7,7 @@ export const HUD_ITEMS = [
   { key: 'realTime', label: 'Real-world time', panel: 'info' },
   { key: 'gameTime', label: 'Game time', panel: 'info' },
   { key: 'dayPart', label: 'Time of day and day number', panel: 'info' },
+  { key: 'weather', label: 'Weather and biome', panel: 'info' },
   { key: 'coords', label: 'Coordinates', panel: 'info' },
   { key: 'goals', label: 'Goals', panel: 'goals' },
 ];

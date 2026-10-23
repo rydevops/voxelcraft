@@ -4,12 +4,14 @@
 // village that straddles chunk borders is built identically (and seamlessly) from both sides.
 // Numbers (how common, how big, which biomes) are data: worldgen.json "villages".
 import { REG } from './registry.js';
-import { B, STAIRS, DOOR_PLACE } from './blocks.js';
+import { B, STAIRS, DOOR_PLACE, BED_FOOT, BED_HEADS } from './blocks.js';
 import { mulberry32, hash2 } from './noise.js';
 import { CH, chunkKey, idx } from './voxel.js';
 
 const WG = REG.worldgen;
 const V = WG.villages;
+const V4 = WG.villages4; // terrain 4: 5-7 villagers, each with a house and a bed
+const BED_COLORS = Object.keys(BED_FOOT);
 const SEA = WG.seaLevel;
 const AIR = 0;
 
@@ -21,7 +23,7 @@ const LAST = ['ford', 'ton', 'wick', 'field', 'haven', 'stead', 'brook', 'hollow
 // ground row (the floor), 1.. = up. `b` offers put / stairs / door, and rotates everything to face the road.
 const planksStairs = () => STAIRS.get(B.PLANKS_STAIRS);
 
-function house(b, w, d, kind) {
+function house(b, w, d, kind, bedColor = null) {
   const front = d - 1, mid = (w - 1) >> 1;
   // floor: a cobblestone rim with planks inside
   for (let x = 0; x < w; x++) for (let z = 0; z < d; z++) b.put(x, 0, z, x === 0 || z === 0 || x === w - 1 || z === d - 1 ? B.COBBLE : B.PLANKS);
@@ -57,6 +59,8 @@ function house(b, w, d, kind) {
   b.put(1, 1, 1, kind === 'hall' || kind === 'long' ? B.FURNACE : B.CRAFTING);
   b.put(1, 2, 1, B.TORCH_FLOOR);
   if (kind === 'hall') { b.put(w - 2, 1, 1, B.CRAFTING); b.put(w - 2, 2, 1, B.TORCH_FLOOR); }
+  // the villager's bed: head against the back wall, foot a step towards the door, to the right of the table (a hall's second table takes the corner)
+  if (bedColor) b.bed(kind === 'hall' ? w - 4 : w - 2, 1, 1, bedColor);
 }
 
 // a plot of wheat with a ditch of water down the middle and a post with a torch at one corner
@@ -74,10 +78,10 @@ function farm(b, w, d) {
 }
 
 const KINDS = {
-  hut:   { w: 5, d: 5, weight: 3, build: (b) => house(b, 5, 5, 'hut') },
-  house: { w: 7, d: 5, weight: 4, build: (b) => house(b, 7, 5, 'house') },
-  long:  { w: 9, d: 5, weight: 2, build: (b) => house(b, 9, 5, 'long') },
-  hall:  { w: 9, d: 7, weight: 1.5, build: (b) => house(b, 9, 7, 'hall') },
+  hut:   { w: 5, d: 5, weight: 3, home: true, build: (b, bed) => house(b, 5, 5, 'hut', bed) },
+  house: { w: 7, d: 5, weight: 4, home: true, build: (b, bed) => house(b, 7, 5, 'house', bed) },
+  long:  { w: 9, d: 5, weight: 2, home: true, build: (b, bed) => house(b, 9, 5, 'long', bed) },
+  hall:  { w: 9, d: 7, weight: 1.5, home: true, build: (b, bed) => house(b, 9, 7, 'hall', bed) },
   farm:  { w: 9, d: 7, weight: 2.5, build: (b) => farm(b, 9, 7) },
 };
 
@@ -89,6 +93,7 @@ class Plan {
     this.buildings = [];
     this.spawns = [];
     this.doors = [];
+    this.homes = [];   // terrain 4: one per villager: { door, doorstep, inside, bedHead, bedFoot, color }
   }
   put(x, y, z, id) { this.blocks.set(x + ',' + y + ',' + z, id); }
   ground(x, z, top, under) { this.columns.set(x + ',' + z, { top, under }); }
@@ -111,6 +116,11 @@ function builder(plan, y0, ox, oz, w, d, front) {
     put,
     // facing f (0-3 = n e s w) in local terms; the front of the building faces local south, which is world direction `front`
     stairs(lx, ly, lz, variants, f) { put(lx, ly, lz, variants[(f + [0, 3, 2, 1][front]) % 4]); }, // (turning the building turns its stairs with it)
+    // a bed with its head at (lx, lz) against the back wall (the pillow end faces the back) and its foot one step nearer the door
+    bed(lx, ly, lz, color) {
+      put(lx, ly, lz, BED_HEADS[color][(0 + [0, 3, 2, 1][front]) % 4]);
+      put(lx, ly, lz + 1, BED_FOOT[color]);
+    },
     door(lx, ly, lz) {
       const [lo, hi] = DOOR_PLACE[front % 2 === 0 ? 'x' : 'z']; // a front wall that runs east-west holds a plate that spans x
       put(lx, ly, lz, lo); put(lx, ly + 1, lz, hi);
@@ -124,6 +134,8 @@ const footprint = (w, d, front) => (front % 2 === 0 ? [w, d] : [d, w]);
 
 function makePlan(world, cx, cz, y0, rng, biome) {
   const plan = new Plan();
+  const v4 = world.terrain >= 4;
+  const wanted = v4 ? V4.minVillagers + Math.floor(rng() * (V4.maxVillagers - V4.minVillagers + 1)) : Infinity; // how many people live here
   const topBlock = biome === 'desert' ? B.SAND : B.GRASS, underBlock = biome === 'desert' ? B.SAND : B.DIRT;
   const suitable = (x, z) => { const h = world.heightAt(x, z); return h > SEA + 1 && Math.abs(h - y0) <= V.maxStep; };
   const free = (x, z) => !plan.has(x, z);
@@ -157,6 +169,8 @@ function makePlan(world, cx, cz, y0, rng, biome) {
   const kinds = Object.keys(KINDS);
   const totalWeight = kinds.reduce((s, k) => s + KINDS[k].weight, 0);
   const pick = () => { let r = rng() * totalWeight; for (const k of kinds) { r -= KINDS[k].weight; if (r <= 0) return k; } return kinds[0]; };
+  const homeKinds = kinds.filter((k) => KINDS[k].home), homeWeight = homeKinds.reduce((s, k) => s + KINDS[k].weight, 0);
+  const pickHome = () => { let r = rng() * homeWeight; for (const k of homeKinds) { r -= KINDS[k].weight; if (r <= 0) return k; } return homeKinds[0]; };
   const slots = [8, 19, 30];
   const sides = [
     // name of the arm, along-road unit, side unit (which way the lot lies from the road), which way its front faces
@@ -166,11 +180,17 @@ function makePlan(world, cx, cz, y0, rng, biome) {
     { arm: 'north', ax: 0, az: -1, sx: 1, sz: 0, front: 3 }, { arm: 'north', ax: 0, az: -1, sx: -1, sz: 0, front: 1 },
   ];
   let placed = 0;
-  for (const s of sides) {
-    for (const t of slots) {
+  // every place a building could go; in terrain 4 they are visited in a shuffled order so the houses spread over the whole village
+  const lots = [];
+  for (const s of sides) for (const t of slots) lots.push({ s, t });
+  if (v4) for (let i = lots.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [lots[i], lots[j]] = [lots[j], lots[i]]; }
+  for (const { s, t } of lots) {
+    {
       if (t + 4 > arm[s.arm]) continue;   // the road does not reach this far
       if (rng() < V.emptyLot) continue;
-      const kind = KINDS[pick()];
+      // terrain 4: houses until everyone has one (about one lot in five is a farm meanwhile), then only farms
+      const homesSoFar = plan.homes.length;
+      const kind = KINDS[v4 ? (homesSoFar >= wanted ? 'farm' : rng() < 0.18 && homesSoFar > 1 ? 'farm' : pickHome()) : pick()];
       const [fw, fd] = footprint(kind.w, kind.d, s.front);
       // the lot's centre along the road is at distance t; its front wall is 3 off the road's middle line, and it extends away from the road
       const mx = cx + s.ax * t, mz = cz + s.az * t;
@@ -186,7 +206,8 @@ function makePlan(world, cx, cz, y0, rng, biome) {
       if (!ok) continue;
       for (let x = x0 - 1; x <= x0 + fw; x++) for (let z = z0 - 1; z <= z0 + fd; z++) plan.ground(x, z, topBlock, underBlock);
       const bd = builder(plan, y0, x0, z0, kind.w, kind.d, s.front);
-      kind.build(bd);
+      const bedColor = v4 && kind.home ? BED_COLORS[Math.floor(rng() * BED_COLORS.length)] : null;
+      kind.build(bd, bedColor);
       // the path from the road to the door: the row in front of the building
       const frontRow = [];
       for (let lx = 0; lx < kind.w; lx++) { const [wx, wz] = bd.toWorld(lx, kind.d); frontRow.push([wx, wz]); }
@@ -194,6 +215,11 @@ function makePlan(world, cx, cz, y0, rng, biome) {
       plan.buildings.push({ kind: Object.keys(KINDS).find((k) => KINDS[k] === kind), x0, z0, w: fw, d: fd, front: s.front });
       const [sx, sz] = bd.toWorld((kind.w - 1) >> 1, kind.d + 1);
       plan.spawns.push({ x: sx + 0.5, y: y0 + 1, z: sz + 0.5 });
+      if (bedColor) { // whose house it is: the way in, a spot just inside, and the bed
+        const mid = (kind.w - 1) >> 1, bx = Object.keys(KINDS).find((k) => KINDS[k] === kind) === 'hall' ? kind.w - 4 : kind.w - 2;
+        const at = (lx, lz) => { const [wx, wz] = bd.toWorld(lx, lz); return { x: wx + 0.5, z: wz + 0.5 }; };
+        plan.homes.push({ kind: Object.keys(KINDS).find((k) => KINDS[k] === kind), color: bedColor, door: { ...at(mid, kind.d - 1), y: y0 + 1 }, doorstep: at(mid, kind.d + 0), inside: at(mid, kind.d - 3), bedHead: at(bx, 1), bedFoot: at(bx, 2), bedBlockHead: bd.toWorld(bx, 1), bedBlockFoot: bd.toWorld(bx, 2), y: y0 + 1 });
+      }
       placed++;
     }
   }
@@ -248,7 +274,7 @@ export function villageOfRegion(world, rx, rz) {
     const site = chooseSite(world, rx, rz, rng);
     if (site) {
       const plan = makePlan(world, site.cx, site.cz, site.y0, rng, site.biome);
-      if (plan.placed >= V.minBuildings) village = finish(plan, site, rx, rz, rng);
+      if (plan.placed >= V.minBuildings && (world.terrain < 4 || plan.homes.length >= V4.minHouses)) village = finish(plan, site, rx, rz, rng);
     }
   }
   cache.set(key, village);
@@ -273,6 +299,7 @@ function finish(plan, site, rx, rz, rng) {
   return {
     key: rx + ',' + rz, name, cx: site.cx, cz: site.cz, y0: site.y0, biome: site.biome,
     bounds: { x0, x1, z0, z1 }, byChunk, buildings: plan.buildings, spawns: plan.spawns, doors: plan.doors,
+    homes: plan.homes, // terrain 4: where each villager lives and sleeps (empty in older villages)
   };
 }
 

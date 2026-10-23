@@ -16,6 +16,7 @@ function flatWorld() {
   for (let cx = 0; cx <= 1; cx++) for (let cz = 0; cz <= 1; cz++) {
     const c = w.generateChunk(cx, cz);
     for (let z = 0; z < CS; z++) for (let x = 0; x < CS; x++) for (let y = 0; y < 64; y++) c.data[idx(x, y, z)] = y < Y ? B.STONE : y === Y ? B.STONE : B.AIR;
+    c.recomputeTop();
   }
   return w;
 }
@@ -25,8 +26,8 @@ const YAW = { east: -Math.PI / 2, west: Math.PI / 2, south: Math.PI, north: 0 };
 
 t('the data: stairs come in four ways round, doors in eight states, and they link up', () => {
   for (const [base, v] of STAIRS) { assert.equal(v.length, 4); for (const id of v) { assert.ok(id > 0 && SHAPE[id] === 1 && SOLID[id] === 2); assert.equal(BASE_OF[id], base); assert.equal(BOXES.get(id).length, 2); } }
-  assert.equal(STAIRS.size, 3, 'oak, cobblestone and brick stairs');
-  assert.equal(DOOR.size, 8);
+  assert.equal(STAIRS.size, 9, 'nine kinds of stairs: oak, cobblestone, brick, stone brick, sandstone, birch, spruce and two roofs');
+  assert.equal(DOOR.size, 16, 'a wooden and an iron door, eight blocks each');
   for (const [id, d] of DOOR) { assert.equal(DOOR.get(d.partner).partner, id); assert.equal(DOOR.get(d.toggled).toggled, id); assert.notEqual(DOOR.get(d.partner).top, d.top); assert.equal(DOOR.get(d.toggled).open, !d.open); assert.equal(SOLID[id], d.open ? 0 : 1, 'a door blocks only while shut'); }
   assert.deepEqual(Object.keys(DOOR_PLACE).sort(), ['x', 'z']);
 });
@@ -44,8 +45,8 @@ t('crafting: stairs from planks / cobblestone / brick, doors from planks; glass 
 t('stairs turned another way drop and pick as the usual stairs; a door drops the door item', () => {
   const ids = STAIRS.get(B.PLANKS_STAIRS);
   for (const id of ids) { assert.deepEqual(dropsFor(id, true), [{ id: B.PLANKS_STAIRS, n: 1 }]); assert.equal(itemForBlock(id), B.PLANKS_STAIRS); }
-  for (const id of DOOR.keys()) { assert.equal(itemForBlock(id), I.DOOR); assert.deepEqual(dropsFor(id, true).map((d) => d.id), [I.DOOR]); }
-  assert.ok(isDoorItem(I.DOOR) && !isDoorItem(B.PLANKS));
+  for (const [id, d] of DOOR) { const item = d.kind === 'iron' ? I.IRON_DOOR : I.DOOR; assert.equal(itemForBlock(id), item); assert.deepEqual(dropsFor(id, true).map((x) => x.id), [item]); }
+  assert.ok(isDoorItem(I.DOOR) && isDoorItem(I.IRON_DOOR) && !isDoorItem(B.PLANKS));
 });
 
 t('walking up a staircase: each step is half a block, you climb it without jumping', () => {
@@ -117,6 +118,7 @@ t('meshing: stairs and doors produce valid geometry, hidden faces are left out',
   // one stair on a stone floor: the floor's top face under it is hidden, the stair adds the quads of its two boxes minus the faces on the floor
   const bare = new World(1337); const c = bare.generateChunk(0, 0);
   for (let z = 0; z < CS; z++) for (let x = 0; x < CS; x++) for (let y = 0; y < 64; y++) c.data[idx(x, y, z)] = y <= Y ? B.STONE : B.AIR;
+  c.recomputeTop();
   const base = meshChunk(bare, c).solid.positions.length / 12;
   bare.setBlock(6, Y + 1, 6, north);
   const withStair = meshChunk(bare, c).solid.positions.length / 12;

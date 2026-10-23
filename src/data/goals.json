@@ -98,6 +98,51 @@
     {
       "text": "Talk to a villager",
       "flag": "talked"
+    },
+    {
+      "text": "Craft a Sword",
+      "craftedAny": [
+        "wood_sword",
+        "stone_sword",
+        "iron_sword"
+      ]
+    },
+    {
+      "text": "Slay a monster",
+      "flag": "slain"
+    },
+    {
+      "text": "Craft a Chest",
+      "crafted": "chest"
+    },
+    {
+      "text": "Craft a Bed",
+      "craftedAny": [
+        "bed_single_white",
+        "bed_double_white",
+        "bed_queen_white",
+        "bed_king_white"
+      ]
+    },
+    {
+      "text": "Sleep in a Bed",
+      "flag": "slept"
+    },
+    {
+      "text": "Craft a Hammer",
+      "craftedAny": [
+        "wood_hammer",
+        "stone_hammer",
+        "iron_hammer"
+      ]
+    },
+    {
+      "text": "Find the ocean",
+      "flag": "ocean"
+    },
+    {
+      "text": "Finish a villager quest",
+      "flag": "quest"
     }
   ]
 }

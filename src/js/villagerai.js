@@ -34,11 +34,20 @@ const LINES = {
   },
 };
 
+// Is it bedtime? From a little after sunset until just before sunrise (dayTime 0 = sunrise, .5 = sunset)
+export const bedtime = (dayTime) => dayTime >= 0.53 && dayTime < 0.98;
+
 export class Villager {
-  constructor(world, village, spawn, index) {
+  // home (terrain 4 villages): { door, doorstep, inside, bedFoot, bedHead, y }: the house this villager lives in and sleeps in
+  constructor(world, village, spawn, index, home = null) {
     this.world = world;
     this.village = village;
     this.index = index;
+    this.key = village.key + ':' + index; // who this is, for the quests they give
+    this.homeInfo = home;
+    this.mode = 'day';       // day | toBed | sleeping | toDoor
+    this.route = [];         // places still to walk through on the way to bed or to the door
+    this.doorOpen = false;
     const h = (salt) => hash2(Math.floor(spawn.x), Math.floor(spawn.z), village.cx * 31 + salt);
     this.rng = mulberry32((h(3) * 4294967296) | 0);
     this.name = NAMES[Math.floor(h(1) * NAMES.length)];
@@ -97,8 +106,58 @@ export class Villager {
   }
 
   // dt seconds; `player` = { x, z } of whoever is nearby (or null)
-  update(dt, player = null, now = 0) {
+  // Where a sleeping villager lies, and which way the head points: { x, y, z, yaw } (the feet at x, y, z)
+  sleepPose() {
+    const h = this.homeInfo;
+    const dx = h.bedHead.x - h.bedFoot.x, dz = h.bedHead.z - h.bedFoot.z, len = Math.hypot(dx, dz) || 1;
+    const hx = dx / len, hz = dz / len;
+    return { x: h.bedFoot.x - hx * 0.4, y: h.y + 0.5, z: h.bedFoot.z - hz * 0.4, yaw: Math.atan2(hx, hz) };
+  }
+
+  // Put them straight into bed (a village that comes into range at night)
+  sleepNow() {
+    if (!this.homeInfo) return;
+    const p = this.sleepPose();
+    this.mode = 'sleeping'; this.route = []; this.target = null;
+    this.body.pos = { x: p.x, y: p.y, z: p.z }; this.body.vel = { x: 0, y: 0, z: 0 };
+    this.moving = false;
+  }
+
+  // Bedtime and morning, for villagers who have a house: walk to the door, in, to the bed, lie down; at dawn the other way round.
+  // env = { night, setDoor(door, open) } (setDoor lets them open and close their own door)
+  thinkHome(dt, player, env) {
+    const h = this.homeInfo, body = this.body;
+    if (env.night && (this.mode === 'day' || this.mode === 'toDoor')) {
+      this.mode = 'toBed';
+      this.route = [h.doorstep, h.inside, { x: h.bedFoot.x, z: h.bedFoot.z }];
+      this.target = null;
+    } else if (!env.night && (this.mode === 'sleeping' || this.mode === 'toBed')) {
+      if (this.mode === 'sleeping') { body.pos = { x: h.inside.x, y: h.y, z: h.inside.z }; body.vel = { x: 0, y: 0, z: 0 }; }
+      this.mode = 'toDoor';
+      this.route = [h.inside, h.doorstep];
+      this.target = null;
+    }
+    // their own door: open it as they go through, shut it behind them
+    const dd = Math.hypot(this.x - h.door.x, this.z - h.door.z);
+    if ((this.mode === 'toBed' || this.mode === 'toDoor') && dd < 2.1 && !this.doorOpen) { this.doorOpen = true; env.setDoor?.(h.door, true); }
+    // shut again once they are through (heading for the bed, in bed, or back out and on their way)
+    const through = this.mode === 'toBed' && this.target && this.target.x === h.bedFoot.x && this.target.z === h.bedFoot.z;
+    if (this.doorOpen && (dd > 2.8 || through || this.mode === 'sleeping' || this.mode === 'day')) { this.doorOpen = false; env.setDoor?.(h.door, false); }
+    if (this.mode === 'toBed' || this.mode === 'toDoor') {
+      if (!this.target && this.route.length) this.target = this.route.shift();
+      if (!this.target && !this.route.length) { // arrived
+        if (this.mode === 'toBed') this.sleepNow(); else { this.mode = 'day'; this.timer = 1 + this.rng() * 3; }
+      }
+    }
+  }
+
+  update(dt, player = null, now = 0, env = null) {
     const body = this.body;
+    if (this.homeInfo && env) {
+      this.thinkHome(dt, player, env);
+      if (this.mode === 'sleeping') { this.moving = false; this.headTurn = 0; return; }
+    }
+    const routing = this.mode === 'toBed' || this.mode === 'toDoor';
     // safety: fallen out of the village (a hole, the sea): back to where we started
     if (body.pos.y < this.village.y0 - 4) { body.pos = { x: this.home.x, y: this.village.y0 + 1, z: this.home.z }; body.vel = { x: 0, y: 0, z: 0 }; this.target = null; }
 
@@ -106,17 +165,19 @@ export class Villager {
     let ahead = 0;
     if (this.target) {
       const dx = this.target.x - this.x, dz = this.target.z - this.z, dist = Math.hypot(dx, dz);
-      if (dist < 0.5) { this.target = null; this.timer = 2 + this.rng() * 6; }
+      if (dist < (routing ? 0.35 : 0.5)) { this.target = null; this.timer = routing ? 0 : 2 + this.rng() * 6; }
       else {
         const off = this.turnTo(Math.atan2(-dx, -dz), dt, 6);
         if (off < 0.5) ahead = body.inWater ? 0.45 : 0.28; // about 1.2 blocks a second
-        if (ahead > 0 && !body.inWater && !this.safeAhead()) { ahead = 0; this.target = null; this.timer = 0.3 + this.rng() * 1.5; } // water, crops or a drop ahead: stop and think again
+        if (ahead > 0 && !body.inWater && !routing && !this.safeAhead()) { ahead = 0; this.target = null; this.timer = 0.3 + this.rng() * 1.5; } // water, crops or a drop ahead: stop and think again
         this.progressAt.t += dt;
         if (this.progressAt.t > 1.6) { // not getting anywhere (a door, a wall, a fence): give up on this one
-          if (Math.hypot(this.x - this.progressAt.x, this.z - this.progressAt.z) < 0.35) { this.target = null; this.timer = 0.4 + this.rng(); }
+          if (Math.hypot(this.x - this.progressAt.x, this.z - this.progressAt.z) < 0.35) { if (routing) { this.route.unshift(this.target); } this.target = null; this.timer = 0.4 + this.rng(); }
           this.progressAt = { x: this.x, z: this.z, t: 0 };
         }
       }
+    } else if (routing) {
+      this.timer -= dt; // (waiting a moment for a door to open)
     } else {
       this.timer -= dt;
       if (near < 5) this.turnTo(Math.atan2(-(player.x - this.x), -(player.z - this.z)), dt, 3.5); // look at whoever is close
@@ -143,6 +204,7 @@ export class Villager {
 
   // Something to say, depending on the job and whether it is day
   speak(night, rand = Math.random) {
+    if (this.mode === 'sleeping') return 'Zzz... mmm... what? Oh, it is you. Is it morning?';
     const set = LINES[this.job][night ? 'night' : 'day'];
     return set[Math.floor(rand() * set.length)].replace('{village}', this.village.name);
   }

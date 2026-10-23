@@ -2,7 +2,7 @@
 // stacked on top of it: break the bottom of a column and the rest slides down one level together.
 // Pure logic with hooks, so it runs in Node tests; main.js draws the falling blocks.
 import { B, GRAVITY, PLANT, IS_WATER } from './blocks.js';
-import { CH } from './world.js';
+import { CH, TICK_CEILING } from './voxel.js';
 
 const FALL_ACCEL = 28; // blocks per second squared
 const canFallInto = (id) => id === B.AIR || PLANT[id] > 0 || IS_WATER[id] === 1;
@@ -19,6 +19,7 @@ export class GravitySim {
 
   // A change can only affect support at the changed cell and the cell above it
   touch(x, y, z) {
+    if (y > TICK_CEILING) return; // (sand up there stays where it is)
     if (GRAVITY[this.world.getBlock(x, y, z)] || GRAVITY[this.world.getBlock(x, y + 1, z)]) {
       this.queue.add(x + ',' + y + ',' + z);
       this.queue.add(x + ',' + (y + 1) + ',' + z);

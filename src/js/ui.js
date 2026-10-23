@@ -3,6 +3,7 @@ import { PALETTE } from './blocks.js';
 import { itemName, maxDamage, equipOf, isOffhand, EQUIP_SLOTS, RECIPES, STATION_LABEL, GOALS, WINDOWS, specIds, specName, SMELTING, fuelSeconds, FUEL_ITEMS } from './items.js';
 import { INPUT, FUEL, OUTPUT, clickFurnaceSlot, quickInsert, autoFill, cooking, isLit } from './furnace.js';
 import { itemIcon } from './textures.js';
+import { clickChest, putInChest, takeFromChest, sortChest, slotLimit } from './chests.js';
 import { SLOTS, HOTBAR, TOTAL_SLOTS } from './inventory.js';
 
 const $ = (id) => document.getElementById(id);
@@ -78,6 +79,8 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
       const st = inventory.slots[i];
       if (e.shiftKey && e.button === 0 && st && (equipOf(st.id) || isOffhand(st.id)) && inventory.quickEquip(i)) {
         onEquip?.();
+      } else if (e.shiftKey && e.button === 0 && chestCtx) { // a chest is open: shift-click sends the stack into it
+        if (st) { const left = putInChest(chestCtx.chest, chestCtx.tier, st); if (left <= 0) inventory.slots[i] = null; else st.n = left; }
       } else if (e.shiftKey && e.button === 0 && furnace) { // furnace window open: shift-click sends smeltable items / fuel into it
         if (st) { const left = quickInsert(furnace, st); if (left <= 0) inventory.slots[i] = null; else st.n = left; }
       } else if (e.shiftKey && e.button === 0) inventory.quickMove(i);
@@ -167,11 +170,13 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
   const CONTEXTS = WINDOWS;
   let ctx = 'hand';
   let furnace = null; // the state of the furnace whose window is open (see furnace.js)
+  let chestCtx = null; // the chest whose window is open: { chest, tier, name } (see chests.js)
   const searchEl = $('recipe-search');
   const onlyEl = $('recipe-only');
   try { onlyEl.checked = localStorage.getItem('voxelcraft.recipeOnly') === '1'; } catch { /* no storage: fine */ }
   const currentStations = () => ({ table: ctx === 'table', furnace: ctx === 'furnace' });
   const isFurnaceWindow = () => !!CONTEXTS[ctx].furnace;
+  const isChestWindow = () => !!CONTEXTS[ctx].chest;
 
   // does a recipe match what was typed? every word must appear in the name, label or an ingredient
   const matchesSearch = (text) => {
@@ -184,7 +189,14 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
     hideTip();
     const info = CONTEXTS[ctx];
     const smelt = !!info.furnace;
-    $('craft-title').textContent = info.title;
+    const box = !!info.chest && !!chestCtx;
+    $('chest-panel').hidden = !box;
+    $('recipe-tools').hidden = box;
+    recipesEl.hidden = box;
+    invEl.classList.toggle('chest-open', box);
+    if (box) { $('furnace-panel').hidden = true; $('craft-title').textContent = chestCtx.name; renderChest(); return; }
+    const near = inventory.linked.length;
+    $('craft-title').textContent = info.title + (near ? ` · using ${near} nearby chest${near === 1 ? '' : 's'}` : '');
     $('recipe-only-label').textContent = smelt ? 'Smeltable only' : 'Craftable only';
     $('furnace-panel').hidden = !smelt;
     if (smelt) renderFurnace();
@@ -252,6 +264,26 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
     try { localStorage.setItem('voxelcraft.recipeOnly', onlyEl.checked ? '1' : '0'); } catch { /* ignore */ }
     renderRecipes();
   });
+
+  // ---- a chest: a grid of slots whose stacks can be bigger than a hand holds -----------------------------------
+  function renderChest() {
+    const { chest, tier } = chestCtx, grid = $('chest-grid');
+    grid.replaceChildren();
+    $('chest-info').textContent = `${tier.slots} slots · stacks up to ${64 * tier.stack}`;
+    chest.slots.forEach((st, i) => {
+      const el = makeSlot(st);
+      if (st) { el.dataset.tipSub = `Holds up to ${slotLimit(st.id, tier)} here`; }
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.shiftKey && e.button === 0) takeFromChest(chest, i, inventory);
+        else cursor = clickChest(chest, i, cursor, e.button === 2 ? 2 : 0, tier);
+        changed();
+      });
+      grid.appendChild(el);
+    });
+  }
+  $('chest-sort').addEventListener('click', () => { if (chestCtx) { sortChest(chestCtx.chest, chestCtx.tier); changed(); } });
 
   // ---- the furnace window: input, fuel and result slots, a flame and a progress arrow ----------------
   const furnaceSlotEls = [$('fur-input'), $('fur-fuel'), $('fur-output')];
@@ -389,10 +421,12 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
     renderCursor();
   });
 
+  // `extra` is the state of the furnace, or { chest, tier, name } for a chest, whose window this is
   function openInventory(selected, context = 'hand', furnaceState = null) {
     currentSelected = selected;
     ctx = CONTEXTS[context] ? context : 'hand';
     furnace = CONTEXTS[ctx].furnace ? furnaceState : null;
+    chestCtx = CONTEXTS[ctx].chest ? furnaceState : null;
     searchEl.value = '';
     invOpen = true;
     invEl.hidden = false;
@@ -408,6 +442,7 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
       cursor = null;
     }
     furnace = null;
+    chestCtx = null;
     invOpen = false;
     invEl.hidden = true;
     renderHotbar(currentSelected);

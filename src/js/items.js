@@ -1,7 +1,7 @@
 // Items, tools, loot, recipes and goals for the engine, built from the data files (src/data/*.json).
 // Nothing here is hand-written content: add an item, recipe or loot table in the JSON and it appears in the game.
 import { REG } from './registry.js';
-import { BLOCKS, EMIT } from './blocks.js';
+import { BLOCKS, EMIT, BED, UNBREAKABLE } from './blocks.js';
 
 // I.STICK, I.WOOD_PICKAXE, ... : numeric ids by item key (upper-cased). Blocks live in B (blocks.js).
 export const I = {};
@@ -44,19 +44,29 @@ export function heldLight(id) {
   return places ? Math.max(0, ...Object.values(places).map((b) => EMIT[b])) : 0;
 }
 // How many uses a tool loses breaking this block: 1 for what it is made for, more for anything else
+export const toolDigs = (t, kind) => !!t && !!kind && (t.type === kind || t.mines === kind); // does this tool dig that kind of block (a hammer is a pickaxe)?
 export function toolWear(blockId, heldId) {
   const t = toolOf(heldId);
   if (!t) return 0;
-  return BLOCKS[blockId]?.tool === t.type ? 1 : REG.game.tools.wrongToolWear;
+  return toolDigs(t, BLOCKS[blockId]?.tool) ? 1 : REG.game.tools.wrongToolWear;
 }
 // The inventory item that stands for a block you look at (middle click): stairs turned any way are the usual stairs, doors the door item
-const DOOR_ITEM = REG.items.find((it) => it.door)?.id ?? 0;
+const DOOR_ITEM = {}; // door kind (wood, iron) -> the item that places it
+for (const it of REG.items) if (it.door) DOOR_ITEM[REG.blockById.get(it.door).model.kind] = it.id;
+const BED_ITEM = {}; // colour -> the single bed of that colour (what picking a bed gives)
+for (const it of REG.items) if (it.bed && it.bed.width === 1) BED_ITEM[it.bed.color] = it.id;
 export function itemForBlock(blockId) {
   const def = REG.blockById.get(blockId);
-  if (def?.model?.type === 'door' && DOOR_ITEM) return DOOR_ITEM;
+  if (def?.model?.type === 'door') return DOOR_ITEM[def.model.kind] ?? 0;
+  if (def?.bed) return BED_ITEM[def.bed.color] ?? blockId;
   return def?.variantOf || blockId;
 }
 export const isDoorItem = (id) => !!ITEM.get(id)?.door; // a door: places a closed, two-block-tall door
+export const doorBlockOf = (id) => ITEM.get(id)?.door ?? 0; // the closed lower half it places (its model.kind picks the wooden or the iron door)
+export const bedOf = (id) => ITEM.get(id)?.bed ?? null; // a bed: { width, color, foot, heads: [n, e, s, w] }
+export const upgradeOf = (id) => ITEM.get(id)?.upgrade ?? null; // a chest upgrade: { from, to } block ids
+export const isShears = (id) => !!ITEM.get(id)?.shears;
+export const BED_ITEMS = REG.items.filter((i) => i.bed).sort((a, b) => b.bed.width - a.bed.width); // widest first (for handing a broken bed back)
 export const placesOf = (id) => ITEM.get(id)?.places ?? null; // torch etc: { up, north, ... } -> block placed on the face you click
 
 // ---- loot ---------------------------------------------------------------------------------------
@@ -69,6 +79,9 @@ function roll(table, rand) {
   }
   return out;
 }
+
+// Roll a loot table by name (what a creature drops, what a quest pays): [{ id, n }]
+export const rollLoot = (name, rand = Math.random) => roll(REG.loot[name] ?? [], rand);
 
 // What a broken block gives: its loot table from loot.json, or itself if it has none.
 export function dropsFor(blockId, canHarvest, rand = Math.random) {
@@ -89,7 +102,8 @@ export function shatterDrops(blockId, rand = Math.random) {
 export function miningInfo(blockId, heldId) {
   const b = BLOCKS[blockId];
   const tool = toolOf(heldId);
-  const matches = !!tool && b.tool === tool.type;
+  const matches = toolDigs(tool, b.tool);
+  if (UNBREAKABLE[blockId]) return { time: Infinity, canHarvest: false, matches: false, unbreakable: true };
   const canHarvest = b.need === 0 || (matches && tool.tier >= b.need);
   let t = b.hard;
   if (matches) t /= tool.speed;
