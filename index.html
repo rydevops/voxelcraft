@@ -28,6 +28,7 @@
       <div class="mm-row" data-hud="realTime"><span>Real time</span><b id="mm-real">--:--:--</b></div>
       <div class="mm-row" data-hud="gameTime"><span>Game time</span><b id="mm-game">--:--</b></div>
       <div class="mm-row mm-sub" data-hud="dayPart"><span id="mm-part"></span></div>
+      <div class="mm-row mm-sub" data-hud="weather"><span id="mm-env"></span></div>
       <div class="mm-row mm-xyz" data-hud="coords"><span>X <b id="mm-x">0</b></span><span>Y <b id="mm-y">0</b></span><span>Z <b id="mm-z">0</b></span></div>
     </div>
     <div id="goals"><h3><i class="chev"></i>Goals <span id="goal-count"></span></h3><ul id="goal-list"></ul></div>
@@ -35,7 +36,7 @@
   <div id="blockname"></div>
   <div id="lookat" hidden><img id="lookat-icon" alt=""><div id="lookat-text"><b id="lookat-name"></b><span id="lookat-sub"></span><div id="lookat-pips"></div></div></div>
   <div id="hurt"></div>
-  <div id="bars"><div id="armorbar" hidden title="Armor: each point softens falls"></div><div id="health"></div><div id="hunger"></div><div id="satbar" title="Saturation: the reserve that heals you"><i></i></div></div>
+  <div id="bars"><div id="armorbar" hidden title="Armor: each point softens falls and blows"></div><div id="health"></div><div id="hunger"></div><div id="satbar" title="Saturation: the reserve that heals you"><i></i></div><div id="airbar" hidden title="Air: you lose health when it runs out"></div><div id="xpbar" title="Experience from monsters"><i></i><b id="xplevel"></b></div></div>
   <div id="eatbar" hidden><i></i></div>
   <div id="hotbar"></div>
 
@@ -68,6 +69,11 @@
             </div>
           </div>
         </div>
+        <div id="chest-panel" hidden>
+          <div class="chest-head"><span id="chest-info"></span><button id="chest-sort" class="small">Sort</button></div>
+          <div id="chest-grid"></div>
+          <p class="hint">Click: pick up / place &middot; Shift-click: move a stack &middot; Crafting uses the items in chests near you.</p>
+        </div>
         <div id="recipe-tools">
           <input id="recipe-search" type="search" placeholder="Search recipes..." autocomplete="off" spellcheck="false">
           <label class="toggle"><input type="checkbox" id="recipe-only"><span id="recipe-only-label">Craftable only</span></label>
@@ -80,6 +86,28 @@
   </div>
 
   <div id="item-tip" hidden></div>
+
+  <!-- a villager talking: their quest, to accept or decline -->
+  <div id="talk" hidden>
+    <div class="talk-panel">
+      <div class="talk-head"><b id="talk-name"></b><span id="talk-job"></span></div>
+      <p id="talk-line"></p>
+      <div id="talk-quest" hidden>
+        <div class="talk-tier"><span id="talk-tier"></span><span id="talk-xp"></span></div>
+        <p id="talk-text"></p>
+        <ul id="talk-reqs"></ul>
+        <p id="talk-reward"></p>
+      </div>
+      <div class="talk-buttons">
+        <button id="talk-accept">Accept</button>
+        <button id="talk-decline" class="small">Decline</button>
+        <button id="talk-turnin">Hand it in</button>
+        <button id="talk-abandon" class="small">Give up</button>
+        <button id="talk-close" class="small">Goodbye</button>
+      </div>
+    </div>
+  </div>
+  <div id="sleep" hidden><p id="sleep-text"></p></div>
 
   <div id="palette" hidden>
     <div class="pal-panel">
@@ -163,7 +191,7 @@
     </div>
     <p id="music-hint" hidden>&#9835; <span class="pc-only">Click or press any key</span><span class="touch-only">Tap anywhere</span> to start the music</p>
     <p id="title-credit"></p>
-    <p id="title-version">v1.0.0-60ffa66a31</p>
+    <p id="title-version">v1.0.0-c7a69ff7c2</p>
   </div>
   <div id="worlds" hidden>
     <div class="world-panel">

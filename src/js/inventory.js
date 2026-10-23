@@ -10,6 +10,7 @@ export class Inventory {
   constructor() {
     this.slots = Array(TOTAL_SLOTS).fill(null); // null | { id, n, d } (d = damage taken, tools only); 36.. only count with a backpack on
     this.equipment = Object.fromEntries(EQUIP_SLOTS.map((e) => [e.id, null])); // helmet, chestplate, ... -> a stack or null
+    this.linked = []; // other places crafting may take from (the chests near you): each has count(id) and remove(id, n); see chests.js
   }
 
   // How many slots can hold things right now: 36, plus the backpack's if one is worn
@@ -151,17 +152,36 @@ export class Inventory {
     return false;
   }
 
-  // How many of an ingredient spec (an item id, or an array of interchangeable ids) we hold
+  // How many of an item we hold, and in the linked chests nearby (what a recipe can use)
+  countAll(id) {
+    return this.linked.reduce((sum, src) => sum + src.count(id), this.count(id));
+  }
+
+  // Take n of an item for a recipe: from the inventory first, then from the chests. Returns how many could NOT be taken.
+  take(id, n) {
+    const mine = Math.min(n, this.count(id));
+    if (mine > 0) this.remove(id, mine);
+    n -= mine;
+    for (const src of this.linked) {
+      if (n <= 0) break;
+      const here = Math.min(n, src.count(id));
+      if (here > 0) { src.remove(id, here); n -= here; }
+    }
+    return n;
+  }
+
+  // How many of an ingredient spec (an item id, or an array of interchangeable ids) we can use
   countSpec(spec) {
-    return specIds(spec).reduce((sum, id) => sum + this.count(id), 0);
+    return specIds(spec).reduce((sum, id) => sum + this.countAll(id), 0);
   }
 
   // Use up n of a spec, taking from the alternatives in the order they are listed
   removeSpec(spec, n) {
     for (const id of specIds(spec)) {
-      const take = Math.min(n, this.count(id));
-      if (take > 0) this.remove(id, take);
-      n -= take;
+      if (n <= 0) break;
+      const here = Math.min(n, this.countAll(id));
+      if (here > 0) this.take(id, here);
+      n -= here;
     }
     return n === 0;
   }

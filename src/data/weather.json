@@ -1,0 +1,98 @@
+{
+  "_comment": "Weather comes in spells (periodDays of game time each, chosen from the world seed, so it is the same every time). weight = how likely, minDay = not before this day. The weather is turned into what your biome allows: cold = what it becomes in a cold biome (rain -> snow), hot = in a hot one (a storm -> sandstorm); climates lists the biomes it can happen in. particles: rain / snow / sand; darkness dims the sky 0-1, wind sways grass and leaves, fog shortens how far you see, lightning = strikes per minute.",
+  "periodDays": 0.28,
+  "events": {
+    "clear": {
+      "label": "Clear",
+      "weight": 10
+    },
+    "cloudy": {
+      "label": "Overcast",
+      "weight": 3,
+      "darkness": 0.15,
+      "wind": 0.3
+    },
+    "rain": {
+      "label": "Rain",
+      "weight": 5,
+      "wet": true,
+      "darkness": 0.28,
+      "wind": 0.5,
+      "fog": 0.8,
+      "particles": "rain",
+      "density": 1,
+      "sound": "rain",
+      "cold": "snow",
+      "hot": "clear"
+    },
+    "storm": {
+      "label": "Thunderstorm",
+      "weight": 2,
+      "wet": true,
+      "darkness": 0.5,
+      "wind": 0.9,
+      "fog": 0.62,
+      "particles": "rain",
+      "density": 1.8,
+      "sound": "rain",
+      "lightning": 5,
+      "cold": "blizzard",
+      "hot": "sandstorm",
+      "minDay": 1
+    },
+    "snow": {
+      "label": "Snow",
+      "weight": 0,
+      "wet": true,
+      "darkness": 0.2,
+      "wind": 0.3,
+      "fog": 0.75,
+      "particles": "snow",
+      "density": 1,
+      "sound": "wind"
+    },
+    "blizzard": {
+      "label": "Blizzard",
+      "weight": 0,
+      "wet": true,
+      "darkness": 0.34,
+      "wind": 1.1,
+      "fog": 0.4,
+      "particles": "snow",
+      "density": 2.4,
+      "sound": "wind",
+      "speed": 0.85
+    },
+    "sandstorm": {
+      "label": "Sandstorm",
+      "weight": 0,
+      "darkness": 0.3,
+      "wind": 1.1,
+      "fog": 0.35,
+      "particles": "sand",
+      "density": 2,
+      "sound": "wind",
+      "speed": 0.85
+    },
+    "hurricane": {
+      "label": "Hurricane",
+      "weight": 0.5,
+      "wet": true,
+      "darkness": 0.62,
+      "wind": 1.6,
+      "fog": 0.4,
+      "particles": "rain",
+      "density": 2.8,
+      "sound": "rain",
+      "lightning": 8,
+      "minDay": 3,
+      "climates": [
+        "ocean",
+        "coast"
+      ],
+      "fallback": "storm",
+      "speed": 0.8,
+      "cold": "blizzard"
+    }
+  }
+}

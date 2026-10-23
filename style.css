@@ -425,3 +425,52 @@ body.touch #touch:not([hidden]) { display: block; }
 #t-invmode { position: static; width: auto; height: auto; align-self: flex-start; padding: 8px 14px; border-radius: 10px; font-size: 14px; background: rgba(20, 20, 26, 0.85); }
 body.touch .inv-col:first-child > h2 { display: none; }
 body:not(.touch) #t-close, body:not(.touch) #t-invmode { display: none; }
+
+/* ---- air, experience ---- */
+#airbar { position: absolute; right: 0; bottom: 48px; display: flex; flex-direction: row-reverse; gap: 1px; }
+#airbar[hidden] { display: none; }
+#airbar canvas { width: 22px; height: 22px; image-rendering: pixelated; }
+#xpbar { position: absolute; left: 0; top: -7px; width: 250px; height: 4px; background: rgba(0, 0, 0, 0.55); border: 1px solid #111; }
+#xpbar i { display: block; height: 100%; width: 0; background: linear-gradient(#9cff6a, #4fb530); }
+#xplevel { position: absolute; left: 252px; width: 32px; text-align: center; top: -16px; font-weight: normal; font-size: 14px; color: #b9ff8a; text-shadow: 1px 1px 0 #000, -1px 1px 0 #000; }
+#xplevel:empty { display: none; }
+
+/* ---- a chest (in the inventory window) ---- */
+#chest-panel { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+#chest-panel[hidden] { display: none; }
+.chest-head { display: flex; align-items: center; gap: 10px; }
+.chest-head b { font-weight: normal; font-size: 17px; text-shadow: 2px 2px 0 #000; }
+.chest-head span { flex: 1; font-size: 12px; color: #b8b8c8; }
+#recipe-tools[hidden], #recipes[hidden] { display: none; }
+#inventory.chest-open .craft-col { width: 372px; }
+#chest-grid { display: grid; grid-template-columns: repeat(6, 54px); gap: 3px; max-height: min(520px, 66vh); overflow-y: auto; padding-right: 6px; }
+#chest-grid .slot .count { font-size: 12px; }
+#chest-panel .hint { margin: 0; }
+
+/* ---- a villager talking ---- */
+#talk { position: fixed; inset: 0; z-index: 12; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); }
+#talk[hidden] { display: none; }
+.talk-panel { width: min(520px, 94vw); max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; background: #46464e; border: 4px solid #111; border-top-color: #8a8a94; border-left-color: #8a8a94; transform: scale(var(--fit, 1)); transform-origin: center; }
+.talk-head { display: flex; align-items: baseline; gap: 10px; }
+.talk-head b { font-size: 22px; font-weight: normal; text-shadow: 2px 2px 0 #000; }
+.talk-head span { color: #ffe27a; font-size: 14px; }
+#talk-line { margin: 0; font-style: italic; color: #e6e6f0; }
+#talk-quest { padding: 10px 12px; background: rgba(20, 20, 26, 0.55); border: 2px solid #2c2c32; display: flex; flex-direction: column; gap: 6px; }
+#talk-quest[hidden] { display: none; }
+.talk-tier { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+#talk-tier { padding: 1px 9px; border: 2px solid #111; text-shadow: 1px 1px 0 #000; }
+#talk-tier.easy { background: #3c7a2a; } #talk-tier.medium { background: #9a7a1c; } #talk-tier.hard { background: #9a2a2a; }
+#talk-xp { color: #b9ff8a; }
+#talk-text { margin: 0; }
+#talk-reqs { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+#talk-reqs li { color: #ff9a9a; } #talk-reqs li.ok { color: #9eff9e; }
+#talk-reward { margin: 0; font-size: 12px; color: #c8c8d8; }
+.talk-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.talk-buttons button[hidden] { display: none; }
+.talk-buttons button { min-width: 0; }
+
+/* ---- going to sleep: the screen fades to black ---- */
+#sleep { position: fixed; inset: 0; z-index: 28; background: #000; opacity: 0; display: flex; align-items: center; justify-content: center; pointer-events: all; transition: opacity 0.9s ease; }
+#sleep[hidden] { display: none; }
+#sleep.on { opacity: 1; }
+#sleep p { color: #cfd8ff; font-size: 24px; text-shadow: 2px 2px 0 #000; }

@@ -14,7 +14,7 @@ const count = (w, id) => { let n = 0; for (const c of w.chunks.values()) for (co
 
 // ---- several kinds of tree ----
 assert.ok(VARIANTS.length >= 5, 'a handful of tree kinds (' + VARIANTS.map((v) => v.key).join(', ') + ')');
-assert.deepEqual([...new Set(VARIANTS.map((v) => v.shape))].sort(), ['bush', 'cone', 'round', 'tall']);
+assert.deepEqual([...new Set(VARIANTS.map((v) => v.shape))].sort(), ['bush', 'cone', 'flat', 'round', 'tall']);
 for (const v of VARIANTS) {
   assert.ok(ROLE_LOG[v.logId] && ROLE_LEAF[v.leavesId], `${v.key}: a log and a leaf block (so it can be felled)`);
   const blocks = treeBlocks(v, 7, 0, 30, 0);

@@ -1374,6 +1374,3197 @@
         "half": "top",
         "open": true
       }
+    },
+    {
+      "id": 67,
+      "key": "bedrock",
+      "name": "Bedrock",
+      "tiles": {
+        "top": "bedrock",
+        "bottom": "bedrock",
+        "side": "bedrock"
+      },
+      "hardness": 1,
+      "sound": "stone",
+      "unbreakable": true,
+      "loot": "bedrock"
+    },
+    {
+      "id": 68,
+      "key": "gravel",
+      "name": "Gravel",
+      "tiles": {
+        "top": "gravel",
+        "bottom": "gravel",
+        "side": "gravel"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "gravel",
+      "creative": true,
+      "gravity": true
+    },
+    {
+      "id": 69,
+      "key": "red_sand",
+      "name": "Red Sand",
+      "tiles": {
+        "top": "red_sand",
+        "bottom": "red_sand",
+        "side": "red_sand"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "sand",
+      "creative": true,
+      "gravity": true
+    },
+    {
+      "id": 70,
+      "key": "terracotta",
+      "name": "Terracotta",
+      "tiles": {
+        "top": "terracotta",
+        "bottom": "terracotta",
+        "side": "terracotta"
+      },
+      "hardness": 1.4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 71,
+      "key": "terracotta_orange",
+      "name": "Orange Terracotta",
+      "tiles": {
+        "top": "terracotta_orange",
+        "bottom": "terracotta_orange",
+        "side": "terracotta_orange"
+      },
+      "hardness": 1.4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 72,
+      "key": "terracotta_white",
+      "name": "White Terracotta",
+      "tiles": {
+        "top": "terracotta_white",
+        "bottom": "terracotta_white",
+        "side": "terracotta_white"
+      },
+      "hardness": 1.4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 73,
+      "key": "ice",
+      "name": "Ice",
+      "tiles": {
+        "top": "ice",
+        "bottom": "ice",
+        "side": "ice"
+      },
+      "hardness": 0.5,
+      "tool": "pickaxe",
+      "sound": "glass",
+      "creative": true,
+      "loot": "ice"
+    },
+    {
+      "id": 74,
+      "key": "savanna_grass",
+      "name": "Savanna Grass",
+      "tiles": {
+        "top": "savanna_grass_top",
+        "bottom": "dirt",
+        "side": "savanna_grass_side"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "dirt",
+      "creative": true,
+      "tillsInto": "farmland",
+      "loot": "grass"
+    },
+    {
+      "id": 75,
+      "key": "podzol",
+      "name": "Podzol",
+      "tiles": {
+        "top": "podzol_top",
+        "bottom": "dirt",
+        "side": "podzol_side"
+      },
+      "hardness": 0.9,
+      "tool": "shovel",
+      "sound": "dirt",
+      "creative": true,
+      "tillsInto": "farmland",
+      "loot": "grass"
+    },
+    {
+      "id": 76,
+      "key": "mud",
+      "name": "Mud",
+      "tiles": {
+        "top": "mud",
+        "bottom": "mud",
+        "side": "mud"
+      },
+      "hardness": 0.8,
+      "tool": "shovel",
+      "sound": "dirt",
+      "creative": true
+    },
+    {
+      "id": 77,
+      "key": "sandstone",
+      "name": "Sandstone",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "creative": true
+    },
+    {
+      "id": 78,
+      "key": "wool",
+      "name": "Wool",
+      "tiles": {
+        "top": "wool",
+        "bottom": "wool",
+        "side": "wool"
+      },
+      "hardness": 0.8,
+      "sound": "cloth",
+      "creative": true,
+      "fuel": 5
+    },
+    {
+      "id": 79,
+      "key": "jungle_log",
+      "name": "Jungle Log",
+      "tiles": {
+        "top": "jungle_log_top",
+        "bottom": "jungle_log_top",
+        "side": "jungle_log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "role": "log",
+      "creative": true,
+      "fuel": 20
+    },
+    {
+      "id": 80,
+      "key": "jungle_leaves",
+      "name": "Jungle Leaves",
+      "tiles": {
+        "top": "jungle_leaves",
+        "bottom": "jungle_leaves",
+        "side": "jungle_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "leaves",
+      "shatterLoot": "leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 81,
+      "key": "acacia_log",
+      "name": "Acacia Log",
+      "tiles": {
+        "top": "acacia_log_top",
+        "bottom": "acacia_log_top",
+        "side": "acacia_log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "role": "log",
+      "creative": true,
+      "fuel": 20
+    },
+    {
+      "id": 82,
+      "key": "acacia_leaves",
+      "name": "Acacia Leaves",
+      "tiles": {
+        "top": "acacia_leaves",
+        "bottom": "acacia_leaves",
+        "side": "acacia_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "leaves",
+      "shatterLoot": "leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 83,
+      "key": "swamp_leaves",
+      "name": "Swamp Leaves",
+      "tiles": {
+        "top": "swamp_leaves",
+        "bottom": "swamp_leaves",
+        "side": "swamp_leaves"
+      },
+      "hardness": 0.25,
+      "sound": "leaves",
+      "opaque": false,
+      "role": "leaf",
+      "loot": "leaves",
+      "shatterLoot": "leaves_shatter",
+      "creative": true,
+      "lightFilter": 1
+    },
+    {
+      "id": 84,
+      "key": "dead_bush",
+      "name": "Dead Bush",
+      "tiles": {
+        "top": "dead_bush",
+        "bottom": "dead_bush",
+        "side": "dead_bush"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "loot": "dead_bush",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "sand",
+          "red_sand",
+          "dirt",
+          "savanna_grass",
+          "terracotta",
+          "terracotta_orange",
+          "terracotta_white"
+        ]
+      }
+    },
+    {
+      "id": 85,
+      "key": "rose",
+      "name": "Rose",
+      "tiles": {
+        "top": "rose",
+        "bottom": "rose",
+        "side": "rose"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 86,
+      "key": "dandelion",
+      "name": "Dandelion",
+      "tiles": {
+        "top": "dandelion",
+        "bottom": "dandelion",
+        "side": "dandelion"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 87,
+      "key": "cornflower",
+      "name": "Cornflower",
+      "tiles": {
+        "top": "cornflower",
+        "bottom": "cornflower",
+        "side": "cornflower"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 88,
+      "key": "orange_tulip",
+      "name": "Orange Tulip",
+      "tiles": {
+        "top": "orange_tulip",
+        "bottom": "orange_tulip",
+        "side": "orange_tulip"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 89,
+      "key": "allium",
+      "name": "Allium",
+      "tiles": {
+        "top": "allium",
+        "bottom": "allium",
+        "side": "allium"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 90,
+      "key": "pink_tulip",
+      "name": "Pink Tulip",
+      "tiles": {
+        "top": "pink_tulip",
+        "bottom": "pink_tulip",
+        "side": "pink_tulip"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 91,
+      "key": "oxeye_daisy",
+      "name": "Oxeye Daisy",
+      "tiles": {
+        "top": "oxeye_daisy",
+        "bottom": "oxeye_daisy",
+        "side": "oxeye_daisy"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 92,
+      "key": "fern",
+      "name": "Fern",
+      "tiles": {
+        "top": "fern",
+        "bottom": "fern",
+        "side": "fern"
+      },
+      "hardness": 0.04,
+      "sound": "grass",
+      "creative": true,
+      "plant": {
+        "kind": "cross",
+        "height": 0.6,
+        "placeOn": [
+          "grass",
+          "dirt",
+          "podzol",
+          "savanna_grass",
+          "mud"
+        ]
+      }
+    },
+    {
+      "id": 93,
+      "key": "chest",
+      "name": "Chest",
+      "tiles": {
+        "top": "chest_top",
+        "bottom": "chest_top",
+        "side": "chest_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "opens": "chest",
+      "creative": true,
+      "chest": {
+        "slots": 27,
+        "stack": 1
+      },
+      "fuel": 15
+    },
+    {
+      "id": 94,
+      "key": "iron_chest",
+      "name": "Iron Chest",
+      "tiles": {
+        "top": "iron_chest_top",
+        "bottom": "iron_chest_top",
+        "side": "iron_chest_side"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "sound": "metal",
+      "opens": "chest",
+      "creative": true,
+      "chest": {
+        "slots": 54,
+        "stack": 4
+      },
+      "need": 1
+    },
+    {
+      "id": 95,
+      "key": "vault_chest",
+      "name": "Vault",
+      "tiles": {
+        "top": "vault_chest_top",
+        "bottom": "vault_chest_top",
+        "side": "vault_chest_side"
+      },
+      "hardness": 5,
+      "tool": "pickaxe",
+      "sound": "metal",
+      "opens": "chest",
+      "creative": true,
+      "chest": {
+        "slots": 81,
+        "stack": 16
+      },
+      "need": 2
+    },
+    {
+      "id": 96,
+      "key": "stone_bricks",
+      "name": "Stone Bricks",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "creative": true,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone"
+    },
+    {
+      "id": 97,
+      "key": "birch_planks",
+      "name": "Birch Planks",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "creative": true,
+      "tool": "axe",
+      "sound": "wood",
+      "fuel": 15
+    },
+    {
+      "id": 98,
+      "key": "spruce_planks",
+      "name": "Spruce Planks",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "creative": true,
+      "tool": "axe",
+      "sound": "wood",
+      "fuel": 15
+    },
+    {
+      "id": 99,
+      "key": "plaster",
+      "name": "Plaster",
+      "tiles": {
+        "top": "plaster",
+        "bottom": "plaster",
+        "side": "plaster"
+      },
+      "hardness": 1.6,
+      "creative": true,
+      "tool": "pickaxe",
+      "sound": "stone"
+    },
+    {
+      "id": 135,
+      "key": "roof_red",
+      "name": "Red Roof Tiles",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "creative": true,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone"
+    },
+    {
+      "id": 136,
+      "key": "roof_slate",
+      "name": "Slate Roof Tiles",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "creative": true,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone"
+    },
+    {
+      "id": 137,
+      "key": "floor_tiles",
+      "name": "Floor Tiles",
+      "tiles": {
+        "top": "floor_tiles",
+        "bottom": "floor_tiles",
+        "side": "floor_tiles"
+      },
+      "hardness": 2,
+      "creative": true,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone"
+    },
+    {
+      "id": 138,
+      "key": "stone_bricks_stairs",
+      "name": "Stone Brick Stairs",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 139,
+      "key": "stone_bricks_stairs_e",
+      "name": "Stone Brick Stairs",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "stone_bricks_stairs"
+    },
+    {
+      "id": 140,
+      "key": "stone_bricks_stairs_s",
+      "name": "Stone Brick Stairs",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "stone_bricks_stairs"
+    },
+    {
+      "id": 141,
+      "key": "stone_bricks_stairs_w",
+      "name": "Stone Brick Stairs",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "stone_bricks_stairs"
+    },
+    {
+      "id": 142,
+      "key": "sandstone_stairs",
+      "name": "Sandstone Stairs",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 143,
+      "key": "sandstone_stairs_e",
+      "name": "Sandstone Stairs",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "sandstone_stairs"
+    },
+    {
+      "id": 144,
+      "key": "sandstone_stairs_s",
+      "name": "Sandstone Stairs",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "sandstone_stairs"
+    },
+    {
+      "id": 145,
+      "key": "sandstone_stairs_w",
+      "name": "Sandstone Stairs",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "sandstone_stairs"
+    },
+    {
+      "id": 146,
+      "key": "birch_planks_stairs",
+      "name": "Birch Stairs",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "creative": true,
+      "fuel": 15
+    },
+    {
+      "id": 147,
+      "key": "birch_planks_stairs_e",
+      "name": "Birch Stairs",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "variantOf": "birch_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 148,
+      "key": "birch_planks_stairs_s",
+      "name": "Birch Stairs",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "variantOf": "birch_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 149,
+      "key": "birch_planks_stairs_w",
+      "name": "Birch Stairs",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "variantOf": "birch_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 150,
+      "key": "spruce_planks_stairs",
+      "name": "Spruce Stairs",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "creative": true,
+      "fuel": 15
+    },
+    {
+      "id": 151,
+      "key": "spruce_planks_stairs_e",
+      "name": "Spruce Stairs",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "variantOf": "spruce_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 152,
+      "key": "spruce_planks_stairs_s",
+      "name": "Spruce Stairs",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "variantOf": "spruce_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 153,
+      "key": "spruce_planks_stairs_w",
+      "name": "Spruce Stairs",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "variantOf": "spruce_planks_stairs",
+      "fuel": 15
+    },
+    {
+      "id": 154,
+      "key": "roof_red_stairs",
+      "name": "Red Roof Stairs",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 155,
+      "key": "roof_red_stairs_e",
+      "name": "Red Roof Stairs",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "roof_red_stairs"
+    },
+    {
+      "id": 156,
+      "key": "roof_red_stairs_s",
+      "name": "Red Roof Stairs",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "roof_red_stairs"
+    },
+    {
+      "id": 157,
+      "key": "roof_red_stairs_w",
+      "name": "Red Roof Stairs",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "roof_red_stairs"
+    },
+    {
+      "id": 158,
+      "key": "roof_slate_stairs",
+      "name": "Slate Roof Stairs",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 159,
+      "key": "roof_slate_stairs_e",
+      "name": "Slate Roof Stairs",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "roof_slate_stairs"
+    },
+    {
+      "id": 160,
+      "key": "roof_slate_stairs_s",
+      "name": "Slate Roof Stairs",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "roof_slate_stairs"
+    },
+    {
+      "id": 161,
+      "key": "roof_slate_stairs_w",
+      "name": "Slate Roof Stairs",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "roof_slate_stairs"
+    },
+    {
+      "id": 162,
+      "key": "planks_slab",
+      "name": "Oak Slab",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "fuel": 8
+    },
+    {
+      "id": 163,
+      "key": "birch_planks_slab",
+      "name": "Birch Slab",
+      "tiles": {
+        "top": "birch_planks",
+        "bottom": "birch_planks",
+        "side": "birch_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "fuel": 8
+    },
+    {
+      "id": 164,
+      "key": "spruce_planks_slab",
+      "name": "Spruce Slab",
+      "tiles": {
+        "top": "spruce_planks",
+        "bottom": "spruce_planks",
+        "side": "spruce_planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "fuel": 8
+    },
+    {
+      "id": 165,
+      "key": "cobble_slab",
+      "name": "Cobblestone Slab",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 2.4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 166,
+      "key": "stone_bricks_slab",
+      "name": "Stone Brick Slab",
+      "tiles": {
+        "top": "stone_bricks",
+        "bottom": "stone_bricks",
+        "side": "stone_bricks"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 167,
+      "key": "brick_slab",
+      "name": "Brick Slab",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 2.4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 168,
+      "key": "sandstone_slab",
+      "name": "Sandstone Slab",
+      "tiles": {
+        "top": "sandstone_top",
+        "bottom": "sandstone_top",
+        "side": "sandstone_side"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 169,
+      "key": "roof_red_slab",
+      "name": "Red Roof Slab",
+      "tiles": {
+        "top": "roof_red",
+        "bottom": "roof_red",
+        "side": "roof_red"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 170,
+      "key": "roof_slate_slab",
+      "name": "Slate Roof Slab",
+      "tiles": {
+        "top": "roof_slate",
+        "bottom": "roof_slate",
+        "side": "roof_slate"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 171,
+      "key": "floor_tiles_slab",
+      "name": "Floor Tile Slab",
+      "tiles": {
+        "top": "floor_tiles",
+        "bottom": "floor_tiles",
+        "side": "floor_tiles"
+      },
+      "hardness": 2,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      },
+      "need": 1
+    },
+    {
+      "id": 172,
+      "key": "stone_column",
+      "name": "Stone Column",
+      "tiles": {
+        "top": "column_stone",
+        "bottom": "column_stone",
+        "side": "column_stone"
+      },
+      "hardness": 3,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.125,
+            0,
+            0.125,
+            0.875,
+            0.125,
+            0.875
+          ],
+          [
+            0.25,
+            0.125,
+            0.25,
+            0.75,
+            0.875,
+            0.75
+          ],
+          [
+            0.125,
+            0.875,
+            0.125,
+            0.875,
+            1,
+            0.875
+          ]
+        ]
+      }
+    },
+    {
+      "id": 173,
+      "key": "wood_column",
+      "name": "Wooden Column",
+      "tiles": {
+        "top": "log_top",
+        "bottom": "log_top",
+        "side": "log_side"
+      },
+      "hardness": 2,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "creative": true,
+      "fuel": 10,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.125,
+            0,
+            0.125,
+            0.875,
+            0.125,
+            0.875
+          ],
+          [
+            0.25,
+            0.125,
+            0.25,
+            0.75,
+            0.875,
+            0.75
+          ],
+          [
+            0.125,
+            0.875,
+            0.125,
+            0.875,
+            1,
+            0.875
+          ]
+        ]
+      }
+    },
+    {
+      "id": 174,
+      "key": "brick_column",
+      "name": "Brick Column",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 2.4,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "stone",
+      "opaque": false,
+      "creative": true,
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.125,
+            0,
+            0.125,
+            0.875,
+            0.125,
+            0.875
+          ],
+          [
+            0.25,
+            0.125,
+            0.25,
+            0.75,
+            0.875,
+            0.75
+          ],
+          [
+            0.125,
+            0.875,
+            0.125,
+            0.875,
+            1,
+            0.875
+          ]
+        ]
+      }
+    },
+    {
+      "id": 175,
+      "key": "wood_window",
+      "name": "Wooden Window",
+      "tiles": {
+        "top": "wood_window",
+        "bottom": "wood_window",
+        "side": "wood_window"
+      },
+      "hardness": 1,
+      "sound": "wood",
+      "opaque": false,
+      "axis": "x",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0.4375,
+            1,
+            1,
+            0.5625
+          ]
+        ]
+      },
+      "tool": "axe",
+      "creative": true
+    },
+    {
+      "id": 176,
+      "key": "wood_window_z",
+      "name": "Wooden Window",
+      "tiles": {
+        "top": "wood_window",
+        "bottom": "wood_window",
+        "side": "wood_window"
+      },
+      "hardness": 1,
+      "sound": "wood",
+      "opaque": false,
+      "axis": "z",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.4375,
+            0,
+            0,
+            0.5625,
+            1,
+            1
+          ]
+        ]
+      },
+      "tool": "axe",
+      "variantOf": "wood_window"
+    },
+    {
+      "id": 177,
+      "key": "stone_window",
+      "name": "Stone Window",
+      "tiles": {
+        "top": "stone_window",
+        "bottom": "stone_window",
+        "side": "stone_window"
+      },
+      "hardness": 2,
+      "sound": "stone",
+      "opaque": false,
+      "axis": "x",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0.4375,
+            1,
+            1,
+            0.5625
+          ]
+        ]
+      },
+      "tool": "pickaxe",
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 178,
+      "key": "stone_window_z",
+      "name": "Stone Window",
+      "tiles": {
+        "top": "stone_window",
+        "bottom": "stone_window",
+        "side": "stone_window"
+      },
+      "hardness": 2,
+      "sound": "stone",
+      "opaque": false,
+      "axis": "z",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.4375,
+            0,
+            0,
+            0.5625,
+            1,
+            1
+          ]
+        ]
+      },
+      "tool": "pickaxe",
+      "need": 1,
+      "variantOf": "stone_window"
+    },
+    {
+      "id": 179,
+      "key": "glass_pane",
+      "name": "Glass Pane",
+      "tiles": {
+        "top": "glass_pane",
+        "bottom": "glass_pane",
+        "side": "glass_pane"
+      },
+      "hardness": 0.35,
+      "sound": "glass",
+      "opaque": false,
+      "axis": "x",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0.4375,
+            1,
+            1,
+            0.5625
+          ]
+        ]
+      },
+      "creative": true
+    },
+    {
+      "id": 180,
+      "key": "glass_pane_z",
+      "name": "Glass Pane",
+      "tiles": {
+        "top": "glass_pane",
+        "bottom": "glass_pane",
+        "side": "glass_pane"
+      },
+      "hardness": 0.35,
+      "sound": "glass",
+      "opaque": false,
+      "axis": "z",
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0.4375,
+            0,
+            0,
+            0.5625,
+            1,
+            1
+          ]
+        ]
+      },
+      "variantOf": "glass_pane"
+    },
+    {
+      "id": 181,
+      "key": "iron_door_b_x_c",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_bottom"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": true,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "x",
+        "half": "bottom",
+        "open": false
+      }
+    },
+    {
+      "id": 182,
+      "key": "iron_door_b_z_c",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_bottom"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": true,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "z",
+        "half": "bottom",
+        "open": false
+      }
+    },
+    {
+      "id": 183,
+      "key": "iron_door_t_x_c",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_top"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": true,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "x",
+        "half": "top",
+        "open": false
+      }
+    },
+    {
+      "id": 184,
+      "key": "iron_door_t_z_c",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_top"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": true,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "z",
+        "half": "top",
+        "open": false
+      }
+    },
+    {
+      "id": 185,
+      "key": "iron_door_b_x_o",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_bottom"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": false,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "x",
+        "half": "bottom",
+        "open": true
+      }
+    },
+    {
+      "id": 186,
+      "key": "iron_door_b_z_o",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_bottom"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": false,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "z",
+        "half": "bottom",
+        "open": true
+      }
+    },
+    {
+      "id": 187,
+      "key": "iron_door_t_x_o",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_top"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": false,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "x",
+        "half": "top",
+        "open": true
+      }
+    },
+    {
+      "id": 188,
+      "key": "iron_door_t_z_o",
+      "name": "Iron Door",
+      "tiles": {
+        "top": "iron_door_top",
+        "bottom": "iron_door_bottom",
+        "side": "iron_door_top"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "need": 1,
+      "sound": "metal",
+      "solid": false,
+      "opaque": false,
+      "loot": "iron_door",
+      "model": {
+        "type": "door",
+        "kind": "iron",
+        "axis": "z",
+        "half": "top",
+        "open": true
+      }
+    },
+    {
+      "id": 189,
+      "key": "bed_white_foot",
+      "name": "White Bed",
+      "tiles": {
+        "top": "blanket_white",
+        "bottom": "planks",
+        "side": "bed_side_white"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "white"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 190,
+      "key": "bed_white_head_n",
+      "name": "White Bed",
+      "tiles": {
+        "top": "bed_head_white_n",
+        "bottom": "planks",
+        "side": "bed_side_white"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "white"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 191,
+      "key": "bed_white_head_e",
+      "name": "White Bed",
+      "tiles": {
+        "top": "bed_head_white_e",
+        "bottom": "planks",
+        "side": "bed_side_white"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "white"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 192,
+      "key": "bed_white_head_s",
+      "name": "White Bed",
+      "tiles": {
+        "top": "bed_head_white_s",
+        "bottom": "planks",
+        "side": "bed_side_white"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "white"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 193,
+      "key": "bed_white_head_w",
+      "name": "White Bed",
+      "tiles": {
+        "top": "bed_head_white_w",
+        "bottom": "planks",
+        "side": "bed_side_white"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "white"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 194,
+      "key": "bed_red_foot",
+      "name": "Red Bed",
+      "tiles": {
+        "top": "blanket_red",
+        "bottom": "planks",
+        "side": "bed_side_red"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "red"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 195,
+      "key": "bed_red_head_n",
+      "name": "Red Bed",
+      "tiles": {
+        "top": "bed_head_red_n",
+        "bottom": "planks",
+        "side": "bed_side_red"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "red"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 196,
+      "key": "bed_red_head_e",
+      "name": "Red Bed",
+      "tiles": {
+        "top": "bed_head_red_e",
+        "bottom": "planks",
+        "side": "bed_side_red"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "red"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 197,
+      "key": "bed_red_head_s",
+      "name": "Red Bed",
+      "tiles": {
+        "top": "bed_head_red_s",
+        "bottom": "planks",
+        "side": "bed_side_red"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "red"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 198,
+      "key": "bed_red_head_w",
+      "name": "Red Bed",
+      "tiles": {
+        "top": "bed_head_red_w",
+        "bottom": "planks",
+        "side": "bed_side_red"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "red"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 199,
+      "key": "bed_orange_foot",
+      "name": "Orange Bed",
+      "tiles": {
+        "top": "blanket_orange",
+        "bottom": "planks",
+        "side": "bed_side_orange"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "orange"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 200,
+      "key": "bed_orange_head_n",
+      "name": "Orange Bed",
+      "tiles": {
+        "top": "bed_head_orange_n",
+        "bottom": "planks",
+        "side": "bed_side_orange"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "orange"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 201,
+      "key": "bed_orange_head_e",
+      "name": "Orange Bed",
+      "tiles": {
+        "top": "bed_head_orange_e",
+        "bottom": "planks",
+        "side": "bed_side_orange"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "orange"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 202,
+      "key": "bed_orange_head_s",
+      "name": "Orange Bed",
+      "tiles": {
+        "top": "bed_head_orange_s",
+        "bottom": "planks",
+        "side": "bed_side_orange"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "orange"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 203,
+      "key": "bed_orange_head_w",
+      "name": "Orange Bed",
+      "tiles": {
+        "top": "bed_head_orange_w",
+        "bottom": "planks",
+        "side": "bed_side_orange"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "orange"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 204,
+      "key": "bed_yellow_foot",
+      "name": "Yellow Bed",
+      "tiles": {
+        "top": "blanket_yellow",
+        "bottom": "planks",
+        "side": "bed_side_yellow"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "yellow"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 205,
+      "key": "bed_yellow_head_n",
+      "name": "Yellow Bed",
+      "tiles": {
+        "top": "bed_head_yellow_n",
+        "bottom": "planks",
+        "side": "bed_side_yellow"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "yellow"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 206,
+      "key": "bed_yellow_head_e",
+      "name": "Yellow Bed",
+      "tiles": {
+        "top": "bed_head_yellow_e",
+        "bottom": "planks",
+        "side": "bed_side_yellow"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "yellow"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 207,
+      "key": "bed_yellow_head_s",
+      "name": "Yellow Bed",
+      "tiles": {
+        "top": "bed_head_yellow_s",
+        "bottom": "planks",
+        "side": "bed_side_yellow"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "yellow"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 208,
+      "key": "bed_yellow_head_w",
+      "name": "Yellow Bed",
+      "tiles": {
+        "top": "bed_head_yellow_w",
+        "bottom": "planks",
+        "side": "bed_side_yellow"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "yellow"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 209,
+      "key": "bed_green_foot",
+      "name": "Green Bed",
+      "tiles": {
+        "top": "blanket_green",
+        "bottom": "planks",
+        "side": "bed_side_green"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "green"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 210,
+      "key": "bed_green_head_n",
+      "name": "Green Bed",
+      "tiles": {
+        "top": "bed_head_green_n",
+        "bottom": "planks",
+        "side": "bed_side_green"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "green"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 211,
+      "key": "bed_green_head_e",
+      "name": "Green Bed",
+      "tiles": {
+        "top": "bed_head_green_e",
+        "bottom": "planks",
+        "side": "bed_side_green"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "green"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 212,
+      "key": "bed_green_head_s",
+      "name": "Green Bed",
+      "tiles": {
+        "top": "bed_head_green_s",
+        "bottom": "planks",
+        "side": "bed_side_green"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "green"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 213,
+      "key": "bed_green_head_w",
+      "name": "Green Bed",
+      "tiles": {
+        "top": "bed_head_green_w",
+        "bottom": "planks",
+        "side": "bed_side_green"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "green"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 214,
+      "key": "bed_blue_foot",
+      "name": "Blue Bed",
+      "tiles": {
+        "top": "blanket_blue",
+        "bottom": "planks",
+        "side": "bed_side_blue"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "blue"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 215,
+      "key": "bed_blue_head_n",
+      "name": "Blue Bed",
+      "tiles": {
+        "top": "bed_head_blue_n",
+        "bottom": "planks",
+        "side": "bed_side_blue"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "blue"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 216,
+      "key": "bed_blue_head_e",
+      "name": "Blue Bed",
+      "tiles": {
+        "top": "bed_head_blue_e",
+        "bottom": "planks",
+        "side": "bed_side_blue"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "blue"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 217,
+      "key": "bed_blue_head_s",
+      "name": "Blue Bed",
+      "tiles": {
+        "top": "bed_head_blue_s",
+        "bottom": "planks",
+        "side": "bed_side_blue"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "blue"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 218,
+      "key": "bed_blue_head_w",
+      "name": "Blue Bed",
+      "tiles": {
+        "top": "bed_head_blue_w",
+        "bottom": "planks",
+        "side": "bed_side_blue"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "blue"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 219,
+      "key": "bed_purple_foot",
+      "name": "Purple Bed",
+      "tiles": {
+        "top": "blanket_purple",
+        "bottom": "planks",
+        "side": "bed_side_purple"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "purple"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 220,
+      "key": "bed_purple_head_n",
+      "name": "Purple Bed",
+      "tiles": {
+        "top": "bed_head_purple_n",
+        "bottom": "planks",
+        "side": "bed_side_purple"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "purple"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 221,
+      "key": "bed_purple_head_e",
+      "name": "Purple Bed",
+      "tiles": {
+        "top": "bed_head_purple_e",
+        "bottom": "planks",
+        "side": "bed_side_purple"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "purple"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 222,
+      "key": "bed_purple_head_s",
+      "name": "Purple Bed",
+      "tiles": {
+        "top": "bed_head_purple_s",
+        "bottom": "planks",
+        "side": "bed_side_purple"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "purple"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 223,
+      "key": "bed_purple_head_w",
+      "name": "Purple Bed",
+      "tiles": {
+        "top": "bed_head_purple_w",
+        "bottom": "planks",
+        "side": "bed_side_purple"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "purple"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 224,
+      "key": "bed_pink_foot",
+      "name": "Pink Bed",
+      "tiles": {
+        "top": "blanket_pink",
+        "bottom": "planks",
+        "side": "bed_side_pink"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "foot",
+        "color": "pink"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 225,
+      "key": "bed_pink_head_n",
+      "name": "Pink Bed",
+      "tiles": {
+        "top": "bed_head_pink_n",
+        "bottom": "planks",
+        "side": "bed_side_pink"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "n",
+        "color": "pink"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 226,
+      "key": "bed_pink_head_e",
+      "name": "Pink Bed",
+      "tiles": {
+        "top": "bed_head_pink_e",
+        "bottom": "planks",
+        "side": "bed_side_pink"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "e",
+        "color": "pink"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 227,
+      "key": "bed_pink_head_s",
+      "name": "Pink Bed",
+      "tiles": {
+        "top": "bed_head_pink_s",
+        "bottom": "planks",
+        "side": "bed_side_pink"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "s",
+        "color": "pink"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": 228,
+      "key": "bed_pink_head_w",
+      "name": "Pink Bed",
+      "tiles": {
+        "top": "bed_head_pink_w",
+        "bottom": "planks",
+        "side": "bed_side_pink"
+      },
+      "hardness": 0.4,
+      "sound": "cloth",
+      "opaque": false,
+      "loot": "bed",
+      "bed": {
+        "part": "head",
+        "facing": "w",
+        "color": "pink"
+      },
+      "model": {
+        "type": "boxes",
+        "boxes": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            1
+          ]
+        ]
+      }
     }
   ]
 }

@@ -129,6 +129,10 @@ gather(I.IRON_INGOT, 5);
 craft(I.IRON_HELMET);
 progress.flags.add('equipped');
 progress.flags.add('village'); progress.flags.add('talked'); // found a village, spoke to someone there
+// weapons, a chest, a bed and a hammer are crafted at the table; the rest are things that happen in the world
+g.add(B.PLANKS, 40); g.add(I.STICK, 8); gather(B.WOOL, 3);
+craft(I.WOOD_SWORD); craft(B.CHEST); craft(I.BED_SINGLE_WHITE); craft(I.WOOD_HAMMER);
+for (const f of ['slain', 'slept', 'ocean', 'quest']) progress.flags.add(f);
 assert.equal(GOALS.filter((x) => x.done(progress)).length, GOALS.length, 'every goal is completable');
 
 // ---- tool wear ----

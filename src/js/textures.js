@@ -3,7 +3,7 @@
 // below are drawn in code. No image files are required.
 import { mulberry32 } from './noise.js';
 import { REG } from './registry.js';
-import { TILE_NAMES, BLOCKS, SHAPE, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
+import { TILE_NAMES, BLOCKS, SHAPE, BOXES, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
 import { isBlockItem, itemKey } from './items.js';
 import { paintTile, paintSprite, imageSources, T } from './tilegen.js';
 import { crackPixels, CRACK_STAGES } from './mining.js';
@@ -206,7 +206,7 @@ export function blockIcon(atlas, id, size = 44) {
     x.restore();
   };
   const cx = a;
-  if (SHAPE[id] === 1) { // stairs: a low step along the front and a tall one behind it
+  if (SHAPE[id] === 1 || SHAPE[id] === 3) { // stairs, slabs, columns, windows: drawn box by box
     // each part is a box (A, B along the two floor directions, Y up, all 0-1); its faces are cut out of the same tiles
     const part = (A0, A1, B0, B1, Y0, Y1) => {
       const sub = (name, m, u0, v0, u1, v1, shade) => { // the piece (u0..u1, v0..v1 of the tile) of a face whose local frame is m
@@ -223,8 +223,9 @@ export function blockIcon(atlas, id, size = 44) {
       sub(def.side, [a / T, b / T, 0, h / T, cx - a, b], A0, 1 - Y1, A1, 1 - Y0, 0.25);                       // left: the B = 1 side
       sub(def.side, [a / T, -b / T, 0, h / T, cx + (A1 - 1) * a, 2 * b + (A1 - 1) * b], 1 - B1, 1 - Y1, 1 - B0, 1 - Y0, 0.45); // right: the A = A1 side
     };
-    part(0, 1, 0, 1, 0, 0.5);
-    part(0, 0.5, 0, 1, 0.5, 1);
+    // (the boxes of the block; A runs along z and B along x on the icon)
+    const boxes = (BOXES.get(id) ?? []).slice().sort((p, q) => p[1] - q[1] || p[0] - q[0] || p[2] - q[2]);
+    for (const bx of boxes) part(bx[2], bx[5], bx[0], bx[3], bx[1], bx[4]);
     return c;
   }
   face(def.top, [a / T, b / T, -a / T, b / T, cx, 0], 0);                 // top
@@ -309,6 +310,33 @@ export function heartIcon(state, scale = 3) {
     x.fillRect(px * scale, (py + 1) * scale, scale, scale);
   }));
   if (state > 0) { x.fillStyle = 'rgba(255,255,255,0.65)'; x.fillRect(2 * scale, 2 * scale, scale, scale); } // glint
+  return c;
+}
+
+// Air bubble icon: 0 = popped (a faint ring), 1 = half, 2 = full (9x9 pixels scaled up)
+const BUBBLE = [
+  '..#####..',
+  '.#@@@@@#.',
+  '#@%%%%%@#',
+  '#@%wwwo@#',
+  '#@%w%%o@#',
+  '#@%%%%o@#',
+  '#@%%oooo#',
+  '.#@@@@@#.',
+  '..#####..',
+];
+export function bubbleIcon(state, scale = 2) {
+  const c = makeCanvas(9 * scale, 9 * scale), x = c.getContext('2d');
+  x.imageSmoothingEnabled = false;
+  BUBBLE.forEach((row, py) => [...row].forEach((ch, px) => {
+    if (ch === '.') return;
+    const edge = ch === '#';
+    if (state === 0) { if (edge) { x.fillStyle = 'rgba(120,180,255,0.35)'; x.fillRect(px * scale, py * scale, scale, scale); } return; }
+    const filled = state === 2 || px < 5;
+    if (!filled) { if (edge) { x.fillStyle = 'rgba(120,180,255,0.35)'; x.fillRect(px * scale, py * scale, scale, scale); } return; }
+    x.fillStyle = edge ? '#1d5fa8' : ch === '@' ? '#5aa8ff' : ch === '%' ? '#9ad0ff' : ch === 'w' ? '#ffffff' : '#7ab8f0';
+    x.fillRect(px * scale, py * scale, scale, scale);
+  }));
   return c;
 }
 

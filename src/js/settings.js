@@ -17,8 +17,8 @@ export const ACTIONS = [
   { id: 'fly', label: 'Toggle flight (creative)', group: 'Actions', key: 'KeyF' },
   { id: 'offhand', label: 'Use offhand item (place a torch from the shield slot)', group: 'Actions', key: 'KeyG' },
   ...Array.from({ length: 9 }, (_, i) => ({ id: 'slot' + (i + 1), label: 'Hotbar slot ' + (i + 1), group: 'Hotbar', key: 'Digit' + (i + 1) })),
-  { id: 'map', label: 'Full-screen map (or tap the minimap)', group: 'Actions', key: 'KeyN' },
-  { id: 'music', label: 'Toggle music', group: 'Other', key: 'KeyM' },
+  { id: 'map', label: 'Full-screen map (or tap the minimap)', group: 'Actions', key: 'KeyM' },
+  { id: 'music', label: 'Toggle music', group: 'Other', key: 'KeyN' },
   { id: 'skipTime', label: 'Skip time of day', group: 'Other', key: 'KeyT' },
   { id: 'renderUp', label: 'Render distance +', group: 'Other', key: 'BracketRight' },
   { id: 'renderDown', label: 'Render distance -', group: 'Other', key: 'BracketLeft' },
@@ -73,6 +73,8 @@ export class Settings {
         for (const a of ACTIONS) if (raw.binds && a.id in raw.binds) this.binds[a.id] = raw.binds[a.id];
         // before crouching existed Shift was the sprint key: move saved settings to the new layout (Tab sprints, Shift crouches)
         if (raw.binds && !('crouch' in raw.binds) && raw.binds.sprint === 'ShiftLeft') this.binds.sprint = 'Tab';
+        // the map used to be N and the music M: the map is M now (move anyone still on the old pair over)
+        if (raw.binds && raw.binds.map === 'KeyN' && raw.binds.music === 'KeyM') { this.binds.map = 'KeyM'; this.binds.music = 'KeyN'; }
       }
     } catch { /* private mode / corrupt data: just use defaults */ }
     this.rebuild();

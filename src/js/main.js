@@ -1,9 +1,9 @@
 // VoxelCraft: game bootstrap, input, interaction, HUD and the main loop.
 import * as THREE from 'three';
-import { World } from './world.js';
-import { B, BLOCKS, STAIRS, DOOR, DOOR_PLACE, PALETTE, PLANT, PLANT_H, PLANT_HALF, LEAN, SUPPORT, SOLID, IS_WATER, TILLS_INTO, OPENS, ROLE_LOG, HYDRATION } from './blocks.js';
+import { World, LATEST_TERRAIN } from './world.js';
+import { B, BLOCKS, STAIRS, DOOR, DOOR_PLACE, DOOR_KINDS, PALETTE, PLANT, PLANT_H, PLANT_HALF, LEAN, SUPPORT, SOLID, IS_WATER, TILLS_INTO, OPENS, ROLE_LOG, HYDRATION, UNBREAKABLE, BED, CHEST, PLACE_ON, AXIS_VARIANTS } from './blocks.js';
 import { REG } from './registry.js';
-import { I, isBlockItem, itemForBlock, isDoorItem, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
+import { I, isBlockItem, itemForBlock, isDoorItem, doorBlockOf, bedOf, upgradeOf, isShears, toolDigs, rollLoot, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
 import { Inventory } from './inventory.js';
 import { ChunkRenderer } from './chunks.js';
 import { Player, raycast } from './player.js';
@@ -18,10 +18,10 @@ import { growPlants, spreadGrass, updateHydration } from './plants.js';
 import { GravitySim } from './gravity.js';
 import { AttachSim } from './attach.js';
 import { Furnaces } from './furnace.js';
-import { canSprint, isStarving as starving, tickHunger, eat as eatFood, reduceDamage, fallDamage, jumpCost } from './survival.js';
+import { canSprint, isStarving as starving, tickHunger, eat as eatFood, reduceDamage, fallDamage, jumpCost, tickBreath, MAX_AIR, weaponDamage, attackWear, xpLevel } from './survival.js';
 import { brightness, MIN_BRIGHTNESS } from './light.js';
 import { BreakTimer } from './mining.js';
-import { buildAtlas, atlasAnimator, blockColors, hungerIcon, heartIcon, armorIcon, itemIcon, plantIcon, logoCanvas, dirtBackground, sunTexture, moonTexture, glowTexture, crackTexture } from './textures.js';
+import { buildAtlas, atlasAnimator, blockColors, hungerIcon, heartIcon, armorIcon, bubbleIcon, itemIcon, plantIcon, logoCanvas, dirtBackground, sunTexture, moonTexture, glowTexture, crackTexture } from './textures.js';
 import { WaterSim } from './water.js';
 import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
@@ -35,6 +35,17 @@ import { createTouchControls } from './touch.js';
 import { lookDelta } from './touchmath.js';
 import { installFit } from './fit.js';
 import { findFallingTree, removeTree, landTree, shatterTree, fallDirection } from './physics.js';
+import { Mobs } from './mobs.js';
+import { createMobModels } from './mobmodels.js';
+import { weatherNow } from './weather.js';
+import { createWeatherFx } from './weatherfx.js';
+import { daylight } from './daylight.js';
+import { bedCells, bedGroup, bedDrops, bedSpawn, isBed, sleepTime } from './beds.js';
+import { Chests, ChestSource, chestTier } from './chests.js';
+import { Quests } from './quests.js';
+import { createDialog } from './dialog.js';
+import { setDoorOpen } from './doors.js';
+import { bedtime } from './villagerai.js';
 
 const GAME = REG.game;      // survival rules and tuning numbers from data/game.json
 const HUNGER = GAME.hunger;
@@ -155,17 +166,19 @@ function withBlockLight(shader) {
 materials.solid.onBeforeCompile = withBlockLight;
 materials.water.onBeforeCompile = withBlockLight;
 const windTime = { value: 0 };
+const windStrength = { value: 1 }; // 1 = a breeze; a storm turns it up (see weatherfx.js)
 const withWind = (shader) => {
   withBlockLight(shader);
   shader.uniforms.uTime = windTime;
+  shader.uniforms.uWind = windStrength;
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nattribute float aSway;\nuniform float uTime;')
+    .replace('#include <common>', '#include <common>\nattribute float aSway;\nuniform float uTime;\nuniform float uWind;')
     .replace('#include <begin_vertex>', `#include <begin_vertex>
       vec3 wp = (modelMatrix * vec4(position, 1.0)).xyz;
       float ph = uTime * 2.1 + wp.x * 0.65 + wp.z * 0.45;
       float gust = sin(ph) + 0.5 * sin(ph * 2.3 + 1.7);
-      transformed.x += gust * 0.075 * aSway;
-      transformed.z += cos(ph * 0.9 + wp.x * 0.3) * 0.05 * aSway;`);
+      transformed.x += gust * 0.075 * aSway * uWind;
+      transformed.z += cos(ph * 0.9 + wp.x * 0.3) * 0.05 * aSway * uWind;`);
 };
 materials.plant.onBeforeCompile = withWind;
 materials.leaves.onBeforeCompile = withWind;
@@ -173,32 +186,60 @@ const sky = new Sky(scene, { sun: sunTexture(), moon: moonTexture(), glow: glowT
 sky.setPixelRatio(renderer.getPixelRatio());
 
 // ---------------------------------------------------------------------------------------
-// First-person hand: bare arm, block, or tool sprite. Transparent + no depth test so it is
-// drawn last and never clips into walls.
+// First-person arms. There is always an arm and a hand at the bottom right (and a left one when something is in the off hand); whatever
+// is selected in the hotbar is held in the hand: a block, a tool, food. The arm is drawn from the shoulder (off the screen) to the hand, so
+// whenever the held thing swings, bobs or is raised to your mouth, the arm follows. Transparent + no depth test so it is drawn last and
+// never clips into walls.
 // ---------------------------------------------------------------------------------------
 const heldBlockMat = new THREE.MeshBasicMaterial({ map: atlasTex, vertexColors: true, alphaTest: 0.5, fog: false, depthTest: false, transparent: true });
 const heldSpriteMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, depthTest: false, transparent: true });
 const heldArmMat = new THREE.MeshBasicMaterial({ color: 0xc99a74, fog: false, depthTest: false, transparent: true });
-const armGeo = new THREE.BoxGeometry(0.11, 0.11, 0.6);
-const held = new THREE.Mesh(armGeo, heldArmMat);
+const sleeveMat = new THREE.MeshBasicMaterial({ color: 0x2f8e9c, fog: false, depthTest: false, transparent: true });
+const SLEEVE = new THREE.Color(0x2f8e9c);
+const held = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.01, 0.01), heldSpriteMat); // (the thing in the hand; its shape is set in refreshHeld)
 held.renderOrder = 999;
 held.frustumCulled = false;
+held.visible = false;
 camera.add(held);
 // the offhand: a torch in the shield slot is held in the left hand
-const heldOff = new THREE.Mesh(armGeo, heldSpriteMat);
+const heldOff = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.01, 0.01), heldSpriteMat);
 heldOff.renderOrder = 999;
 heldOff.frustumCulled = false;
 heldOff.visible = false;
 camera.add(heldOff);
 let heldOffKey = 0;
 const OFF_POSE = { pos: [-0.56, -0.2, -0.72], rot: [0.12, 0.5, -0.06], scale: 0.4 };
+// an arm: a sleeve from the shoulder and a hand at the end, stretched between two points
+function makeArm() {
+  const g = new THREE.Group();
+  const sleeveGeo = new THREE.BoxGeometry(0.19, 0.19, 1);
+  sleeveGeo.translate(0, 0, -0.5); // runs from the shoulder along -z; scaled to the length
+  const sleeve = new THREE.Mesh(sleeveGeo, sleeveMat);
+  const hand = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.2), heldArmMat);
+  for (const m of [sleeve, hand]) { m.renderOrder = 998; m.frustumCulled = false; }
+  g.add(sleeve, hand);
+  g.visible = false;
+  camera.add(g);
+  return { g, sleeve, hand };
+}
+const armRight = makeArm(), armLeft = makeArm();
+const SHOULDER_R = new THREE.Vector3(0.78, -1.0, -0.1), SHOULDER_L = new THREE.Vector3(-0.78, -1.0, -0.1);
+const _aim = new THREE.Vector3(), _handR = new THREE.Vector3(), _handL = new THREE.Vector3(), NEG_Z = new THREE.Vector3(0, 0, -1);
+function aimArm(arm, shoulder, hand) {
+  _aim.copy(hand).sub(shoulder);
+  const len = _aim.length();
+  arm.g.position.copy(shoulder);
+  arm.g.quaternion.setFromUnitVectors(NEG_Z, _aim.normalize());
+  arm.sleeve.scale.z = Math.max(0.05, len - 0.14);
+  arm.hand.position.z = -(len - 0.1);
+}
 const POSES = {
-  arm:    { pos: [0.5, -0.5, -0.55], rot: [0.55, -0.35, 0.15], scale: 1 },
-  block:  { pos: [0.5, -0.46, -0.8], rot: [0.25, -0.6, 0.05], scale: 0.22 },
-  sprite: { pos: [0.46, -0.33, -0.7], rot: [0.1, -0.5, 0.05], scale: 0.42 },
+  arm:    { pos: [0.4, -0.38, -0.7], rot: [0, 0, 0], scale: 1, hold: [0, 0, 0] },
+  block:  { pos: [0.5, -0.38, -0.86], rot: [0.25, -0.6, 0.05], scale: 0.17, hold: [0.04, -0.09, 0.15] },
+  sprite: { pos: [0.42, -0.3, -0.78], rot: [0.1, -0.5, 0.05], scale: 0.32, hold: [0.03, -0.08, 0.08] },
   // Tools are held like in a first-person game: handle down towards your hand at the lower right, head up and forward, the
   // flat of the blade turned a little towards you so you can see its thickness. Swinging pivots the whole tool about the hand.
-  tool:   { pos: [0.52, -0.42, -0.8], rot: [0.12, 2.45, 0.38], scale: 0.46, pivot: [0.66, -0.7, -0.45] },
+  tool:   { pos: [0.5, -0.22, -0.82], rot: [0.12, 2.45, 0.38], scale: 0.44, pivot: [0.6, -0.5, -0.78] },
 };
 // An axe is held with its blade turned down (the sprite is flipped over about the handle)
 POSES.axe = { ...POSES.tool, flip: true };
@@ -210,22 +251,26 @@ const _swingQ = new THREE.Quaternion(), _swingE = new THREE.Euler(), _pivot = ne
 function refreshOffhand() {
   const id = inventory.equipment.shield && isOffhand(inventory.equipment.shield.id) ? inventory.equipment.shield.id : 0;
   if (id !== heldOffKey) { heldOffKey = id; if (id) heldOff.geometry = spriteGeometry(id, true); }
-  heldOff.visible = !!id && held.visible && !dead;
+  heldOff.visible = !!id && !dead && !creativePalette();
+  armLeft.g.visible = heldOff.visible;
   if (!heldOff.visible) return;
   // sways a little with your steps, ahead of the other hand's swing
   heldOff.position.set(OFF_POSE.pos[0] + Math.sin(bob + 1.3) * 0.01, OFF_POSE.pos[1] + Math.abs(Math.cos(bob + 1.3)) * 0.012 + Math.sin(elapsed * 7) * 0.002, OFF_POSE.pos[2]);
   heldOff.rotation.set(OFF_POSE.rot[0], OFF_POSE.rot[1], OFF_POSE.rot[2]);
   heldOff.scale.setScalar(OFF_POSE.scale);
+  _handL.set(heldOff.position.x - 0.02, heldOff.position.y - 0.17, heldOff.position.z + 0.14);
+  aimArm(armLeft, SHOULDER_L, _handL);
 }
+const creativePalette = () => screen === 'palette';
 
 function refreshHeld() {
   const st = stackAt(slot);
   const id = st ? st.id : 0;
   if (id === heldKey) return;
   heldKey = id;
-  if (!id) { held.geometry = armGeo; held.material = heldArmMat; pose = POSES.arm; }
-  else if (isBlockItem(id)) { held.geometry = blockGeometry(id); held.material = heldBlockMat; pose = POSES.block; }
-  else { held.geometry = spriteGeometry(id, true); held.material = heldSpriteMat; pose = !toolOf(id) ? POSES.sprite : toolOf(id).type === 'axe' ? POSES.axe : POSES.tool; }
+  if (!id) { held.visible = false; pose = POSES.arm; }
+  else if (isBlockItem(id)) { held.geometry = blockGeometry(id); held.material = heldBlockMat; pose = POSES.block; held.visible = true; }
+  else { held.geometry = spriteGeometry(id, true); held.material = heldSpriteMat; pose = !toolOf(id) ? POSES.sprite : toolOf(id).type === 'axe' ? POSES.axe : POSES.tool; held.visible = true; }
 }
 
 // ---------------------------------------------------------------------------------------
@@ -336,6 +381,7 @@ const options = createOptions(settings, {
   layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }), reset: () => settings.set('touchLayout', {}) },
 });
 held.visible = false;
+armRight.g.visible = false;
 // The audio engine exists from the start so the title screen can play its theme. Browsers keep it silent until the first
 // click or key press; it starts then.
 const audio = new AudioEngine();
@@ -349,7 +395,7 @@ const startup = await runStartup({
   tickAtlas: (t) => { if (animateAtlas(t)) atlasTex.needsUpdate = true; }, // water and flames animate on the title screen too
 });
 inWorld = true;
-held.visible = true;
+heldKey = -1;
 audio.setScene('game'); // from here on the shuffled soundtrack plays
 const worldId = startup.id;
 
@@ -359,7 +405,7 @@ const worldId = startup.id;
 const save = startup.save;
 const seed = save?.seed ?? Math.floor(Math.random() * 2 ** 31);
 // Worlds that were already played keep the original terrain (their builds sit on it); new worlds get the biome terrain
-const world = new World(seed, { terrain: save?.terrain ?? (save?.player ? 1 : 3) });
+const world = new World(seed, { terrain: save?.terrain ?? (save?.player ? 1 : LATEST_TERRAIN) });
 if (save?.edits) world.loadEdits(save.edits, save.legacyCaves);
 
 const chunkRenderer = new ChunkRenderer(scene, world, materials, save?.radius ?? 6, (c) => mapData.chunkColumns(c)); // the map keeps what a chunk looked like when it unloads
@@ -430,6 +476,21 @@ const progress = {
   crafted: new Set(save?.progress?.crafted),
   flags: new Set(save?.progress?.flags), // one-off achievements that aren't items: 'tilled', 'planted', 'ate'
 };
+// ---- what the living world adds: chests, quests, creatures, weather, a bed to wake up in ----
+const chests = new Chests();
+chests.load(save?.chests);
+const quests = new Quests(seed);
+quests.load(save?.quests);
+let xp = save?.xp ?? 0;                 // experience from monsters (for the armour and tool augments to come)
+let spawnBed = save?.bed ?? null;        // { x, y, z }: the bed you last slept in (you come back there after dying, until it is broken)
+const mobs = new Mobs(world, { seed });
+mobs.load(save?.mobs);
+const mobModels = createMobModels({ scene });
+const weatherFx = createWeatherFx({ scene, world, audio, windUniform: windStrength });
+let weatherState = weatherNow(seed, 0, 'temperate'), biomeNow = { key: null, label: '', climate: 'temperate' }, fogMul = 1;
+let air = MAX_AIR, drownTimer = 0;       // breath under water
+let sleeping = false, attackTimer = 0, targetMob = null;
+const NO_INPUT = {};
 const MAX_FOOD = GAME.player.maxFood;
 let food = Math.min(MAX_FOOD, save?.food ?? MAX_FOOD);
 let saturation = save?.saturation ?? GAME.hunger.respawnSaturation; // the hidden reserve that heals you (see survival.js)
@@ -522,6 +583,22 @@ const ui = createUI({
   },
 });
 
+// A villager's job: accept or decline, hand it in for the reward (the rules are in quests.js)
+const dialog = createDialog({
+  quests, inventory,
+  onClose: () => { if (screen === 'talk') closeScreen(); },
+  onAccept: () => { audio.craft(); toast('Quest accepted'); },
+  onComplete: (v, result) => {
+    for (const l of result.loot) { const left = inventory.add(l.id, l.n); progress.collected.add(l.id); if (left > 0) tossStack({ id: l.id, n: left, d: 0 }); }
+    if (!creative) xp += result.xp;
+    progress.flags.add('quest');
+    audio.craft();
+    toast(`Quest complete! +${result.xp} XP`);
+    refreshHotbar();
+    checkGoals();
+  },
+});
+
 let nameTimer = 0;
 function showName() {
   const st = stackAt(slot);
@@ -596,8 +673,15 @@ function respawn() {
   food = MAX_FOOD;
   saturation = HUNGER.respawnSaturation;
   dead = false;
+  air = MAX_AIR; drownTimer = 0;
   $('death').hidden = true;
-  player.pos.x = spawnPoint.x; player.pos.y = spawnPoint.y; player.pos.z = spawnPoint.z;
+  let at = spawnPoint, msg = null;
+  if (spawnBed) { // back to the bed you slept in: unless it is gone, or there is nowhere to stand beside it
+    chunkRenderer.preload(spawnBed.x, spawnBed.z, 2);
+    if (isBed(world, spawnBed.x, spawnBed.y, spawnBed.z)) { at = bedSpawn(world, spawnBed.x, spawnBed.y, spawnBed.z) ?? spawnPoint; if (at === spawnPoint) msg = 'Your bed is boxed in: back at the world spawn'; }
+    else { spawnBed = null; msg = 'Your bed was gone: back at the world spawn'; }
+  }
+  player.pos.x = at.x; player.pos.y = at.y; player.pos.z = at.z;
   player.vel.x = player.vel.y = player.vel.z = 0;
   player.stepSmooth = 0; player.fallPeak = null;
   chunkRenderer.preload(player.pos.x, player.pos.z, 2);
@@ -606,6 +690,7 @@ function respawn() {
   renderHealth();
   renderHunger();
   if (AUTOPLAY) setPlaying(true); else { setPlaying(true); lock(); }
+  if (msg) toast(msg, 3500);
 }
 $('respawn').addEventListener('click', respawn);
 
@@ -703,14 +788,17 @@ function setFlying(on) {
 // inventory / palette screens
 function openScreen(kind, context = 'hand', at = null) {
   screen = kind;
-  if (kind === 'inv') ui.openInventory(slot, context, at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
-  else if (kind === 'map') fullMap.open();
+  if (kind === 'inv') {
+    inventory.linked = nearbyChests(); // crafting reaches into the chests around you
+    ui.openInventory(slot, context, WINDOWS[context]?.chest ? at : at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
+  } else if (kind === 'map') fullMap.open();
+  else if (kind === 'talk') { /* the window is already showing */ }
   else ui.openPalette();
   document.exitPointerLock?.(); // (iPhone Safari has no Pointer Lock API at all)
   if (AUTOPLAY || touchMode) setPlaying(false); // (no pointer lock to lose, so there is no unlock event to pause us)
 }
 function hideScreen() {
-  if (screen === 'inv') ui.closeInventory(); else if (screen === 'palette') ui.closePalette(); else if (screen === 'map') fullMap.close();
+  if (screen === 'inv') { ui.closeInventory(); inventory.linked = []; } else if (screen === 'palette') ui.closePalette(); else if (screen === 'map') fullMap.close(); else if (screen === 'talk') dialog.hide();
   screen = null;
   refreshHotbar();
 }
@@ -727,6 +815,7 @@ function closeScreen() {
 window.addEventListener('keydown', (e) => {
   if (optionsOpen) return; // the options screen handles its own keys (it is rebinding them)
   if (e.target instanceof HTMLInputElement && e.code !== 'Escape') return; // typing in the recipe search box: these are not game keys
+  if (sleeping) { e.preventDefault(); return; } // (asleep: nothing to press)
   if (e.code === 'Escape' && playing && !AUTOPLAY && document.pointerLockElement !== canvasEl && !screen) {
     // playing without the mouse captured (just after closing a window): Esc pauses as usual
     setPlaying(false);
@@ -945,7 +1034,7 @@ function renderControlsTable() {
     [k('inventory'), 'Inventory & crafting', k('music'), 'Toggle music'],
     [k('skipTime'), 'Skip time of day', `${k('renderDown')} ${k('renderUp')}`, 'Render distance'],
     [k('fly'), 'Fly (creative only)', k('debug'), 'Debug info'],
-    [k('offhand'), 'Place the torch held in your shield slot', k('map'), 'Full-screen map (or tap the minimap)'],
+    [k('offhand'), 'Place the torch held in your shield slot', k('map'), 'Full-screen map (drag to explore; or tap the minimap)'],
   ];
   $('controls').replaceChildren(...rows.map((r) => {
     const tr = document.createElement('tr');
@@ -1007,6 +1096,30 @@ function renderHunger() {
 }
 renderHunger();
 renderHealth();
+
+// ---- air: a row of bubbles over the hunger bar while you are under water (and while it fills again) ----
+let shownAir = -1;
+function renderAir() {
+  const el = $('airbar');
+  const show = !creative && (player.headInWater || air < MAX_AIR - 0.01);
+  el.hidden = !show;
+  if (!show) { shownAir = -1; return; }
+  const a = Math.ceil(air);
+  if (a === shownAir) return;
+  shownAir = a;
+  el.replaceChildren(...Array.from({ length: 10 }, (_, i) => { const v = air - i * 2; return bubbleIcon(v >= 2 ? 2 : v > 0 ? 1 : 0); }));
+}
+// ---- experience: a thin bar over the hotbar and the level it has reached ----
+let shownXp = -1;
+function renderXp() {
+  const el = $('xpbar');
+  el.style.display = creative ? 'none' : '';
+  if (creative || xp === shownXp) return;
+  shownXp = xp;
+  const l = xpLevel(xp);
+  el.firstElementChild.style.width = Math.min(100, (l.into / l.need) * 100) + '%';
+  $('xplevel').textContent = l.level > 0 ? String(l.level) : '';
+}
 
 // ---------------------------------------------------------------------------------------
 // Block interaction
@@ -1116,6 +1229,8 @@ function updateFallingTrees(dt) {
 let shovelHinted = false;
 
 function breakBlock(hit) {
+  if (UNBREAKABLE[hit.id]) return; // the bottom of the world
+  if (BED.has(hit.id)) { breakBed(hit); return; }
   const info = miningInfo(hit.id, heldId());
   const isPlant = !!PLANT[hit.id];
   world.setBlock(hit.x, hit.y, hit.z, B.AIR);
@@ -1138,8 +1253,12 @@ function breakBlock(hit) {
   if (WINDOWS[OPENS.get(hit.id)]?.furnace) { // whatever was in the furnace falls out
     for (const st of furnaces.remove(hit.x, hit.y, hit.z)) drops.spawn(st.id, st.n, hit.x + 0.5, hit.y + 0.6, hit.z + 0.5, { d: st.d });
   }
+  if (CHEST.has(hit.id)) { // whatever was in the chest falls out
+    for (const st of chests.remove(hit.x, hit.y, hit.z)) drops.spawn(st.id, st.n, hit.x + 0.5, hit.y + 0.6, hit.z + 0.5, { d: st.d });
+  }
   chunkRenderer.remeshNow(neighbourChunks(hit.x, hit.z));
   if (ROLE_LOG[hit.id]) startTreeFall(hit.x, hit.y, hit.z); // the tree above the cut comes down
+  const extra = isPlant ? 0 : hammerExtras(hit);                 // a hammer takes the stone around it too
   if (creative) return;
 
   for (const d of dropsFor(hit.id, info.canHarvest)) drops.spawn(d.id, d.n, hit.x + 0.5, hit.y + 0.5, hit.z + 0.5);
@@ -1148,7 +1267,7 @@ function breakBlock(hit) {
   const st = inventory.slots[slot];
   if (st && toolOf(st.id)) {
     const name = itemName(st.id);
-    if (inventory.damage(slot, toolWear(hit.id, st.id))) { toast(`Your ${name} broke!`); audio.toolBreak(); } // a pickaxe on dirt wears three times as fast
+    if (inventory.damage(slot, toolWear(hit.id, st.id) + Math.floor(extra / 3))) { toast(`Your ${name} broke!`); audio.toolBreak(); } // a pickaxe on dirt wears three times as fast; a hammer a little more for the extra blocks
     refreshHotbar();
   }
 }
@@ -1166,7 +1285,9 @@ function placeBlock(hit) {
   const st = stackAt(slot);
   if (!st || !isBlockItem(st.id) || PLANT[st.id]) return;
   if (player.intersectsBlock(x, y, z)) return;
-  const id = STAIRS.has(st.id) ? STAIRS.get(st.id)[lookFacing()] : st.id; // stairs climb away from you, whichever way you face
+  const id = STAIRS.has(st.id) ? STAIRS.get(st.id)[lookFacing()] // stairs climb away from you, whichever way you face
+    : AXIS_VARIANTS.has(st.id) ? AXIS_VARIANTS.get(st.id)[lookFacing() % 2 === 0 ? 'x' : 'z'] // a window spans the way you are not looking
+    : st.id;
   world.setBlock(x, y, z, id);
   chunkRenderer.remeshNow(neighbourChunks(x, z));
   audio.block(BLOCKS[st.id].sound, 'place');
@@ -1193,7 +1314,8 @@ function placeDoor(hit) {
   if (!SOLID[world.getBlock(x, y - 1, z)]) return; // nothing to stand on
   if (player.intersectsBlock(x, y, z) || player.intersectsBlock(x, y + 1, z)) return;
   const f = lookFacing();
-  const [lower, upper] = DOOR_PLACE[f % 2 === 0 ? 'x' : 'z']; // looking north / south: the plate runs east-west
+  const kind = REG.blockById.get(doorBlockOf(heldId()))?.model?.kind || 'wood';
+  const [lower, upper] = DOOR_KINDS[kind][f % 2 === 0 ? 'x' : 'z']; // looking north / south: the plate runs east-west
   world.setBlock(x, y, z, lower);
   world.setBlock(x, y + 1, z, upper);
   chunkRenderer.remeshNow(neighbourChunks(x, z));
@@ -1218,6 +1340,188 @@ function toggleDoor(hit) {
   chunkRenderer.remeshNow(neighbourChunks(hit.x, hit.z));
   audio.block('wood', d.open ? 'break' : 'place');
   swing = 1;
+}
+
+// ---- hammers ---------------------------------------------------------------------------------
+// A hammer breaks a 3x3 patch of stone at once: the block you hit and the eight round it, in the plane you are facing. Only what it
+// could mine on its own goes (stone, ores it is good enough for), never chests, beds, doors or the bottom of the world. Returns how many
+// extra blocks went.
+function hammerExtras(hit) {
+  const tool = toolOf(heldId());
+  if (!tool || tool.area < 2 || !toolDigs(tool, BLOCKS[hit.id]?.tool)) return 0;
+  const r = (tool.area - 1) / 2, nx = Math.abs(hit.nx), ny = Math.abs(hit.ny);
+  const cells = [];
+  for (let a = -r; a <= r; a++) {
+    for (let b = -r; b <= r; b++) {
+      if (!a && !b) continue;
+      const x = hit.x + (nx ? 0 : a), y = hit.y + (nx ? a : ny ? 0 : b), z = hit.z + (nx ? b : ny ? b : 0);
+      if (y <= 0 || !world.isLoaded(x, z)) continue;
+      const id = world.getBlock(x, y, z);
+      if (id === B.AIR || PLANT[id] || IS_WATER[id] || UNBREAKABLE[id] || OPENS.has(id) || DOOR.has(id) || BED.has(id) || BLOCKS[id].tool !== 'pickaxe') continue;
+      if (!creative && !miningInfo(id, heldId()).canHarvest) continue;
+      world.setBlock(x, y, z, B.AIR);
+      spawnBurst(x, y, z, id);
+      if (!creative) for (const d of dropsFor(id, true)) drops.spawn(d.id, d.n, x + 0.5, y + 0.5, z + 0.5);
+      const above = world.getBlock(x, y + 1, z);
+      if (PLANT[above]) { world.setBlock(x, y + 1, z, B.AIR); spawnBurst(x, y + 1, z, above); }
+      cells.push([x, y, z]);
+    }
+  }
+  if (cells.length) { remeshBlocks(cells); audio.block(soundOf(hit.id), 'break'); }
+  return cells.length;
+}
+
+// ---- creatures ---------------------------------------------------------------------------------
+function spawnColorBurst(x, y, z, rgb, n = 8) {
+  for (let i = 0; i < n && particles.length < MAX_PARTICLES; i++) {
+    particles.push({ x: x + (Math.random() - 0.5) * 0.5, y: y + Math.random() * 0.9, z: z + (Math.random() - 0.5) * 0.5, vx: (Math.random() - 0.5) * 3, vy: Math.random() * 3 + 1, vz: (Math.random() - 0.5) * 3,
+      life: 0.4 + Math.random() * 0.4, size: 0.06 + Math.random() * 0.06, r: rgb[0], g: rgb[1], b: rgb[2] });
+  }
+}
+// A blow at a creature: what you hold decides the damage (swords hit hardest, a fist hardly at all)
+function attackMob(m) {
+  attackTimer = GAME.combat.attackCooldown;
+  const st = stackAt(slot), tool = st && toolOf(st.id);
+  const killed = m.damage(weaponDamage(tool), player.pos.x, player.pos.z, GAME.combat.knockback);
+  swing = 1;
+  audio.mobHit();
+  spawnColorBurst(m.x, m.y + m.def.size.height * 0.5, m.z, [0.8, 0.12, 0.1]);
+  if (!creative && tool) {
+    const name = itemName(st.id);
+    if (inventory.damage(slot, attackWear(tool))) { toast(`Your ${name} broke!`); audio.toolBreak(); }
+    refreshHotbar();
+  }
+  if (killed) onMobKilled(m);
+}
+function onMobKilled(m) {
+  if (!creative) {
+    for (const d of rollLoot(m.def.loot)) drops.spawn(d.id, d.n, m.x, m.y + 0.5, m.z, { delay: 0.4 });
+    if (m.hostile) { xp += m.def.xp; toast(`+${m.def.xp} XP`, 1200); }
+  }
+  if (m.hostile) { quests.recordKill(m.type); progress.flags.add('slain'); checkGoals(); }
+}
+function shearSheep(m) {
+  const st = inventory.slots[slot];
+  if (!mobs.shear(m)) { toast('It has no wool right now'); return; }
+  for (const d of rollLoot(m.def.shear.loot)) drops.spawn(d.id, d.n, m.x, m.y + 0.8, m.z, { delay: 0.3 });
+  audio.block('cloth', 'break');
+  swing = 1;
+  if (!creative && st && toolOf(st.id) && inventory.damage(slot, 1)) { toast('Your shears broke!'); audio.toolBreak(); }
+  refreshHotbar();
+}
+function mobHitsPlayer(dmg, src) {
+  if (creative || dead || sleeping) return;
+  const name = REG.mobs.species[src.type]?.name ?? 'monster';
+  const dx = player.pos.x - src.x, dz = player.pos.z - src.z, d = Math.hypot(dx, dz) || 1;
+  player.vel.x += (dx / d) * 5; player.vel.z += (dz / d) * 5; player.vel.y = Math.max(player.vel.y, 3);
+  damage(reduceDamage(dmg, inventory.armor), src.arrow ? `Shot by a ${name}` : `Slain by a ${name}`); // armor takes damage off every blow
+}
+function mobCalls(m) {
+  const d = Math.hypot(m.x - player.pos.x, m.z - player.pos.z);
+  if (d < 30) audio.creature(m.def.call, 1 - d / 32);
+}
+function mobBurns(m) { spawnBurst(m.x - 0.5, m.y, m.z - 0.5, B.COBBLE); }
+
+// ---- beds and sleep ----------------------------------------------------------------------------
+function placeBed(hit, spec) {
+  const replacing = !!PLANT[hit.id];
+  const x = replacing ? hit.x : hit.x + hit.nx, y = replacing ? hit.y : hit.y + hit.ny, z = replacing ? hit.z : hit.z + hit.nz;
+  const cells = bedCells(world, x, y, z, lookFacing(), spec);
+  if (!cells) { toast('A bed needs a flat, solid floor with room for it'); return; }
+  if (cells.some((c) => player.intersectsBlock(c.x, c.y, c.z))) return;
+  for (const c of cells) world.setBlock(c.x, c.y, c.z, c.id);
+  remeshBlocks(cells.map((c) => [c.x, c.y, c.z]));
+  audio.block('cloth', 'place');
+  swing = 1;
+  if (!creative) { const st = inventory.slots[slot]; if (st && --st.n <= 0) inventory.slots[slot] = null; refreshHotbar(); }
+}
+// Taking a bed apart: every square goes and you get the bed back (or beds: two singles side by side give a double)
+function breakBed(hit) {
+  const group = bedGroup(world, hit.x, hit.y, hit.z);
+  const color = BED.get(hit.id).color;
+  for (const c of group) { world.setBlock(c.x, c.y, c.z, B.AIR); spawnBurst(c.x, c.y, c.z, c.id); }
+  remeshBlocks(group.map((c) => [c.x, c.y, c.z]));
+  audio.block('cloth', 'break');
+  swing = 1;
+  if (spawnBed && group.some((c) => c.x === spawnBed.x && c.y === spawnBed.y && c.z === spawnBed.z)) { spawnBed = null; toast('Your bed is gone: you will come back at the world spawn again', 3500); }
+  if (!creative) for (const d of bedDrops(color, group.length)) drops.spawn(d.item, d.n, hit.x + 0.5, hit.y + 0.6, hit.z + 0.5);
+}
+// Right-click a bed: it becomes where you come back after dying, and you go to sleep (if no monster is near): day becomes night and night day
+function useBed(hit) {
+  spawnBed = { x: hit.x, y: hit.y, z: hit.z };
+  const near = !creative && mobs.nearest(player.pos.x, player.pos.z, GAME.sleep.monsterRadius);
+  if (near) { toast('Respawn point set. You cannot sleep now: a monster is nearby', 3200); return; }
+  startSleep();
+}
+function startSleep() {
+  if (sleeping) return;
+  sleeping = true;
+  keys.clear(); syncInput(); mouseDown = { left: false, right: false }; resetBreak();
+  const el = $('sleep'), secs = GAME.sleep.fadeSeconds;
+  $('sleep-text').textContent = gameDayPart(dayTime) === 'Night' ? 'Sleeping until morning...' : 'Sleeping until evening...';
+  el.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
+  audio.sleep();
+  setTimeout(() => { // in the dark: the clock jumps twelve hours
+    const t = sleepTime(dayTime, dayCount);
+    dayTime = t.dayTime;
+    if (t.dayCount !== dayCount) { dayCount = t.dayCount; sky.setMoonPhase(dayCount); }
+    health = Math.max(health, Math.min(MAX_HEALTH, GAME.sleep.healTo));
+    shownHealth = -1; renderHealth();
+    for (const m of mobs.monsters) { m.dead = true; m.deathTimer = 0; m.vanished = true; }
+    progress.flags.add('slept');
+    checkGoals();
+  }, secs * 450);
+  setTimeout(() => {
+    el.classList.remove('on');
+    setTimeout(() => { el.hidden = true; sleeping = false; toast(gameDayPart(dayTime) === 'Night' ? 'You slept through the day' : 'You slept through the night: good morning!', 2800); }, 950);
+  }, secs * 1000);
+}
+
+// ---- chests ------------------------------------------------------------------------------------
+function nearbyChests() {
+  return chests.near(player.pos.x, player.pos.y, player.pos.z).map((c) => new ChestSource([c]));
+}
+function openChest(hit) {
+  const tier = chestTier(hit.id);
+  openScreen('inv', 'chest', { chest: chests.get(hit.x, hit.y, hit.z, tier), tier, name: BLOCKS[hit.id].name });
+}
+// An upgrade item turns a chest into the next one and keeps what is inside
+function upgradeChest(hit, st) {
+  const up = upgradeOf(st.id);
+  if (hit.id !== up.from) { toast(`This upgrade is for a ${BLOCKS[up.from].name}`); return; }
+  world.setBlock(hit.x, hit.y, hit.z, up.to);
+  chests.get(hit.x, hit.y, hit.z, chestTier(up.to));
+  chunkRenderer.remeshNow(neighbourChunks(hit.x, hit.z));
+  audio.block('metal', 'place');
+  swing = 1;
+  toast(`Upgraded to a ${BLOCKS[up.to].name}`);
+  if (!creative) { if (--st.n <= 0) inventory.slots[slot] = null; refreshHotbar(); }
+}
+
+// ---- flowers: pick them, plant them on grass for the look of it, or turn them into dye ----
+function placeFlower(hit) {
+  const st = stackAt(slot), soils = PLACE_ON.get(st.id);
+  const replacing = !!PLANT[hit.id];
+  const x = hit.x, y = replacing ? hit.y : hit.y + 1, z = hit.z;
+  if (!replacing && hit.ny !== 1) return;
+  const below = world.getBlock(x, y - 1, z);
+  if (!soils.includes(below) || !canPlaceAt(x, y, z)) return;
+  const here = world.getBlock(x, y, z);
+  if (here !== B.AIR && !PLANT[here]) return;
+  world.setBlock(x, y, z, st.id);
+  chunkRenderer.remeshNow(neighbourChunks(x, z));
+  audio.block(soundOf(st.id), 'place');
+  swing = 1;
+  if (!creative) { if (--st.n <= 0) inventory.slots[slot] = null; refreshHotbar(); }
+}
+
+// Villagers open and shut their own doors on their way to bed (and never shut one on you)
+function setDoorFor(door, open) {
+  const x = Math.floor(door.x), z = Math.floor(door.z);
+  if (!open && (player.intersectsBlock(x, door.y, z) || player.intersectsBlock(x, door.y + 1, z))) return;
+  const changed = setDoorOpen(world, x, door.y, z, open);
+  if (changed) { remeshBlocks(changed); if (Math.hypot(x - player.pos.x, z - player.pos.z) < 24) audio.block('wood', open ? 'place' : 'break'); }
 }
 
 // Torches: the block you get depends on the face you click (up = standing on the floor, a side = hanging on that wall).
@@ -1390,7 +1694,16 @@ function updateInteraction(dt) {
   placeTimer -= dt;
   swing = Math.max(0, swing - dt * 4.5);
 
-  if (mouseDown.left && hit && hit.y > 0) {
+  // a creature in reach and nearer than the block behind it: the left button hits it instead of digging
+  attackTimer = Math.max(0, attackTimer - dt);
+  const mobHit = !sleeping ? mobs.pick(player.eye, lookDir, GAME.combat.reach) : null;
+  const blockDist = hit ? Math.hypot(hit.x + 0.5 - player.eye.x, hit.y + 0.5 - player.eye.y, hit.z + 0.5 - player.eye.z) - 0.5 : Infinity;
+  targetMob = mobHit && mobHit.dist < blockDist ? mobHit.mob : null;
+  if (mouseDown.left && targetMob) {
+    resetBreak();
+    breakTimer.idle(dt);
+    if (attackTimer <= 0) attackMob(targetMob);
+  } else if (mouseDown.left && hit && !UNBREAKABLE[hit.id]) {
     const key = hit.x + ',' + hit.y + ',' + hit.z;
     if (key !== breakKey) { // started on a new block
       breakKey = key;
@@ -1429,6 +1742,11 @@ function updateInteraction(dt) {
     }
   }
 
+  if (mouseDown.right && rightFresh && placeTimer <= 0 && !eating && targetMob?.def.shear && isShears(heldId())) { // shears on a sheep
+    shearSheep(targetMob);
+    mouseDown.right = false; rightFresh = false; placeTimer = 0.5;
+  }
+
   updateEating(dt, hit);
 
   if (mouseDown.right && hit && placeTimer <= 0 && !eating) {
@@ -1439,12 +1757,22 @@ function updateInteraction(dt) {
     const tool = heldStack && toolOf(heldStack.id);
     if (fresh && OPENS.has(hit.id)) {
       mouseDown.right = false;
-      openScreen('inv', OPENS.get(hit.id), hit); // use the station instead of placing a block against it
+      if (WINDOWS[OPENS.get(hit.id)]?.chest) {
+        if (heldStack && upgradeOf(heldStack.id) && CHEST.has(hit.id)) upgradeChest(hit, heldStack); // holding an upgrade: use it on the chest
+        else openChest(hit);
+      } else openScreen('inv', OPENS.get(hit.id), hit); // use the station instead of placing a block against it
+    } else if (fresh && BED.has(hit.id)) {
+      mouseDown.right = false;
+      useBed(hit);
     } else if (fresh && DOOR.has(hit.id)) {
       mouseDown.right = false;
       toggleDoor(hit); // use a door instead of placing a block against it
     } else if (heldStack && isDoorItem(heldStack.id)) {
       placeDoor(hit);
+    } else if (heldStack && bedOf(heldStack.id)) {
+      placeBed(hit, bedOf(heldStack.id));
+    } else if (heldStack && PLACE_ON.has(heldStack.id)) {
+      placeFlower(hit);
     } else if (tool?.type === 'hoe') {
       tillBlock(hit, fresh);
     } else if (heldStack && plantsOf(heldStack.id)) {
@@ -1460,11 +1788,12 @@ function updateInteraction(dt) {
 // A villager answers: something about their job, or the night. (They turn to look at you and stand still for a moment.)
 function talkTo(v) {
   v.target = null; v.timer = 4;
-  toast(`${v.name} the ${v.job}: \u201C${v.speak(gameDayPart(dayTime) === 'Night')}\u201D`, 4500);
   audio.villager();
   swing = 1;
   progress.flags.add('talked');
   checkGoals();
+  dialog.show(v, v.speak(gameDayPart(dayTime) === 'Night')); // their job for you, to accept or decline
+  openScreen('talk');
 }
 
 // Walking into a village says so (once per visit); finding the first one is a goal
@@ -1491,6 +1820,7 @@ function updateClocks(now) {
   $('mm-real').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
   $('mm-game').textContent = gameClock(dayTime);
   $('mm-part').textContent = `${gameDayPart(dayTime)} · Day ${dayCount + 1}`;
+  $('mm-env').textContent = [biomeNow.label, weatherState.key === 'clear' ? '' : weatherState.label].filter(Boolean).join(' · ') || 'Clear';
   $('mm-x').textContent = Math.floor(player.pos.x);
   $('mm-y').textContent = Math.floor(player.pos.y);
   $('mm-z').textContent = Math.floor(player.pos.z);
@@ -1509,7 +1839,20 @@ function updateLookAt() {
   if (!playing || screen || dead) { el.hidden = true; lookSig = null; return; }
   camera.getWorldDirection(_look);
   const hit = raycast(world, player.eye, _look, GAME.player.lookAtReach); // only things within reach of the HUD
+  const mh = mobs.pick(player.eye, _look, GAME.player.lookAtReach);
+  if (mh && (!hit || mh.dist < Math.hypot(hit.x + 0.5 - player.eye.x, hit.y + 0.5 - player.eye.y, hit.z + 0.5 - player.eye.z) - 0.5)) { // a creature in the way
+    const m = mh.mob;
+    lookSig = null;
+    $('lookat-icon').style.visibility = 'hidden';
+    $('lookat-name').textContent = m.def.name;
+    $('lookat-sub').classList.remove('ready');
+    $('lookat-sub').textContent = `${'\u2665'.repeat(Math.max(1, Math.ceil(m.hp / 2)))} ${Math.ceil(m.hp / 2)} / ${Math.ceil(m.def.health / 2)}${m.def.shear ? (m.sheared ? ' \u2014 sheared' : ' \u2014 shears get wool') : ''}`;
+    $('lookat-pips').replaceChildren();
+    el.hidden = false;
+    return;
+  }
   if (!hit) { el.hidden = true; lookSig = null; return; }
+  $('lookat-icon').style.visibility = '';
   if (hit.id !== lookSig) {
     lookSig = hit.id;
     const g = GROWTH_INFO[hit.id];
@@ -1540,7 +1883,7 @@ function updateLookAt() {
 // Fog / time of day
 // ---------------------------------------------------------------------------------------
 function updateFog() {
-  const far = chunkRenderer.radius * 16 - 4;
+  const far = (chunkRenderer.radius * 16 - 4) * fogMul; // (a storm or a blizzard closes the view in)
   scene.fog.near = far * 0.55;
   scene.fog.far = far;
 }
@@ -1560,8 +1903,44 @@ function updateEyeLight() {
   eyeLight += (brightness(level) - eyeLight) * Math.min(1, dt * 4);
   return eyeLight;
 }
+// Weather: refresh where you are now and what the weather is there, then show it (particles, thunder, wind)
+let envAt = 0;
+function updateWeather(dt) {
+  if (elapsed - envAt > 0.5) {
+    envAt = elapsed;
+    biomeNow = world.biomeInfo(player.pos.x, player.pos.z, player.pos.y);
+    if (biomeNow.climate === 'ocean' && !progress.flags.has('ocean')) { progress.flags.add('ocean'); checkGoals(); }
+  }
+  weatherState = weatherNow(seed, dayCount + dayTime, biomeNow.climate);
+  weatherFx.update(dt, weatherState, camera.position, { underwater: player.headInWater, elapsed });
+}
+// Blizzards, sandstorms and hurricanes slow you down, out in the open
+function stormSlowdown() {
+  if (weatherState.speed >= 1) return 1;
+  const sky = world.lighting.get(Math.floor(player.pos.x), Math.floor(player.pos.y + 1.6), Math.floor(player.pos.z), 0);
+  return sky >= 14 ? weatherState.speed : 1;
+}
+// Storm clouds darken the sky and hide the sun; a flash of lightning whitens everything for a moment
+function applyWeatherLook(env) {
+  const wd = weatherState.darkness, fl = weatherFx.flash;
+  if (wd > 0.001) {
+    _c.setRGB(0.44, 0.47, 0.52).multiplyScalar(0.1 + 0.9 * env.day);
+    env.sky.lerp(_c, Math.min(1, wd * 1.3));
+    env.tint.multiplyScalar(1 - 0.38 * wd);
+    sky.cloudMat.color.multiplyScalar(1 - 0.5 * wd);
+    sky.sun.material.opacity = 1 - 0.95 * wd;
+    sky.sunHalo.material.opacity *= 1 - wd;
+    sky.moonMat.uniforms.uAlpha.value *= 1 - 0.85 * wd;
+    sky.halo.material.opacity *= 1 - wd;
+    sky.starMat.uniforms.uOpacity.value *= 1 - wd;
+  } else sky.sun.material.opacity = 1;
+  if (fl > 0.01) { env.sky.lerp(WHITE, fl * 0.55); env.tint.lerp(WHITE, fl * 0.5); }
+  fogMul = weatherState.fog;
+}
+
 function updateEnvironment() {
   const env = sky.update(dayTime, camera.position, elapsed);
+  applyWeatherLook(env);
   const dim = updateEyeLight();
   tintUniform.value.copy(env.tint); // solid, water and plants tint through the shader (see withBlockLight)
   materials.sprite.color.copy(env.tint);
@@ -1569,6 +1948,7 @@ function updateEnvironment() {
   heldBlockMat.color.copy(handTint);
   heldSpriteMat.color.copy(handTint);
   heldArmMat.color.copy(SKIN).multiply(handTint);
+  sleeveMat.color.copy(SLEEVE).multiply(handTint);
   pMesh.material.color.copy(env.tint);
   scene.background = scene.background || new THREE.Color();
   scene.background.copy(env.sky).multiplyScalar(dim);
@@ -1607,6 +1987,7 @@ function snapshot() {
     food, saturation,
     health: dead ? MAX_HEALTH : health, spawnPoint, day: dayCount, drops: drops.serialize(), furnaces: furnaces.serialize(),
     progress: { collected: [...progress.collected], crafted: [...progress.crafted], flags: [...progress.flags] },
+    chests: chests.serialize(), quests: quests.serialize(), xp, bed: spawnBed, mobs: mobs.serialize(),
     slot, time: dayTime, radius: chunkRenderer.radius,
   });
 }
@@ -1653,10 +2034,10 @@ function frame(now) {
 
   touchCtl.sync({ show: playing && !screen && !dead && !optionsOpen, screen, creative, flying: player.flying });
   if (playing) {
-    player.speedMul = isStarving() ? HUNGER.starvingSpeed : 1;
+    player.speedMul = (isStarving() ? HUNGER.starvingSpeed : 1) * stormSlowdown();
     input.sprint = sprintHeld && sprintAllowed();
-    player.update(dt, input);
-    updateInteraction(dt);
+    player.update(dt, sleeping ? NO_INPUT : input);
+    if (!sleeping) updateInteraction(dt);
     advanceTime(dt / GAME.time.dayLengthSeconds);
     if (!creative) {
       // regeneration when well fed; starvation costs half a heart every 15 s until you are dead; standing still is free
@@ -1667,8 +2048,22 @@ function frame(now) {
       if (r.healed) renderHealth();
       if (r.starved) damage(r.starved, 'You starved to death');
       renderHunger();
+      // breath: the air runs out under water, and then it hurts
+      const bs = { air, drownTimer };
+      const drown = tickBreath(bs, dt, player.headInWater);
+      ({ air, drownTimer } = bs);
+      if (drown) damage(drown, 'You drowned');
     }
+    // the creatures: animals wander, monsters come out where it is dark and come for you
+    mobs.update(dt, {
+      player: dead ? null : { x: player.pos.x, y: player.pos.y, z: player.pos.z }, creative, daylight: daylight(dayTime, weatherState.darkness),
+      hitPlayer: mobHitsPlayer, call: mobCalls, onSunBurn: mobBurns,
+    });
   }
+  renderAir();
+  renderXp();
+  mobModels.update(mobs.all, mobs.arrows, mobs.removed, tintUniform.value, player.pos, elapsed);
+  updateWeather(dt);
   windTime.value = elapsed % 1000;
   waterSim.update(dt);
   gravitySim.update(dt);
@@ -1718,6 +2113,11 @@ function frame(now) {
       pose.pos[2] - sw * 0.08 + eatBlend * 0.2);
     held.rotation.set(pose.rot[0] - sw * 0.9 + eatBlend * 0.5, pose.rot[1] + sw * 0.25, pose.rot[2]);
   }
+  // the right arm reaches from the shoulder to the hand: the held thing's own motion (bob, swing, raised to the mouth) moves it
+  if (pose.pivot) _handR.set(pose.pivot[0] + Math.sin(bob) * 0.01 - sw * 0.1, pose.pivot[1] + Math.abs(Math.cos(bob)) * 0.012 + sw * 0.1, pose.pivot[2] - sw * 0.16);
+  else _handR.set(held.position.x + pose.hold[0], held.position.y + pose.hold[1], held.position.z + pose.hold[2]);
+  aimArm(armRight, SHOULDER_R, _handR);
+  armRight.g.visible = !dead && !sleeping;
   refreshOffhand();
   held.scale.setScalar(pose.scale * (1 - 0.35 * eatBlend * Math.min(1, eating / GAME.eating.seconds))); // it gets eaten away
   if (eatBlend > 0.05 && !pose.pivot) held.rotation.z += Math.sin(elapsed * 26) * 0.07 * eatBlend; // chewing wobble
@@ -1729,7 +2129,7 @@ function frame(now) {
   updateClocks(now);
   updateParticles(dt);
   updateEnvironment();
-  villagers.update(playing || screen ? dt : 0, { x: player.pos.x, z: player.pos.z }, tintUniform.value, now);
+  villagers.update(playing || screen ? dt : 0, { x: player.pos.x, z: player.pos.z }, tintUniform.value, now, { night: bedtime(dayTime), setDoor: setDoorFor });
   checkVillage(now);
   renderer.render(scene, camera);
 
@@ -1752,9 +2152,12 @@ window.__vc = {
   get food() { return food; }, set food(v) { food = v; shownFood = -1; renderHunger(); },
   get creative() { return creative; },
   REG, villagers, waterSim, damage, respawn, advanceTime, fallingTrees, startTreeFall, sky,
+  mobs, chests, quests, dialog, mobModels, weatherFx, startSleep, useBed, openChest, attackMob, breakBlock, placeBed, hammerExtras, setDoorFor, mobHitsPlayer,
+  get weather() { return weatherState; }, get biome() { return biomeNow; }, get spawnBed() { return spawnBed; }, set spawnBed(v) { spawnBed = v; }, get xp() { return xp; }, set xp(v) { xp = v; },
+  get air() { return air; }, set air(v) { air = v; shownAir = -1; }, get sleeping() { return sleeping; },
   get health() { return health; }, set health(v) { health = v; shownHealth = -1; renderHealth(); },
   get dead() { return dead; }, get playing() { return playing; }, get screen() { return screen; },
-  get dayTime() { return dayTime; }, set dayTime(v) { dayTime = v; },
+  get dayTime() { return dayTime; }, set dayTime(v) { dayTime = v; }, get dayCount() { return dayCount; }, set dayCount(v) { dayCount = v; },
   toggleDebug: () => ($('debug').hidden = !$('debug').hidden),
 };
 

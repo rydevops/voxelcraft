@@ -5,7 +5,7 @@
 // and dries up when nothing supplies it, so streams retreat when their source is blocked or removed.
 // Pure logic: no rendering, runs in Node for tests.
 import { B, PLANT, IS_WATER, WATER_LEVEL, WATER_FLOW } from './blocks.js';
-import { CH } from './world.js';
+import { CH, TICK_CEILING } from './voxel.js';
 
 const FLOW = WATER_FLOW; // flowing level (1..6) -> block id, from the blocks that have a water level in blocks.json
 const SIDES = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -28,11 +28,11 @@ export class WaterSim {
   }
 
   key(x, y, z) {
-    return ((x + 32768) * 65536 + (z + 32768)) * 64 + y;
+    return ((x + 32768) * 65536 + (z + 32768)) * CH + y;
   }
   unkey(k) {
-    const y = k % 64;
-    const rest = Math.floor(k / 64);
+    const y = k % CH;
+    const rest = Math.floor(k / CH);
     return [Math.floor(rest / 65536) - 32768, y, (rest % 65536) - 32768];
   }
 
@@ -72,7 +72,7 @@ export class WaterSim {
     let changed = 0;
     for (const k of cells) {
       const [x, y, z] = this.unkey(k);
-      if (y < 0 || y >= CH || !w.isLoaded(x, z)) continue;
+      if (y < 0 || y >= CH || y > TICK_CEILING || !w.isLoaded(x, z)) continue; // (nothing flows up in the sky)
       const id = w.getBlock(x, y, z);
       if (WATER_LEVEL[id] === 7 || !replaceable(id)) continue; // sources never change; solid blocks hold no water
       const current = IS_WATER[id] ? WATER_LEVEL[id] : 0;

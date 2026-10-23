@@ -3,7 +3,7 @@ import { B, SOLID, SHAPE, BOXES, PLANT, PLANT_H, PLANT_HALF, IS_WATER } from './
 
 const FULL = [[0, 0, 0, 1, 1, 1]];
 
-const HW = 0.3;        // half width
+const HW = 0.3;        // half width (a player; animals and monsters pass their own size to the constructor)
 const HEIGHT = 1.8;
 const CROUCH_HEIGHT = 1.5;
 export const EYE = 1.62;
@@ -15,8 +15,11 @@ const JUMP = 9.2;
 const TERMINAL = 40;
 
 export class Player {
-  constructor(world) {
+  // size: { hw, height } for something that is not a person (a cow is wider, a pig lower); it uses the same physics
+  constructor(world, size = {}) {
     this.world = world;
+    this.hw = size.hw ?? HW;
+    this.fullHeight = size.height ?? HEIGHT;
     this.pos = { x: 0, y: 40, z: 0 };   // feet
     this.vel = { x: 0, y: 0, z: 0 };
     this.yaw = 0;
@@ -32,7 +35,7 @@ export class Player {
     this.stepSmooth = 0;    // how far the camera still lags behind after an automatic step up (eases to 0)
     this.canStep = false;   // step-assist is only allowed while walking on the ground
     this.crouching = false; // lower and slow, and you cannot walk off an edge
-    this.height = HEIGHT;
+    this.height = this.fullHeight;
     this.eyeHeight = EYE;   // eases between standing and crouching eye height
   }
 
@@ -53,6 +56,7 @@ export class Player {
 
   // Call fn(minX, minY, minZ, maxX, maxY, maxZ) for every solid box a body at (x, y, z) overlaps; stop (and return true) when fn does
   overlapping(x, y, z, height, fn) {
+    const HW = this.hw;
     const x0 = Math.floor(x - HW + 1e-5), x1 = Math.floor(x + HW - 1e-5);
     const y0 = Math.floor(y + 1e-5), y1 = Math.floor(y + height - 1e-5);
     const z0 = Math.floor(z - HW + 1e-5), z1 = Math.floor(z + HW - 1e-5);
@@ -89,20 +93,20 @@ export class Player {
 
   // Is there solid ground under any part of the feet at this position? (crouching stops you walking off edges)
   supported(x, y, z) {
-    const by = Math.floor(y - 0.05);
+    const HW = this.hw, by = Math.floor(y - 0.05);
     for (const dz of [-HW, HW]) for (const dx of [-HW, HW]) if (this.solidAt(Math.floor(x + dx), by, Math.floor(z + dz))) return true;
     return false;
   }
 
   intersectsBlock(bx, by, bz) {
-    const p = this.pos;
+    const p = this.pos, HW = this.hw;
     return p.x + HW > bx && p.x - HW < bx + 1 && p.y + this.height > by && p.y < by + 1 && p.z + HW > bz && p.z - HW < bz + 1;
   }
 
   // Move along one axis in small steps; on impact snap flush against the block.
   moveAxis(axis, delta) {
     if (delta === 0) return false;
-    const p = this.pos;
+    const p = this.pos, HW = this.hw;
     const steps = Math.ceil(Math.abs(delta) / 0.2);
     const step = delta / steps;
     for (let i = 0; i < steps; i++) {
@@ -151,7 +155,7 @@ export class Player {
     // crouch: lower the body; standing back up needs headroom
     const wantCrouch = !!input.crouch && !this.flying && !this.inWater;
     if (wantCrouch) { this.crouching = true; this.height = CROUCH_HEIGHT; }
-    else if (this.crouching && !this.collides(p.x, p.y, p.z, HEIGHT)) { this.crouching = false; this.height = HEIGHT; }
+    else if (this.crouching && !this.collides(p.x, p.y, p.z, this.fullHeight)) { this.crouching = false; this.height = this.fullHeight; }
     this.eyeHeight += ((this.crouching ? CROUCH_EYE : EYE) - this.eyeHeight) * Math.min(1, 16 * dt);
 
     // desired horizontal direction

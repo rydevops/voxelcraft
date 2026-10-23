@@ -21,7 +21,10 @@ messages in the terminal. Names are lowercase keys like `coal_ore`; the engine f
 | `sounds.json` | block sound materials |
 | `worldgen.json` | terrain, rivers, caves, ores, trees, ground cover, spawn |
 | `music.json` | the soundtrack: tracks, tempos, chords, instruments, the title theme |
-| `game.json` | equipment slots, health, hunger, falling, tilling, light levels, studio logo, day length, tree falling, creative hotbar |
+| `game.json` | equipment slots, health, hunger, falling, tilling, light levels, studio logo, day length, tree falling, creative hotbar, breath, combat, experience, sleep, chests |
+| `mobs.json` | animals and monsters: health, speed, size, drops, where they live, and the rules for when they spawn |
+| `quests.json` | what each kind of villager asks for, by difficulty, and the loot table each difficulty pays from |
+| `weather.json` | the kinds of weather, how likely they are and what they look like |
 
 ## blocks.json
 
@@ -49,6 +52,13 @@ messages in the terminal. Names are lowercase keys like `coal_ore`; the engine f
 * `model: { "type": "torch", "height": 0.75, "lean": [dx, dz] }` - drawn as a thin torch instead of a cube (`lean` points away from the wall it hangs on). Not solid, selectable with a small box, glows (`light`).
 * `model: { "type": "stairs", "facing": "n" }` - a stair: a low slab and a tall back on the side `facing` names (n, e, s, w), solid only where it is drawn. Make one block per direction and give the other three `"variantOf": "<the first one's key>"`: placing the first picks the direction from the way you look, and the others drop and pick as the first. Set `"opaque": false`.
 * `model: { "type": "door", "axis": "x", "half": "bottom", "open": false }` - one half of a door: a thin plate (`axis` = the way it spans; an open door swings to the edge). A door needs all eight combinations (axis x/z, bottom/top, shut/open), the shut ones `"solid": true` and the open ones `"solid": false`; the item that places them has `"door": "<key of the shut, lower, x-axis block>"` (see `door` in items.json).
+* `model: { "type": "boxes", "boxes": [[x0, y0, z0, x1, y1, z1], ...] }` - made of boxes inside the cell (0-1): slabs, columns, windows, beds. Solid only where drawn, so you walk up onto a half-high slab. Set `"opaque": false`.
+* `axis: "x"` / `"z"` - a window (or wall piece) that spans one way; the z copy lists the x one as `variantOf`, and placing the x one picks whichever fits the way you face.
+* `model.kind` on a door (`"wood"`, `"iron"`) - a door kind is its own set of eight blocks; the item that places it has `"door": "<its closed lower x block>"`.
+* `unbreakable: true` - cannot be mined in any mode and gives nothing (bedrock).
+* `bed: { "part": "foot" | "head", "facing": "n"|"e"|"s"|"w", "color": "red" }` - one square of a bed: the foot, or the head with the pillow on the side it faces. The bed items (`items.json` `bed`) place a bed `width` wide and two long out of these.
+* `chest: { "slots": 27, "stack": 1 }` - storage: how many slots, and how many times a normal stack each slot holds. It needs `"opens": "chest"` (a window with `"chest": true` in `recipes.json`).
+* `plant.placeOn: ["grass", "dirt"]` - a flower you can carry and plant on those blocks (the block is its own item).
 * `support: [dx, dy, dz]` - where the block it hangs on is; it drops as an item when that stops being solid.
 * `fuel: seconds` - burns that long in a furnace (blocks and items).
 * `hydration` - soil that tracks water: `{ "wet": "farmland_wet", "decay": { "into": "dirt", "chancePerSecond": 0.012 } }` turns it into the wet block
@@ -83,6 +93,8 @@ messages in the terminal. Names are lowercase keys like `coal_ore`; the engine f
   A tier has `level` (compared with a block's `need`), mining `speed` multiplier, `durability` and a `head` colour set from `textures.json`.
   A new tier is just a new entry (e.g. `ruby` with level 4).
 * Every non-tool item needs a sprite in `textures.json` -> `sprites`.
+* `tool: { "type": "hammer", "tier": "iron", "mines": "pickaxe", "area": 3, "speed": 0.7, "durabilityMul": 2.5 }` - `mines` makes the tool dig that kind of block as if it were that tool (a hammer is a pickaxe); `area` breaks a square of that width (3x3); `speed` and `durabilityMul` scale the tier's numbers. A weapon's damage comes from its `type` and tier in `game.json` `combat`.
+* `bed: { "width": 2, "color": "red", "foot": "bed_red_foot", "heads": ["bed_red_head_n", ...e, s, w] }` - places a bed; `upgrade: { "from": "chest", "to": "iron_chest" }` - used on a chest it becomes the next one and keeps its contents; `shears: true` - shears a sheep.
 
 ## loot.json
 
@@ -132,17 +144,30 @@ Each material is a list of layers played together: `{ "type": "noise", "filter":
 
 ## worldgen.json
 
-Sea level, snow line, which blocks form the surface and filler, terrain and river shape numbers, caves, `ores`
+Sea level, snow line, which blocks form the surface and filler (and the bedrock), terrain and river shape numbers, caves, `ores`
 (noise settings and height range - first match wins, so list rare ores first), `trees`, `groundCover` (grass tufts) and the spawn search.
 Caves: `scale`/`threshold` shape the thin winding tunnels, `caverns` (`scale`, `threshold`, `minY`, `maxY`, `surfaceDepth`) the wide chambers (lower threshold = bigger and more), and `entrances` (`scale`, `threshold`) the columns where tunnels may break through the surface.
 `biomes`: three slow noise fields (`temp`, `wet`, `rel`, each mostly between -0.35 and 0.35, stretched by `climateScale`) choose a biome per column using the cut-offs in `select`. Each entry of `types` (`plains`, `forest`, `hills`, `mountains`, `desert`, `tundra`) names its `surface` and `filler` blocks and `fillerDepth`, an optional `rockFrom` height (above it the surface is bare stone) and a `trees` multiplier (`denseMin` keeps forests dense). The shape of the land comes from `terrain` (`plainsHills` / `rollingHills` = how bumpy flat and rolling country is, `mountainHeight`, `mountainUplift`, `duneHeight`, `flatContinent` = how much the big continent noise is flattened on dry land). A tree variant can list `biomes` it grows in.
 `villages`: `regionSize` (the world is cut into squares; each may hold one village), `chance`, `attempts` (places tried per square), `flatRadius` / `flatRange` (how level the site must be), `maxStep`, `minAboveSea`, `armLength` (how far the two roads run), `emptyLot` (chance a plot is left bare), `minBuildings`, `maxVillagers` and the `biomes` they may be in. What the buildings are made of lives in `src/js/villages.js`: they use the same blocks players can craft.
-Changing it changes new terrain only; already generated and edited chunks keep what you built. A world records which terrain it uses (`terrain` in its save: 1 is the original rolling terrain, 2 the biomes), so playing worlds keep theirs.
+`terrain4` and `biomes.select4` / `biomes.ocean` are terrain 4 (new worlds): taller mountains, the climate cut-offs for savanna, jungle, swamp, taiga and badlands, and the sea (its noise, depth, floors, ice). A biome type may also list `cover` (what grows on its ground: grass tufts and flowers with weights), `strata` (bands of blocks below the surface), `climate` (cold, hot, temperate: what weather it gets), `freeze` (lakes ice over) and `water` (it is a sea). A tree variant with `"since": 4` only grows in terrain 4 worlds, and `shape: "flat"` is an acacia. `villages4` is how many people (5-7) and houses a terrain 4 village has.
+Changing it changes new terrain only; already generated and edited chunks keep what you built. A world records which terrain it uses (`terrain` in its save: 1 is the original rolling terrain, 2 the biomes, 3 adds villages, 4 the oceans, the new biomes and the new villages), so playing worlds keep theirs.
+
+## mobs.json
+
+`species` has one entry per creature: `kind` (`animal` or `hostile`), `health` (half hearts), `speed` (share of a player's walking speed), `size` (`hw` half width, `height`), `loot` (a table in loot.json), `xp`, `call` (its sound) and, for animals, `herd` ([min, max] together), `biomes` and `shear` (what shearing gives and how long the wool takes to grow back); monsters add `damage`, `sight`, `reach`, `cooldown` and, for an archer, `ranged` and `keepDistance`. `spawning.hostile.maxLight` is the light level monsters need to be at or below (5 = under 6), `max` how many at once, `minDistance` / `maxDistance` how far from you they appear, `despawnDistance` and `sunSeconds` when they fade. `spawning.animals` sets how many herds a chunk gets.
+
+## quests.json
+
+`tiers` (easy, medium, hard) name the loot table each pays from, the experience, and how likely it is to be offered. `jobs` has, for every villager job, a list of quests per tier: `{ "type": "fetch", "item": "wheat", "count": [6, 10], "text": "...{n}..." }` (bring items; they are taken from you) or `{ "type": "slay", "mob": "zombie", "count": [4, 6] }` (defeat them while the quest is open). Which quest a villager offers is chosen from the world's seed, so it is the same every time; declining one makes them think of another, and finishing jobs makes harder ones likelier.
+
+## weather.json
+
+`periodDays`: how long a spell of weather lasts in game days. Each event has `weight` (how likely; 0 = only as a conversion), `minDay`, `darkness`, `wind`, `fog` (view distance multiplier), `particles` (rain, snow, sand), `density`, `lightning` (strikes a minute), `sound`, `speed` (a slowdown out in the open), and conversions for where you stand: `cold` (what it becomes in a cold biome: rain -> snow), `hot`, `climates` (only in those: a hurricane needs the sea or the coast) with a `fallback`.
 
 ## game.json
 
 Health and hunger numbers, eating time, fall damage (`safeDistance`, `damageOffset`), `tilling` (how near water must be),
-`hunger` (`drainPerSecond`, `sprintDrainPerSecond`, `jumpCost`, `sprintJumpCost`, `miningCost`, `miningDrainPerSecond`, `noSprintAtOrBelow` = points at or under which you cannot sprint (6 = 3 icons), `starveEverySeconds`, `starveDamage`, and the saturation rules: `maxSaturation`, `healEverySeconds`, `saturationPerHeal`, `emptySaturationCost` = hunger lost when the reserve runs dry, `respawnSaturation`), `equipment` (`slots` = the equipment slots in screen order, `armorReduction` = damage taken off per armor point, `maxArmor`), `fall.kick` (how hard the view jolts when a fall hurts), `time.dayLengthSeconds`, `spread` and `plants` tick settings, `creativeHotbar`, `studio` (`name` and `tagline` of the developer logo shown at startup; letters, digits, space and `- . ! & '`), `lighting` (`skyLevel` 15, `minBrightness` the darkest a face can be, `gamma` how quickly it falls off), and `treeFall.mode`:
+`hunger` (`drainPerSecond`, `sprintDrainPerSecond`, `jumpCost`, `sprintJumpCost`, `miningCost`, `miningDrainPerSecond`, `noSprintAtOrBelow` = points at or under which you cannot sprint (6 = 3 icons), `starveEverySeconds`, `starveDamage`, and the saturation rules: `maxSaturation`, `healEverySeconds`, `saturationPerHeal`, `emptySaturationCost` = hunger lost when the reserve runs dry, `respawnSaturation`), `equipment` (`slots` = the equipment slots in screen order, `armorReduction` = damage taken off per armor point, `maxArmor`), `breath` (air under water: `max`, `drainPerSecond`, `refillPerSecond`, `drownEverySeconds`, `drownDamage`), `combat` (`handDamage`, `attackCooldown`, `knockback`, `reach`, `weapons` = damage by tool type and `tierBonus` by metal), `xp.perLevel`, `sleep` (`monsterRadius`, `fadeSeconds`, `healTo`), `chests.craftRange`, `world.tickCeiling` (nothing ticks above this height), `fall.kick` (how hard the view jolts when a fall hurts), `time.dayLengthSeconds`, `spread` and `plants` tick settings, `creativeHotbar`, `studio` (`name` and `tagline` of the developer logo shown at startup; letters, digits, space and `- . ! & '`), `lighting` (`skyLevel` 15, `minBrightness` the darkest a face can be, `gamma` how quickly it falls off), and `treeFall.mode`:
 `"shatter"` - the tree tips over and bursts into loot (logs, and each leaf rolls its `shatterLoot`), or `"land"` - it
 comes to rest as blocks on the ground.
 

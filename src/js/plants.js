@@ -3,7 +3,7 @@
 // timers need to be stored or saved.
 import { REG } from './registry.js';
 import { B, PLANT, SPREADS_ONTO, HYDRATION } from './blocks.js';
-import { CS, CH } from './world.js';
+import { CS, CH, TICK_CEILING } from './voxel.js';
 import { growSapling } from './trees.js';
 
 // block id -> { next, rate (chance per second), soil }
@@ -31,6 +31,7 @@ export function growPlants(world, pcx, pcz, radius, dt, rand = Math.random) {
       for (const i of [...chunk.plants]) { // copy: setBlock edits the set
         const id = chunk.data[i];
         const x = cx * CS + (i % CS), z = cz * CS + (Math.floor(i / CS) % CS), y = Math.floor(i / (CS * CS));
+        if (y > TICK_CEILING) continue; // (nothing grows in the sky)
         const g = GROWTH[id];
         const seed = SEEDING[id];
         const sap = SAPLINGS[id];
@@ -86,7 +87,7 @@ export function spreadGrass(world, pcx, pcz, radius, dt, rand = Math.random, sam
       const n = Math.floor(samplesPerChunk * dt + rand());
       for (let i = 0; i < n; i++) {
         const x = cx * CS + Math.floor(rand() * CS), z = cz * CS + Math.floor(rand() * CS);
-        let y = CH - 1;
+        let y = Math.min(CH - 1, TICK_CEILING);
         while (y > 0) { // find the surface: first block that is neither air nor a plant
           const id = world.getBlock(x, y, z);
           if (id !== B.AIR && !PLANT[id]) break;
@@ -113,6 +114,7 @@ export function updateHydration(world, pcx, pcz, radius, dt, rand = Math.random)
         const h = HYDRATION.get(chunk.data[i]);
         if (!h) continue;
         const x = cx * CS + (i % CS), z = cz * CS + (Math.floor(i / CS) % CS), y = Math.floor(i / (CS * CS));
+        if (y > TICK_CEILING) continue;
         const wet = world.nearWater(x, y, z);
         if (wet && h.wet) { world.setBlock(x, y, z, h.wet); changes++; }
         else if (!wet && h.dry) { world.setBlock(x, y, z, h.dry); changes++; }

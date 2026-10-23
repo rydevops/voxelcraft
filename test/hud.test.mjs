@@ -6,10 +6,10 @@ let n = 0;
 const t = (name, fn) => { try { fn(); n++; } catch (e) { e.message = name + ': ' + e.message; throw e; } };
 
 t('every part of the HUD can be switched off, each belongs to a panel, and everything is shown by default', () => {
-  assert.deepEqual(HUD_ITEMS.map((i) => i.key), ['minimap', 'realTime', 'gameTime', 'dayPart', 'coords', 'goals']);
+  assert.deepEqual(HUD_ITEMS.map((i) => i.key), ['minimap', 'realTime', 'gameTime', 'dayPart', 'weather', 'coords', 'goals']);
   for (const it of HUD_ITEMS) { assert.ok(it.label.length > 3 && HUD_PANELS.includes(it.panel)); assert.ok(hudShown({}, it.key) && hudShown(undefined, it.key)); }
   assert.ok(!hudShown({ coords: false }, 'coords') && hudShown({ coords: false }, 'realTime'));
-  assert.ok(panelHasContent({}, 'info') && !panelHasContent({ realTime: false, gameTime: false, dayPart: false, coords: false }, 'info'));
+  assert.ok(panelHasContent({}, 'info') && !panelHasContent({ realTime: false, gameTime: false, dayPart: false, weather: false, coords: false }, 'info'));
 });
 
 t('saved choices are cleaned: unknown keys and non-booleans are dropped', () => {

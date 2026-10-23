@@ -62,7 +62,9 @@ export function createVillagers({ scene, world }) {
   const active = new Map(); // village key -> { village, list: [{ v, mesh }] }
   let timer = 0;
 
-  function spawnVillage(village) {
+  // Newer villages (terrain 4) have a house and a bed for every villager: that many people, each starting at their own doorstep.
+  function spawnVillage(village, night) {
+    if (village.homes?.length) return spawnHomes(village, night);
     // wait until the ground the first few of them stand on exists
     const spots = village.spawns;
     const loaded = spots.filter((s) => world.isLoaded(Math.floor(s.x), Math.floor(s.z)));
@@ -77,6 +79,22 @@ export function createVillagers({ scene, world }) {
       mesh.position.set(v.x, v.y, v.z);
       scene.add(mesh);
       list.push({ v, mesh });
+    });
+    active.set(village.key, { village, list });
+  }
+
+  function spawnHomes(village, night) {
+    const spots = village.homes.map((h) => h.doorstep);
+    if (!spots.every((s) => world.isLoaded(Math.floor(s.x), Math.floor(s.z)))) return; // wait for the ground to exist
+    const list = village.homes.map((h, i) => {
+      const v = new Villager(world, village, { x: h.doorstep.x, y: h.y, z: h.doorstep.z }, i, h);
+      if (night) v.sleepNow();
+      const mesh = buildModel(v);
+      mesh.rotation.order = 'YXZ'; // (so a sleeper lies down first and is then turned to face the right way)
+      const p = v.mode === 'sleeping' ? v.sleepPose() : null;
+      if (p) mesh.position.set(p.x, p.y, p.z); else mesh.position.set(v.x, v.y, v.z);
+      scene.add(mesh);
+      return { v, mesh };
     });
     active.set(village.key, { village, list });
   }
@@ -96,13 +114,14 @@ export function createVillagers({ scene, world }) {
     all() { const out = []; for (const a of active.values()) for (const e of a.list) out.push(e.v); return out; },
 
     // tint: the time-of-day colour the world is multiplied by; player: { x, z }
-    update(dt, player, tint, now = 0) {
+    // env = { night, setDoor(door, open) }: whether it is bedtime, and a way for villagers to open and shut their own doors
+    update(dt, player, tint, now = 0, env = null) {
       for (const m of materials.values()) m.color.copy(m.userData.base).multiply(tint);
       timer -= dt;
       if (timer <= 0) {
         timer = 1;
         const near = villagesNear(world, player.x - SPAWN_RANGE, player.z - SPAWN_RANGE, player.x + SPAWN_RANGE, player.z + SPAWN_RANGE);
-        for (const v of near) if (!active.has(v.key) && Math.hypot(v.cx - player.x, v.cz - player.z) < SPAWN_RANGE + 20) spawnVillage(v);
+        for (const v of near) if (!active.has(v.key) && Math.hypot(v.cx - player.x, v.cz - player.z) < SPAWN_RANGE + 20) spawnVillage(v, !!env?.night);
         for (const [key, a] of [...active]) if (Math.hypot(a.village.cx - player.x, a.village.cz - player.z) > KEEP_RANGE) removeVillage(key);
       }
       for (const a of active.values()) {
@@ -111,9 +130,17 @@ export function createVillagers({ scene, world }) {
           const on = d < ACT_RANGE && world.isLoaded(Math.floor(v.x), Math.floor(v.z));
           mesh.visible = on;
           if (!on) continue;
-          v.update(Math.min(dt, 0.05), player, now);
+          v.update(Math.min(dt, 0.05), player, now, env);
+          if (v.mode === 'sleeping') { // lying on the bed, head on the pillow
+            const p = v.sleepPose();
+            mesh.position.set(p.x, p.y + 0.02, p.z);
+            mesh.rotation.set(Math.PI / 2, p.yaw, 0);
+            mesh.userData.legL.rotation.x = mesh.userData.legR.rotation.x = 0;
+            mesh.userData.head.rotation.y = 0;
+            continue;
+          }
           mesh.position.set(v.x, v.y, v.z);
-          mesh.rotation.y = v.yaw;
+          mesh.rotation.set(0, v.yaw, 0);
           const swing = v.moving ? Math.sin(v.walkPhase) * 0.7 : 0;
           mesh.userData.legL.rotation.x = swing;
           mesh.userData.legR.rotation.x = -swing;
