@@ -47,11 +47,12 @@ export class MinimapData {
     return entry;
   }
 
-  // Column at world (x, z), or null if its chunk is not loaded
+  // Column at world (x, z), or null if it has never been seen. A chunk that has been unloaded since (you walked away from it)
+  // is remembered as it was, so the map keeps showing where you have been.
   column(x, z) {
     const chunk = this.world.getChunk(x >> 4, z >> 4);
-    if (!chunk) return null;
-    const c = this.chunkColumns(chunk);
+    const c = chunk ? this.chunkColumns(chunk) : this.cache.get(chunkKey(x >> 4, z >> 4));
+    if (!c) return null;
     const i = (z & 15) * CS + (x & 15);
     return { y: c.y[i], id: c.id[i], depth: c.depth[i] };
   }

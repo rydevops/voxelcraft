@@ -172,7 +172,6 @@ export function createTouchControls(hooks) {
   const sprintBtn = toggleButton('sprint', 'Run', 'sprint');
   const crouchBtn = toggleButton('crouch', 'Sneak', 'crouch');
   tapButton('inv', 'Bag', () => hooks.inventory());
-  tapButton('off', 'Torch', () => hooks.offhand());
   tapButton('menu', 'II', () => hooks.menu());
 
   // ---- inventory / palette helpers: the close button sits above those windows, the tap-mode button inside the inventory ----

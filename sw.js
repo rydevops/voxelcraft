@@ -4,7 +4,7 @@
 // takes over at once and removes the old cache; the page reloads into it if you are still on the title screen, otherwise the
 // next launch (or quitting to the title) runs the new game. The files are fetched past the browser's HTTP cache so a new
 // version never caches stale copies.
-const VERSION = '1.0.0-9c47be791b';
+const VERSION = '1.0.0-68a9af066c';
 const CACHE = 'voxelcraft-' + VERSION;
 const FILES = ["./","index.html","app.js","style.css","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable-512.png","apple-touch-icon.png","favicon.png"];
 

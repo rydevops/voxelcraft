@@ -77,7 +77,8 @@ t('a saved layout keeps only known buttons and sane numbers', () => {
   assert.deepEqual(cleanLayout('junk'), {});
   const l = cleanLayout({ attack: { x: 0.3, y: 0.4 }, jump: { x: 5, y: -2 }, bogus: { x: 0.5, y: 0.5 }, use: { x: 'a', y: 1 }, fly: null });
   assert.deepEqual(l, { attack: { x: 0.3, y: 0.4 }, jump: { x: 1, y: 0 } });
-  for (const n of ['attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'inv', 'off', 'menu']) assert.ok(LAYOUT_BUTTONS.includes(n), n);
+  assert.deepEqual(cleanLayout({ off: { x: 0.5, y: 0.5 } }), {}, 'the removed Torch button is forgotten');
+  for (const n of ['attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'inv', 'menu']) assert.ok(LAYOUT_BUTTONS.includes(n), n);
 });
 
 t('a dragged button always stays fully on screen', () => {

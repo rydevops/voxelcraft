@@ -301,8 +301,14 @@ export function buildRegistry(data) {
         if (!(isArr(v.trunk) && v.trunk.length === 2 && v.trunk.every(Number.isInteger) && v.trunk[0] >= 1 && v.trunk[1] >= v.trunk[0])) err(`${w}: trunk must be [min, max] whole numbers`);
         const heights = v.heights ?? [0, 99];
         if (!(isArr(heights) && heights.length === 2 && heights[1] >= heights[0])) err(`${w}: heights must be [lowest, highest] terrain height`);
-        return { key: v.key, weight: v.weight, shape: v.shape, trunk: v.trunk, heights, logId: needBlock(v.log, `${w} log`), leavesId: needBlock(v.leaves, `${w} leaves`) };
+        return { key: v.key, weight: v.weight, shape: v.shape, trunk: v.trunk, heights, biomes: isArr(v.biomes) ? v.biomes : null, logId: needBlock(v.log, `${w} log`), leavesId: needBlock(v.leaves, `${w} leaves`) };
       }),
+    },
+    biomes: wg.biomes && {
+      ...wg.biomes,
+      types: Object.fromEntries(Object.entries(wg.biomes.types || {}).filter(([k]) => !k.startsWith('_')).map(([k, b]) => [k, {
+        ...b, surfaceId: needBlock(b.surface, `worldgen.json biomes.types.${k} surface`), fillerId: needBlock(b.filler, `worldgen.json biomes.types.${k} filler`),
+      }])),
     },
     groundCover: {
       ...wg.groundCover,
@@ -310,6 +316,11 @@ export function buildRegistry(data) {
     },
   };
   if (!worldgen.trees.variants.length) err('worldgen.json: trees.variants needs at least one tree');
+  if (worldgen.biomes) {
+    const kinds = Object.keys(worldgen.biomes.types);
+    for (const need of ['plains', 'forest', 'hills', 'mountains', 'desert', 'tundra']) if (!kinds.includes(need)) err(`worldgen.json biomes.types needs "${need}"`);
+    for (const v of worldgen.trees.variants) for (const k of v.biomes ?? []) if (!kinds.includes(k)) err(`worldgen.json tree "${v.key}": biome "${k}" is not in biomes.types`);
+  }
   const treeKeys = new Set(worldgen.trees.variants.map((v) => v.key));
   for (const b of blocks) for (const k of b.plant?.grows?.trees ?? []) if (!treeKeys.has(k)) err(`blocks.json "${b.key}": plant.grows.trees "${k}" is not a tree variant in worldgen.json`);
   const game = { ...data.game };
