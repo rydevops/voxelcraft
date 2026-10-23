@@ -24,6 +24,7 @@ released those lines move under a new version heading. The list of everything th
 - **The version is shown on the title screen** (bottom left), e.g. `v1.0.0-8726a41cae`: the package version plus the build.
 
 ### Changed
+- **Longer days and nights.** Daytime (6:00 to 18:00 on the in-game clock) now lasts 10 real minutes and the night lasts another 10, so a full day is 20 minutes instead of 8. It is `time.dayLengthSeconds` in `game.json`.
 - **Touch buttons rearranged for the right thumb.** Attack (pickaxe) sits in the bottom-right corner with use (hand) right above it, jump beside them, and sprint and crouch a little further out, in an arc the thumb sweeps easily. The joystick stays on the left and the pause button where it was.
 - **New touch controls.** The joystick is now fixed in the bottom left corner instead of floating, and the buttons show symbols instead of words: a pickaxe (attack, dig, mine), a hand (interact, use), an up arrow (jump), a lightning bolt (sprint), a down arrow (crouch), wings (fly, creative) and pause bars. The inventory is a loot bag button attached to the right of the hotbar (it replaces the *Bag* button). The hotbar and loot bag shrink on small screens so they always fit between the joystick and the action buttons.
 - **Moving the controls** now includes the joystick, and the editor is a *Move the controls* window with **Reset** and **Done** (Done returns to Options). *Options -> Reset controls to default* puts everything back without opening the editor.
