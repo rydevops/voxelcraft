@@ -44,6 +44,15 @@ export function createHudPanels(settings) {
       el.style.top = c.y * 100 + '%';
     }
   }
+  // on a touch screen the pause button sits top left: a panel that ends up on top of it is nudged down below it
+  function clearOfPause(name) {
+    const btn = document.querySelector('.tb.menu'), el = els[name];
+    if (!btn || !document.body.classList.contains('touch') || !el.classList.contains('hud-free')) return;
+    const b = btn.getBoundingClientRect(), r = el.getBoundingClientRect(), m = 4;
+    if (!(b.width > 0) || !(r.width > 0)) return;
+    if (r.left >= b.right + m || r.right <= b.left - m || r.top >= b.bottom + m || r.bottom <= b.top - m) return;
+    free(name, { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + b.bottom + m - r.top + r.height / 2) / window.innerHeight });
+  }
   function unfree(name) {
     const el = els[name];
     el.classList.remove('hud-free');
@@ -60,7 +69,7 @@ export function createHudPanels(settings) {
     els.info.classList.toggle('collapsed', !!folded.info);
     els.goals.classList.toggle('collapsed', !!folded.goals);
     if (editing) return; // (the panels are being dragged: leave them where the finger put them)
-    for (const name of HUD_PANELS) layout[name] ? free(name, layout[name]) : unfree(name);
+    for (const name of HUD_PANELS) { if (layout[name]) { free(name, layout[name]); clearOfPause(name); } else unfree(name); }
   }
 
   // ---- tap to fold / unfold ----
@@ -154,6 +163,7 @@ export function createHudPanels(settings) {
       const end = (ev) => {
         if (ev.pointerId !== id) return;
         for (const t of ['pointermove', 'pointerup', 'pointercancel']) el.removeEventListener(t, t === 'pointermove' ? move : end);
+        clearOfPause(name);
         settings.set('hudLayout', positions()); // (all the panels: they were all frozen in place when the move began)
       };
       el.addEventListener('pointermove', move);

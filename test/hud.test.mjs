@@ -1,5 +1,6 @@
 // The HUD panels' settings: what is shown, what is folded, where panels were put, and that junk from storage cannot break anything.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { HUD_ITEMS, HUD_PANELS, hudShown, cleanHudShow, cleanCollapsed, cleanHudLayout, panelHasContent } from '../src/js/hudmath.js';
 
 let n = 0;
@@ -22,6 +23,12 @@ t('panel positions stay on the screen and ignore junk', () => {
   const l = cleanHudLayout({ info: { x: 0.3, y: 0.4 }, goals: { x: 9, y: -3 }, minimap: { x: 'a', y: 0.5 }, nope: { x: 0.5, y: 0.5 }, extra: null });
   assert.deepEqual(l, { info: { x: 0.3, y: 0.4 }, goals: { x: 1, y: 0 } });
   assert.deepEqual(cleanHudLayout({ info: { x: NaN, y: 0.2 } }), {});
+});
+
+t('on a phone the goals panel sits above the move layer, so it can be dragged like the others', () => {
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(css, /body\.touch\.hudedit > #goals \{ z-index: 7;/);
+  assert.match(css, /#hud-shield \{[^}]*z-index: 6;/);
 });
 
 console.log(`hud: ${n} checks passed`);

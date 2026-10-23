@@ -34,6 +34,7 @@ released those lines move under a new version heading. The list of everything th
 - **Updates load by themselves.** Every time the app is opened or brought back to the front it checks for a newer version; if one is found while you are on the title screen the game reloads into it at once. In a world it waits and tells you, and the update loads when you quit to the title. The service worker also fetches new files past the browser's HTTP cache, so an update never caches stale copies.
 
 ### Fixed
+- **The goals panel can be moved on a phone.** In *Move the HUD* the goals showed its dashed outline but sat under the full-screen drag layer, so a finger never reached it. A panel dropped on the pause button is also nudged just below it.
 - **The joystick no longer sprints.** Pushing it to the rim used to switch sprint on by itself; now sprinting is only the sprint button, which you tap on and off.
 - **Dragging a finger on empty screen always turns the camera.** A finger that starts on the minimap, the clock panel, the goals or the hotbar now turns the camera as soon as it moves (a plain tap still does what it did), and a touch whose lift was never reported can no longer leave the joystick, look area or a button stuck.
 - **Saturation only goes down when it heals you.** Walking, sprinting and mining used to drag the hidden saturation reserve down with the hunger bar; now they only cost hunger, and the reserve is spent on healing and nothing else.

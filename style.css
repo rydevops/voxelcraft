@@ -367,6 +367,7 @@ body.touch #minimap { width: 120px; height: 120px; }
 body.touch #mm-info, body.touch #goals { font-size: 15px; }
 body.touch #goals h3 { font-size: 15px; }
 body.touch > #goals { position: fixed; z-index: 6; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }
+body.touch.hudedit > #goals { z-index: 7; } /* (above the move shield, like the other panels: without this the goals could not be grabbed on a phone) */
 body.touch #controls, body.touch #debug { display: none; }
 body.touch button:hover:not(:disabled) { background: #7a7a82; }
 body.touch #hotbar { z-index: 6; }
