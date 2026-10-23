@@ -1,6 +1,6 @@
-// DOM user interface: hotbar, inventory + crafting screen, creative palette and the goals tracker.
+// DOM user interface: hotbar, inventory + crafting screen and the creative palette.
 import { PALETTE } from './blocks.js';
-import { itemName, maxDamage, equipOf, isOffhand, EQUIP_SLOTS, RECIPES, STATION_LABEL, GOALS, WINDOWS, specIds, specName, SMELTING, fuelSeconds, FUEL_ITEMS } from './items.js';
+import { itemName, maxDamage, equipOf, isOffhand, EQUIP_SLOTS, RECIPES, STATION_LABEL, WINDOWS, specIds, specName, SMELTING, fuelSeconds, FUEL_ITEMS } from './items.js';
 import { INPUT, FUEL, OUTPUT, clickFurnaceSlot, quickInsert, autoFill, cooking, isLit } from './furnace.js';
 import { itemIcon } from './textures.js';
 import { clickChest, putInChest, takeFromChest, sortChest, slotLimit } from './chests.js';
@@ -457,30 +457,6 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
     paletteGrid.appendChild(el);
   }
 
-  // ---- goals ---------------------------------------------------------------------------------
-  const goalList = $('goal-list');
-  function renderGoals(done) {
-    goalList.replaceChildren();
-    $('goal-count').textContent = `${done.filter(Boolean).length}/${GOALS.length}`;
-    // show the most recent achievement plus the next couple of goals (no spoilers)
-    const lastDone = done.lastIndexOf(true);
-    let pending = 0;
-    GOALS.forEach((g, i) => {
-      const show = done[i] ? i === lastDone : ++pending <= 2;
-      if (!show) return;
-      const li = document.createElement('li');
-      li.className = done[i] ? 'done' : 'todo';
-      li.textContent = g.text;
-      goalList.appendChild(li);
-    });
-    if (done.every(Boolean)) {
-      const li = document.createElement('li');
-      li.className = 'done';
-      li.textContent = 'All goals complete!';
-      goalList.appendChild(li);
-    }
-  }
-
   return {
     renderHotbar: (selected) => { currentSelected = selected; renderHotbar(selected); if (invOpen) renderInventory(); },
     refreshInventory: () => { if (invOpen) renderInventory(); },
@@ -490,7 +466,7 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
       if (sigOf(furnace) !== furnaceSig) renderFurnace(); // (the recipe list does not depend on the furnace, so it is left alone)
       else updateFurnaceBars();
     },
-    openInventory, closeInventory, renderGoals,
+    openInventory, closeInventory,
     openPalette: () => { paletteEl.hidden = false; },
     closePalette: () => { paletteEl.hidden = true; hideItemTip(); },
     get invOpen() { return invOpen; },

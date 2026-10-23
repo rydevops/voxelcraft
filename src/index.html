@@ -30,7 +30,6 @@
       <div class="mm-row mm-sub" data-hud="weather"><span id="mm-env"></span></div>
       <div class="mm-row mm-xyz" data-hud="coords"><span>X <b id="mm-x">0</b></span><span>Y <b id="mm-y">0</b></span><span>Z <b id="mm-z">0</b></span></div>
     </div>
-    <div id="goals"><h3><i class="chev"></i>Goals <span id="goal-count"></span></h3><ul id="goal-list"></ul></div>
   </div>
   <div id="blockname"></div>
   <div id="lookat" hidden><img id="lookat-icon" alt=""><div id="lookat-text"><b id="lookat-name"></b><span id="lookat-sub"></span><div id="lookat-pips"></div></div></div>
@@ -106,6 +105,24 @@
       </div>
     </div>
   </div>
+  <!-- the quest book: goals, then the jobs villagers have given you -->
+  <div id="book" hidden>
+    <div class="bk-wrap">
+      <div class="bk-tabs"><button data-go="goals" type="button">Goals</button><button data-go="jobs" type="button">Jobs</button></div>
+      <div class="bk-spread">
+        <div class="bk-side" id="book-left"></div>
+        <div class="bk-spine"></div>
+        <div class="bk-side" id="book-right"></div>
+      </div>
+      <div class="bk-nav">
+        <button id="book-prev" class="small" type="button">&#9664; Back</button>
+        <span id="book-count"></span>
+        <button id="book-next" class="small" type="button">Next &#9654;</button>
+        <button id="book-close" class="small" type="button">Close</button>
+      </div>
+      <p class="bk-hint"><span class="pc-only">Arrow keys turn the page.</span></p>
+    </div>
+  </div>
   <div id="sleep" hidden><p id="sleep-text"></p></div>
 
   <div id="palette" hidden>
@@ -128,7 +145,7 @@
   <div id="hud-menu" hidden>
     <div class="hud-menu-panel">
       <h2>HUD</h2>
-      <p class="opt-hint">Tap the clock panel or the goals to fold them away or open them again.</p>
+      <p class="opt-hint">Click (or tap) the clock panel to fold it away or open it again.</p>
       <div id="hud-menu-list"></div>
       <div class="hud-menu-buttons">
         <button id="hud-move" class="small">Move panels...</button>

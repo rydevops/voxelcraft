@@ -42,13 +42,13 @@ t('every species gets a model made of boxes, which swings its legs when it walks
   cow.hurt = 0.3;
   models.update(mobs, [], [], tint, { x: 5, z: 5 }, 2);
   let red = 0;
-  group.traverse((o) => { if (o.isMesh && o.material.color.r > o.material.color.g * 1.5) red++; });
+  group.traverse((o) => { const m = Array.isArray(o.material) ? o.material[0] : o.material; if (o.isMesh && m.color.r > m.color.g * 1.5) red++; });
   assert.ok(red >= 4, 'hurt: red all over (' + red + ' boxes)');
   cow.hurt = 0; cow.dead = true; cow.deathTimer = 0.45;
   models.update(mobs, [], [], tint, { x: 5, z: 5 }, 3);
   assert.ok(Math.abs(group.rotation.z) > 0.5, 'tipping over');
   const sheep = mobs.find((m) => m.type === 'sheep'), sg = scene.children[mobs.indexOf(sheep)];
-  const woolBoxes = () => { let v = 0; sg.traverse((o) => { if (o.isMesh && o.material.userData.base && o.visible) v++; }); return v; };
+  const woolBoxes = () => { let v = 0; sg.traverse((o) => { if (o.isMesh && o.visible) v++; }); return v; };
   const before = woolBoxes();
   sheep.sheared = true;
   models.update(mobs, [], [], tint, { x: 5, z: 5 }, 4);

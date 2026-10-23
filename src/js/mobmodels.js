@@ -1,9 +1,11 @@
-// What the creatures look like: a handful of coloured boxes each (cows, pigs, sheep, zombies, skeletons, spiders), a walking animation,
-// a red flash when hit, and falling over when dead. (What they do is in mobs.js.) Like the villagers they are tinted by the time of day.
+// What the creatures look like: boxes with a walking animation, a red flash when hit, and falling over when dead. (What they do is in mobs.js.)
+// Cows, pigs and sheep are boxes with painted faces (patches, muzzles, eyes, hooves, wool curls: see mobart.js) plus ears, horns, tails and an udder;
+// zombies, skeletons and spiders are plainer boxes of one colour. Like the villagers they are tinted by the time of day.
 import * as THREE from 'three';
+import { Pix, ANIMAL_ART } from './mobart.js';
 
 const RED = [0.9, 0.12, 0.1];
-const materials = new Map(); // "r,g,b" -> { normal, hurt }
+const materials = new Map(); // "r,g,b" or a texture's id -> { normal, hurt }
 
 // Every colour is a shared pair of materials: the normal one and a reddened one for the flash after a hit
 function mat(rgb) {
@@ -20,8 +22,31 @@ function mat(rgb) {
 }
 const shade = (c, k) => c.map((x) => Math.min(1, x * k));
 
+// ---- painted faces: a texture per face kind, made once and shared by every animal of that kind ----
+const texCache = new Map(); // key -> { tex, pair }
+const px = (blocks) => Math.max(2, Math.round(blocks * 16)); // a pixel is a sixteenth of a block
+function paintedPair(key, painter, w, h) {
+  let t = texCache.get(key);
+  if (!t) {
+    const p = new Pix(w, h);
+    painter(p);
+    const tex = new THREE.DataTexture(p.data(), w, h, THREE.RGBAFormat);
+    tex.magFilter = tex.minFilter = THREE.NearestFilter;
+    tex.generateMipmaps = false;
+    tex.needsUpdate = true;
+    const hurtColor = new THREE.Color(1, 0.42, 0.38);
+    t = { tex, pair: { normal: new THREE.MeshBasicMaterial({ map: tex }), hurt: new THREE.MeshBasicMaterial({ map: tex, color: hurtColor }) } };
+    t.pair.normal.userData.base = new THREE.Color(1, 1, 1);
+    t.pair.hurt.userData.base = hurtColor.clone();
+    materials.set('tex:' + key, t.pair);
+    texCache.set(key, t);
+  }
+  return t.pair;
+}
+
 class Rig {
   constructor() { this.group = new THREE.Group(); this.parts = []; }
+  // a box of one colour
   box(w, h, d, rgb, x, y, z, { pivotTop = false, parent = this.group } = {}) {
     const g = new THREE.BoxGeometry(w, h, d);
     if (pivotTop) g.translate(0, -h / 2, 0);
@@ -29,43 +54,73 @@ class Rig {
     const m = new THREE.Mesh(g, pair.normal);
     m.position.set(x, y, z);
     parent.add(m);
-    this.parts.push({ mesh: m, pair });
+    this.parts.push({ mesh: m, normal: pair.normal, hurt: pair.hurt });
     return m;
   }
-  group3(x, y, z) { const g = new THREE.Group(); g.position.set(x, y, z); this.group.add(g); return g; }
+  // a box with a picture on every face. `art` is { side, end, front?, top, bottom } painters (or one painter for every face); the picture of
+  // a face is as many pixels as the face is sixteenths of a block, so every pixel is the same size on every animal.
+  tbox(key, art, w, h, d, x, y, z, { pivotTop = false, parent = this.group } = {}) {
+    const dims = { side: [d, h], end: [w, h], front: [w, h], top: [w, d], bottom: [w, d] };
+    const face = (kind) => {
+      const painter = typeof art === 'function' ? art : art[kind] ?? art.end ?? art.side;
+      const [fw, fh] = dims[kind];
+      return paintedPair(key + ':' + kind + ':' + px(fw) + 'x' + px(fh), painter, px(fw), px(fh));
+    };
+    const pairs = [face('side'), face('side'), face('top'), face('bottom'), face('end'), face('front')]; // +x -x +y -y +z -z (the front looks along -z)
+    const g = new THREE.BoxGeometry(w, h, d);
+    if (pivotTop) g.translate(0, -h / 2, 0);
+    const m = new THREE.Mesh(g, pairs.map((p) => p.normal));
+    m.position.set(x, y, z);
+    parent.add(m);
+    this.parts.push({ mesh: m, normal: pairs.map((p) => p.normal), hurt: pairs.map((p) => p.hurt) });
+    return m;
+  }
+  group3(x, y, z, parent = this.group) { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
 }
 
 // ---- the models (facing -z, feet on the ground at y = 0) ----
 const MODELS = {
-  cow(rig, mob) {
-    const body = [0.36, 0.24, 0.15], white = [0.9, 0.9, 0.86], dark = [0.1, 0.08, 0.07];
-    rig.legs = [[-0.28, -0.42], [0.28, -0.42], [-0.28, 0.42], [0.28, 0.42]].map(([x, z]) => rig.box(0.24, 0.62, 0.24, shade(body, 0.8), x, 0.62, z, { pivotTop: true }));
-    rig.box(0.84, 0.78, 1.3, body, 0, 1.0, 0.05);
-    rig.box(0.86, 0.3, 0.5, white, 0, 1.0, 0.28); rig.box(0.5, 0.02, 0.4, white, 0.2, 1.4, -0.1); // patches
+  cow(rig) {
+    const A = ANIMAL_ART.cow;
+    rig.legs = [[-0.28, -0.42], [0.28, -0.42], [-0.28, 0.42], [0.28, 0.42]].map(([x, z]) => rig.tbox('cow:leg', A.leg, 0.24, 0.62, 0.24, x, 0.62, z, { pivotTop: true }));
+    rig.tbox('cow:body', A.body, 0.84, 0.78, 1.3, 0, 1.0, 0.05);
+    rig.tbox('cow:udder', A.udder, 0.3, 0.14, 0.34, 0, 0.56, 0.5);
+    rig.tail = rig.group3(0, 1.34, 0.7);
+    rig.tbox('cow:tail', A.tail, 0.07, 0.62, 0.07, 0, 0, 0, { pivotTop: true, parent: rig.tail });
     rig.head = rig.group3(0, 1.22, -0.68);
-    rig.box(0.58, 0.52, 0.5, body, 0, 0.0, -0.1, { parent: rig.head });
-    rig.box(0.34, 0.24, 0.12, [0.88, 0.66, 0.62], 0, -0.12, -0.38, { parent: rig.head });
-    rig.box(0.08, 0.08, 0.02, dark, -0.15, 0.08, -0.36, { parent: rig.head }); rig.box(0.08, 0.08, 0.02, dark, 0.15, 0.08, -0.36, { parent: rig.head });
-    rig.box(0.1, 0.22, 0.1, [0.9, 0.88, 0.8], -0.33, 0.3, -0.06, { parent: rig.head }); rig.box(0.1, 0.22, 0.1, [0.9, 0.88, 0.8], 0.33, 0.3, -0.06, { parent: rig.head }); // horns
+    rig.tbox('cow:head', A.head, 0.58, 0.52, 0.5, 0, 0, -0.1, { parent: rig.head });
+    rig.box(0.34, 0.2, 0.1, [0.9, 0.67, 0.64], 0, -0.14, -0.4, { parent: rig.head }); // the muzzle
+    rig.box(0.05, 0.05, 0.02, [0.45, 0.28, 0.26], -0.08, -0.15, -0.46, { parent: rig.head }); rig.box(0.05, 0.05, 0.02, [0.45, 0.28, 0.26], 0.08, -0.15, -0.46, { parent: rig.head }); // nostrils
+    for (const side of [-1, 1]) {
+      rig.tbox('cow:ear', A.ear, 0.16, 0.1, 0.2, side * 0.37, 0.12, -0.1, { parent: rig.head });
+      rig.tbox('cow:horn', A.horn, 0.08, 0.2, 0.08, side * 0.3, 0.34, -0.08, { parent: rig.head });
+      rig.tbox('cow:horn', A.horn, 0.08, 0.08, 0.08, side * 0.36, 0.46, -0.08, { parent: rig.head }); // the tip
+    }
   },
   pig(rig) {
-    const pink = [0.93, 0.64, 0.64], snout = [0.85, 0.5, 0.52], dark = [0.1, 0.08, 0.07];
-    rig.legs = [[-0.22, -0.3], [0.22, -0.3], [-0.22, 0.3], [0.22, 0.3]].map(([x, z]) => rig.box(0.22, 0.34, 0.22, shade(pink, 0.85), x, 0.34, z, { pivotTop: true }));
-    rig.box(0.72, 0.58, 1.0, pink, 0, 0.62, 0);
+    const A = ANIMAL_ART.pig;
+    rig.legs = [[-0.22, -0.3], [0.22, -0.3], [-0.22, 0.3], [0.22, 0.3]].map(([x, z]) => rig.tbox('pig:leg', A.leg, 0.22, 0.34, 0.22, x, 0.34, z, { pivotTop: true }));
+    rig.tbox('pig:body', A.body, 0.72, 0.58, 1.0, 0, 0.62, 0);
+    rig.tail = rig.group3(0, 0.8, 0.5);
+    rig.tbox('pig:tail', A.tail, 0.06, 0.06, 0.14, 0, 0, 0.07, { parent: rig.tail });
+    rig.tbox('pig:tail', A.tail, 0.06, 0.12, 0.06, 0, 0.05, 0.14, { parent: rig.tail }); // a curl
     rig.head = rig.group3(0, 0.74, -0.58);
-    rig.box(0.5, 0.46, 0.44, pink, 0, 0.0, -0.1, { parent: rig.head });
-    rig.box(0.26, 0.2, 0.1, snout, 0, -0.06, -0.36, { parent: rig.head });
-    rig.box(0.07, 0.07, 0.02, dark, -0.13, 0.08, -0.33, { parent: rig.head }); rig.box(0.07, 0.07, 0.02, dark, 0.13, 0.08, -0.33, { parent: rig.head });
+    rig.tbox('pig:head', A.head, 0.5, 0.46, 0.44, 0, 0, -0.1, { parent: rig.head });
+    rig.tbox('pig:snout', A.snout, 0.26, 0.2, 0.1, 0, -0.06, -0.36, { parent: rig.head });
+    for (const side of [-1, 1]) rig.tbox('pig:ear', A.ear, 0.16, 0.2, 0.04, side * 0.17, 0.28, -0.04, { parent: rig.head });
   },
-  sheep(rig, mob) {
-    const wool = [0.92, 0.92, 0.89], skin = [0.8, 0.68, 0.6], dark = [0.1, 0.08, 0.07];
-    rig.legs = [[-0.24, -0.34], [0.24, -0.34], [-0.24, 0.34], [0.24, 0.34]].map(([x, z]) => rig.box(0.2, 0.52, 0.2, shade(skin, 0.8), x, 0.52, z, { pivotTop: true }));
-    rig.wool = [rig.box(0.86, 0.74, 1.1, wool, 0, 0.9, 0.04)];
-    rig.naked = rig.box(0.6, 0.5, 0.9, [0.86, 0.72, 0.68], 0, 0.82, 0.04);
+  sheep(rig) {
+    const A = ANIMAL_ART.sheep;
+    rig.legs = [[-0.24, -0.34], [0.24, -0.34], [-0.24, 0.34], [0.24, 0.34]].map(([x, z]) => rig.tbox('sheep:leg', A.leg, 0.2, 0.52, 0.2, x, 0.52, z, { pivotTop: true }));
+    rig.wool = [rig.tbox('sheep:fleece', A.fleece, 0.86, 0.74, 1.1, 0, 0.9, 0.04)];
+    rig.wool.push(rig.tbox('sheep:fleece', A.fleece, 0.5, 0.1, 0.6, 0, 1.3, -0.05), rig.tbox('sheep:fleece', A.fleece, 0.7, 0.12, 0.5, 0, 0.5, 0.04)); // puffs on the back and under the belly
+    rig.naked = rig.tbox('sheep:naked', A.naked, 0.6, 0.5, 0.9, 0, 0.82, 0.04);
+    rig.tail = rig.group3(0, 1.0, 0.62);
+    rig.wool.push(rig.tbox('sheep:fleece', A.fleece, 0.16, 0.16, 0.14, 0, 0, 0.05, { parent: rig.tail }));
     rig.head = rig.group3(0, 1.08, -0.6);
-    rig.box(0.4, 0.44, 0.46, skin, 0, 0.0, -0.1, { parent: rig.head });
-    rig.wool.push(rig.box(0.46, 0.18, 0.4, wool, 0, 0.26, -0.02, { parent: rig.head }));
-    rig.box(0.07, 0.07, 0.02, dark, -0.1, 0.04, -0.33, { parent: rig.head }); rig.box(0.07, 0.07, 0.02, dark, 0.1, 0.04, -0.33, { parent: rig.head });
+    rig.tbox('sheep:head', A.head, 0.4, 0.44, 0.46, 0, 0, -0.1, { parent: rig.head });
+    rig.wool.push(rig.tbox('sheep:fleece', A.fleece, 0.46, 0.18, 0.4, 0, 0.26, -0.02, { parent: rig.head }));
+    for (const side of [-1, 1]) rig.tbox('sheep:ear', A.ear, 0.18, 0.08, 0.14, side * 0.28, 0.08, -0.05, { parent: rig.head });
   },
   zombie(rig) {
     const skin = [0.36, 0.55, 0.3], shirt = [0.2, 0.52, 0.58], pants = [0.24, 0.24, 0.52], dark = [0.08, 0.1, 0.06];
@@ -161,10 +216,11 @@ export function createMobModels({ scene }) {
           const graze = !mob.hostile && mob.state === 'idle' ? Math.max(0, Math.sin(elapsed * 0.9 + mob.id * 1.7)) * 0.7 : 0;
           e.head.rotation.x = graze;
         }
+        if (e.tail) e.tail.rotation.x = Math.sin(elapsed * (mob.moving ? 7 : 2.2) + mob.id * 2.1) * (mob.moving ? 0.5 : 0.18); // a wagging tail
         if (e.wool) for (const w of e.wool) w.visible = !mob.sheared;
         if (e.naked) e.naked.visible = mob.sheared;
         const hurt = mob.hurt > 0;
-        for (const p of e.parts) p.mesh.material = hurt ? p.pair.hurt : p.pair.normal;
+        for (const p of e.parts) p.mesh.material = hurt ? p.hurt : p.normal;
       }
       // arrows: thin sticks pointing the way they fly
       const live = new Set(arrows);

@@ -9,9 +9,8 @@ export const HUD_ITEMS = [
   { key: 'dayPart', label: 'Time of day and day number', panel: 'info' },
   { key: 'weather', label: 'Weather and biome', panel: 'info' },
   { key: 'coords', label: 'Coordinates', panel: 'info' },
-  { key: 'goals', label: 'Goals', panel: 'goals' },
 ];
-export const HUD_PANELS = ['minimap', 'info', 'goals']; // the three things that can be moved (and, but the minimap, folded away)
+export const HUD_PANELS = ['minimap', 'info']; // the two things that can be moved (and the clock panel folded away)
 
 // Everything is shown unless it was switched off: a saved choice only ever lists what was changed
 export const hudShown = (show, key) => !(show && show[key] === false);
@@ -24,7 +23,7 @@ export function cleanHudShow(raw) {
 }
 export function cleanCollapsed(raw) {
   const out = {};
-  if (raw && typeof raw === 'object') for (const k of ['info', 'goals']) if (typeof raw[k] === 'boolean') out[k] = raw[k];
+  if (raw && typeof raw === 'object') for (const k of ['info']) if (typeof raw[k] === 'boolean') out[k] = raw[k];
   return out;
 }
 

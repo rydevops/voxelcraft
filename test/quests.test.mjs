@@ -115,6 +115,25 @@ t('a slay job counts only what you defeat after accepting, and only the right mo
   assert.ok(done && done.loot.length >= 1);
 });
 
+t('the quest book can list the jobs you have taken, with whose they are and how far along', () => {
+  const q = new Quests(51), inv = new Inventory();
+  let key = null;
+  for (let i = 0; i < 60 && !key; i++) if (q.of('B:' + i, 'mason').offer.type === 'fetch') key = 'B:' + i;
+  assert.deepEqual(q.activeList(inv), [], 'nothing taken yet');
+  q.accept(key, 'mason', { name: 'Rowan', village: 'Oakford' });
+  q.accept('B:other', 'cleric'); // (accepted without saying who: an older save)
+  const list = q.activeList(inv);
+  assert.equal(list.length, 2);
+  const mine = list.find((j) => j.key === key);
+  assert.deepEqual(mine.who, { name: 'Rowan', village: 'Oakford', job: 'mason' });
+  assert.equal(mine.have, 0); assert.equal(mine.ready, false); assert.equal(mine.need, mine.offer.count);
+  assert.equal(list.find((j) => j.key === 'B:other').who, null);
+  inv.add(mine.offer.item, mine.offer.count);
+  assert.equal(q.activeList(inv).find((j) => j.key === key).ready, true, 'ready when you carry it');
+  q.complete(key, 'mason', inv);
+  assert.equal(q.activeList(inv).some((j) => j.key === key), false, 'a finished job leaves the book');
+});
+
 t('quests are saved with the world', () => {
   const q = new Quests(41);
   q.accept('A:1', 'blacksmith'); q.of('A:2', 'librarian'); q.recordKill('zombie');

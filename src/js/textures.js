@@ -4,7 +4,7 @@
 import { mulberry32 } from './noise.js';
 import { REG } from './registry.js';
 import { TILE_NAMES, BLOCKS, SHAPE, BOXES, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
-import { isBlockItem, itemKey } from './items.js';
+import { isBlockItem, drawsFlat, itemKey } from './items.js';
 import { paintTile, paintSprite, imageSources, T } from './tilegen.js';
 import { crackPixels, CRACK_STAGES } from './mining.js';
 import { textPixels } from './pixelfont.js';
@@ -240,7 +240,8 @@ const spriteCache = new Map();
 export function itemSprite(id, held = false) { // held: the version drawn for the model in your hand (bigger shovel blade)
   const ck = held ? 'h' + id : id;
   if (spriteCache.has(ck)) return spriteCache.get(ck);
-  const buf = paintSprite(itemKey(id), REG.itemById.get(id), REG.textures, images, held);
+  // a flower (a plant block that is its own item) is its own tile; everything else has a sprite or is a tool
+  const buf = drawsFlat(id) ? paintTile(BLOCKS[id].side, TILE_NAMES.indexOf(BLOCKS[id].side), REG.tiles, images) : paintSprite(itemKey(id), REG.itemById.get(id), REG.textures, images, held);
   const c = makeCanvas(T, T);
   c.getContext('2d').putImageData(new ImageData(buf, T, T), 0, 0);
   spriteCache.set(ck, c);
@@ -349,9 +350,9 @@ export function plantIcon(atlas, id, size = 44) {
   return c;
 }
 
-// Any item as a UI icon: isometric cube for blocks, scaled pixel sprite for everything else
+// Any item as a UI icon: isometric cube for blocks, scaled pixel sprite for everything else (flowers and other flat plants included)
 export function itemIcon(atlas, id, size = 44) {
-  if (isBlockItem(id)) return blockIcon(atlas, id, size);
+  if (isBlockItem(id) && !drawsFlat(id)) return blockIcon(atlas, id, size);
   const c = makeCanvas(size, size), x = c.getContext('2d');
   x.imageSmoothingEnabled = false;
   x.drawImage(itemSprite(id), 0, 0, size, size);

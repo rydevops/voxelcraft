@@ -45,7 +45,7 @@ export function createDialog({ quests, inventory, onAccept, onDecline, onAbandon
   function hide() { el.hidden = true; villager = null; }
   function close() { if (el.hidden) return; hide(); onClose?.(); }
 
-  $('talk-accept').addEventListener('click', () => { if (!villager) return; quests.accept(villager.key, villager.job); onAccept?.(villager); render('Thank you. I will be waiting.'); });
+  $('talk-accept').addEventListener('click', () => { if (!villager) return; quests.accept(villager.key, villager.job, { name: villager.name, village: villager.village.name }); onAccept?.(villager); render('Thank you. I will be waiting.'); });
   $('talk-decline').addEventListener('click', () => { if (!villager) return; const v = villager; quests.decline(v.key, v.job); onDecline?.(v); render('Another time, then. Perhaps I can find something else for you...'); });
   $('talk-abandon').addEventListener('click', () => { if (!villager) return; const v = villager; quests.abandon(v.key, v.job); onAbandon?.(v); render('I understand. It was a lot to ask.'); });
   $('talk-turnin').addEventListener('click', () => {
