@@ -17,6 +17,7 @@ export const ACTIONS = [
   { id: 'fly', label: 'Toggle flight (creative)', group: 'Actions', key: 'KeyF' },
   { id: 'offhand', label: 'Use offhand item (place a torch from the shield slot)', group: 'Actions', key: 'KeyG' },
   ...Array.from({ length: 9 }, (_, i) => ({ id: 'slot' + (i + 1), label: 'Hotbar slot ' + (i + 1), group: 'Hotbar', key: 'Digit' + (i + 1) })),
+  { id: 'map', label: 'Full-screen map (or tap the minimap)', group: 'Actions', key: 'KeyN' },
   { id: 'music', label: 'Toggle music', group: 'Other', key: 'KeyM' },
   { id: 'skipTime', label: 'Skip time of day', group: 'Other', key: 'KeyT' },
   { id: 'renderUp', label: 'Render distance +', group: 'Other', key: 'BracketRight' },

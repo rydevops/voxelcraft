@@ -45,7 +45,7 @@
         <div id="inv-grid"></div>
         <div id="backpack-box" hidden><span class="fur-label">Backpack</span><div id="backpack-grid"></div></div>
         <div id="inv-hotbar"></div>
-        <p class="hint touch-only">Tap a slot to pick up / place. The button at the top switches a tap to <b>split</b> or <b>quick move</b>. Tap outside the window to throw what you hold.</p>
+        <p class="hint touch-only">Tap a slot to pick up / place. The button at the top switches a tap to <b>split</b> or <b>quick move / wear</b> (torches go to the shield slot, where they light your way). Tap outside the window to throw what you hold.</p>
         <p class="hint pc-only">Click: pick up / place &middot; Right-click: split / place one &middot; Shift-click: quick move &middot; Click outside: throw</p>
       </div>
       <div class="inv-col craft-col">
@@ -93,6 +93,20 @@
       <p id="death-cause"></p>
       <button id="respawn">Respawn</button>
     </div>
+  </div>
+
+  <!-- full-screen map (tap the minimap) -->
+  <div id="fullmap" hidden>
+    <canvas id="fullmap-canvas"></canvas>
+    <div id="fullmap-bar">
+      <b>Map</b>
+      <span id="fullmap-pos"></span>
+      <button id="fm-out" class="small" title="Zoom out">&minus;</button>
+      <button id="fm-in" class="small" title="Zoom in">+</button>
+      <button id="fm-here" class="small">Find me</button>
+      <button id="fm-close" class="small">Close</button>
+    </div>
+    <p id="fullmap-hint"><span class="pc-only">Drag to move, scroll to zoom.</span><span class="touch-only">Drag to move, pinch to zoom.</span> Unexplored ground is dark.</p>
   </div>
 
   <!-- pause menu -->

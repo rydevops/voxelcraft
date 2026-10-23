@@ -9,7 +9,8 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 ## World
 | | Feature |
 |---|---|
-| ✔ | Endless procedural terrain from a seed: continents, hills, ridged mountains, oceans, beaches, rivers, snow caps |
+| ✔ | Endless procedural terrain from a seed: continents, oceans, beaches, rivers, snow caps |
+| ✔ | Biomes: flat plains, forests, rolling hills, tall mountains, deserts and snowy tundra, each with its own ground and trees (new worlds; playing worlds keep their terrain) |
 | ✔ | Biome-style variety of trees: oak, apple, birch, spruce, tall oak, bush; forests and clearings |
 | ✔ | Caves: winding tunnels, wide caverns and openings onto the surface; coal and iron ore veins |
 | ✔ | Flowing water that spreads over level ground and pours down slopes; sources and streams that retreat |
@@ -48,7 +49,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Inventory (36 slots + backpack), hotbar, drag, split, shift-click, throw |
 | ✔ | Recipe book per window (hand, crafting table, furnace) as one list with search and a "craftable only" filter, hover pop-outs |
 | ✔ | Furnace with smelt, fuel and result slots, real cooking time, fuel burn times, lit look and light |
-| ✔ | Equipment slots: helmet, chestplate, leggings, boots, shield (also the offhand for torches), backpack, quiver |
+| ✔ | Equipment slots: helmet, chestplate, leggings, boots, shield (also the offhand for torches: a torch there is held in the left hand and lights the way; shift-click sends torches there), backpack, quiver |
 | ✔ | Iron tools and armor set; backpack adds 9 slots |
 | ◐ | Quiver and shield have slots and items but nothing to use them on yet |
 
@@ -59,6 +60,8 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Chunky three-dimensional held tools with a swing animation; flickering furnace and torch flames |
 | ✔ | Smooth lighting with ambient occlusion; sky light and warm untinted block light |
 | ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
+| ✔ | Full-screen map (tap the minimap, or N): drag, zoom, remembers the ground you have left |
+| ✔ | Tree leaves rustle in the wind like the grass |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |
 | ✔ | Generated music: six in-game tracks in shuffled order and a looping title theme; generated sound effects |
 | ✔ | Developer logo, animated title screen (showing the version), world selection |
@@ -68,7 +71,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view (the menus fade away while you adjust it, so you see the result), invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
-| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Torch / Bag / Pause buttons, hotbar by tap; every button can be dragged to a place you like (Options), and the layout is saved |
+| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Bag / Pause buttons, hotbar by tap; every button can be dragged to a place you like (Options), and the layout is saved |
 | ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |
 | ✔ | Screens scale to fit small displays (HUD, inventory, options, menus), respect notches and safe areas, and ask for landscape |
 | ◐ | Controllers / gamepads are not supported |

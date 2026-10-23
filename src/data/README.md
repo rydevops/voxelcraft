@@ -133,7 +133,8 @@ Each material is a list of layers played together: `{ "type": "noise", "filter":
 Sea level, snow line, which blocks form the surface and filler, terrain and river shape numbers, caves, `ores`
 (noise settings and height range - first match wins, so list rare ores first), `trees`, `groundCover` (grass tufts) and the spawn search.
 Caves: `scale`/`threshold` shape the thin winding tunnels, `caverns` (`scale`, `threshold`, `minY`, `maxY`, `surfaceDepth`) the wide chambers (lower threshold = bigger and more), and `entrances` (`scale`, `threshold`) the columns where tunnels may break through the surface.
-Changing it changes new terrain only; already generated and edited chunks keep what you built.
+`biomes`: three slow noise fields (`temp`, `wet`, `rel`, each mostly between -0.35 and 0.35, stretched by `climateScale`) choose a biome per column using the cut-offs in `select`. Each entry of `types` (`plains`, `forest`, `hills`, `mountains`, `desert`, `tundra`) names its `surface` and `filler` blocks and `fillerDepth`, an optional `rockFrom` height (above it the surface is bare stone) and a `trees` multiplier (`denseMin` keeps forests dense). The shape of the land comes from `terrain` (`plainsHills` / `rollingHills` = how bumpy flat and rolling country is, `mountainHeight`, `mountainUplift`, `duneHeight`, `flatContinent` = how much the big continent noise is flattened on dry land). A tree variant can list `biomes` it grows in.
+Changing it changes new terrain only; already generated and edited chunks keep what you built. A world records which terrain it uses (`terrain` in its save: 1 is the original rolling terrain, 2 the biomes), so playing worlds keep theirs.
 
 ## game.json
 

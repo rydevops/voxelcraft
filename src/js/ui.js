@@ -1,6 +1,6 @@
 // DOM user interface: hotbar, inventory + crafting screen, creative palette and the goals tracker.
 import { PALETTE } from './blocks.js';
-import { itemName, maxDamage, equipOf, EQUIP_SLOTS, RECIPES, STATION_LABEL, GOALS, WINDOWS, specIds, specName, SMELTING, fuelSeconds, FUEL_ITEMS } from './items.js';
+import { itemName, maxDamage, equipOf, isOffhand, EQUIP_SLOTS, RECIPES, STATION_LABEL, GOALS, WINDOWS, specIds, specName, SMELTING, fuelSeconds, FUEL_ITEMS } from './items.js';
 import { INPUT, FUEL, OUTPUT, clickFurnaceSlot, quickInsert, autoFill, cooking, isLit } from './furnace.js';
 import { itemIcon } from './textures.js';
 import { SLOTS, HOTBAR, TOTAL_SLOTS } from './inventory.js';
@@ -76,7 +76,7 @@ export function createUI({ atlas, inventory, getHotbarStack, onCraft, onToss, on
       e.preventDefault();
       e.stopPropagation();
       const st = inventory.slots[i];
-      if (e.shiftKey && e.button === 0 && st && equipOf(st.id) && inventory.quickEquip(i)) {
+      if (e.shiftKey && e.button === 0 && st && (equipOf(st.id) || isOffhand(st.id)) && inventory.quickEquip(i)) {
         onEquip?.();
       } else if (e.shiftKey && e.button === 0 && furnace) { // furnace window open: shift-click sends smeltable items / fuel into it
         if (st) { const left = quickInsert(furnace, st); if (left <= 0) inventory.slots[i] = null; else st.n = left; }

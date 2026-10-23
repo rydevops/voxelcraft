@@ -217,6 +217,17 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 .mm-sub { margin-top: -1px; justify-content: flex-end; font-size: 11px; }
 .mm-sub span { color: #8f94a6; }
 
+/* ---- full-screen map ---- */
+#minimap { pointer-events: auto; cursor: pointer; }
+#fullmap { position: fixed; inset: 0; z-index: 30; background: #0c0f13; touch-action: none; }
+#fullmap[hidden] { display: none; }
+#fullmap-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#fullmap-canvas.drag { cursor: grabbing; }
+#fullmap-bar { position: absolute; left: 50%; top: calc(10px + env(safe-area-inset-top)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(20, 20, 26, 0.88); border: 2px solid #111; font-size: 14px; white-space: nowrap; }
+#fullmap-bar button { min-width: 0; padding: 6px 12px; }
+#fullmap-pos { color: #ffe27a; }
+#fullmap-hint { position: absolute; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom)); margin: 0; text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.75); text-shadow: 1px 1px 0 #000; pointer-events: none; }
+
 /* ---- instant item tooltip ---- */
 #item-tip { position: fixed; z-index: 31; padding: 6px 10px; background: rgba(16, 10, 28, 0.96); border: 2px solid #3a1f6e; border-top-color: #6a46b8; border-left-color: #6a46b8; font-size: 14px; pointer-events: none; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45); white-space: nowrap; }
 #item-tip[hidden] { display: none; }
@@ -224,7 +235,7 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 #item-tip span { display: block; margin-top: 2px; font-size: 12px; color: #9fd0ff; }
 
 /* ---- startup: developer logo, title, world selection ---- */
-body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
+body.startup #fullmap, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
 body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #debug, body.startup #underwater { display: none !important; }
 #intro { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; align-items: center; justify-content: center; }
 #intro[hidden], #title[hidden], #worlds[hidden], #loading[hidden] { display: none; }
@@ -323,6 +334,7 @@ body.touch .pc-only { display: none; }
 /* ---- touch mode ---- */
 /* Phones are short: the minimap shrinks, the real-time row goes (the phone has a clock) and the goals move to the top left, under
    the menu buttons (main.js moves #goals out of #hud-right), with larger text than the desktop HUD. */
+body.touch #hud-right { z-index: 6; }
 body.touch #minimap { width: 120px; height: 120px; }
 body.touch #mm-info .mm-row:first-child { display: none; }
 body.touch #mm-info, body.touch #goals { font-size: 15px; }
@@ -358,10 +370,9 @@ body.touch #touch:not([hidden]) { display: block; }
 .tb.fly { right: calc(3vmin + var(--sr) + var(--big) + 2vmin); bottom: calc(5vmin + var(--sb) + var(--tb) + 1.5vmin); }
 .tb.sprint { left: calc(12vmin + var(--sl)); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
 .tb.crouch { left: calc(12vmin + var(--sl) + var(--tb) + 2vmin); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
-.tb.menu, .tb.inv, .tb.off { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); border-radius: 12px; font-size: clamp(10px, calc(var(--tb) * 0.2), 14px); }
+.tb.menu, .tb.inv { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); border-radius: 12px; font-size: clamp(10px, calc(var(--tb) * 0.2), 14px); }
 .tb.menu { left: calc(2vmin + var(--sl)); }
 .tb.inv { left: calc(2vmin + var(--sl) + var(--tb) * 0.8 + 1.5vmin); }
-.tb.off { left: calc(2vmin + var(--sl) + (var(--tb) * 0.8 + 1.5vmin) * 2); }
 
 /* layout editor (touch.js edit()): the zones stop catching fingers so the buttons can be dragged */
 #touch.editing .tz, #touch.editing .stick { display: none; }
