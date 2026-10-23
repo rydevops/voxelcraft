@@ -331,7 +331,7 @@ let optionsOpen = false;
 const options = createOptions(settings, {
   onClose: () => { optionsOpen = false; },
   // moving the touch buttons: only in a world on a touch device; afterwards the Options screen comes back
-  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }) },
+  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }), reset: () => settings.set('touchLayout', {}) },
 });
 held.visible = false;
 // The audio engine exists from the start so the title screen can play its theme. Browsers keep it silent until the first
@@ -954,7 +954,6 @@ function renderControlsTable() {
 
 function applySettings() {
   audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
-  refitHud();
   const goalsHome = touchMode ? document.body : $('hud-right'); // on a phone the goals sit top left, out of the crowded right column
   if ($('goals').parentNode !== goalsHome) goalsHome.appendChild($('goals'));
   touchCtl.setLayout(settings.get('touchLayout'));
@@ -966,6 +965,7 @@ function applySettings() {
     mouseDown = { left: false, right: false };
     if (touchMode) document.exitPointerLock?.();
   }
+  refitHud(); // (after the touch class above: on a touch screen the hotbar is sized to fit between the controls)
   $('tagline').textContent = touchMode ? 'Game paused' : 'Game paused \u2014 press Esc to resume';
   renderControlsTable();
 }

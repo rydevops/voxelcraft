@@ -40,17 +40,25 @@ On first visit the service worker caches the whole game (under 1 MB of code), so
 
 On a touch device (primary pointer is a finger) the game switches to on-screen controls by itself; the switch is also in **Options** (and `?touch` / `?desktop` on the address force either way).
 
+Every control is a picture, not a word:
+
 | Control | What it does |
 |---|---|
-| Left thumb, anywhere on the left | Floating move stick (analog: walk slowly or fast); push it to the rim to sprint |
-| Drag on the right | Look around (a finger held on any button can drag to look too) |
-| **Break** (hold) / **Use** (hold) | Left click / right click: mine, attack, place, open, till, plant, eat |
-| **Jump** (tap twice in creative to fly) · **Run** · **Sneak** | Jump / swim up, latch sprint, crouch / fly down |
-| **Fly** (creative) | Toggle flying |
+| **Joystick** (bottom left, stays where it is) | Move: analog, so a small push walks slowly and a full push walks fast; push it to the rim to sprint |
+| Drag anywhere else | Look around (a finger held on a button can drag to look too) |
+| **Pickaxe** button (hold) | Attack, dig and mine: the left mouse button |
+| **Hand** button (hold) | Interact and use: the right mouse button (place a block, open a door or a crafting table, talk to a villager, till, plant, eat) |
+| **Arrow up** | Jump / swim up (tap twice in creative to fly) |
+| **Lightning bolt** | Sprint: tap to switch on, tap again to switch off |
+| **Arrow down onto a floor** | Crouch (slower, and you cannot walk off an edge) / fly down: tap on, tap off |
+| **Wings** (creative only) | Toggle flying |
+| **Pause bars** (top left) | The pause menu |
+| **Loot bag** (on the right of the hotbar) | Your inventory (or the creative palette) |
 | Tap the **minimap** | Full-screen map (drag to move, pinch to zoom) |
-| **Bag** · **II** | Inventory (or the creative palette) · pause menu |
 | Tap the hotbar | Pick a slot |
 | Inventory button at the top | What a tap does: pick up / place, split / place one, quick move / wear (torches go to the shield slot) |
+
+**Put the controls where your thumbs want them:** *Options -> Move the touch controls...* (from the pause menu, in a world) shows the controls over the world with a **Move the controls** window; drag the joystick or any button anywhere on the screen and tap **Done** to go back to Options. **Reset** in that window, or *Reset controls to default* in Options, puts them back. The loot bag stays on the hotbar.
 
 The game asks for full screen and landscape when you press Resume.
 

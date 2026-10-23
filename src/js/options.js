@@ -16,7 +16,7 @@ const TOGGLES = [
   { key: 'touchControls', label: 'On-screen touch controls (sticks and buttons)' },
 ];
 
-// `layout` (optional): { available() -> boolean, edit() } for moving the touch buttons around
+// `layout` (optional): { available() -> boolean, edit(), reset() } for moving the touch controls around and putting them back
 export function createOptions(settings, { onClose, layout }) {
   const root = $('options');
   const general = $('opt-general');
@@ -84,9 +84,14 @@ export function createOptions(settings, { onClose, layout }) {
       btn.className = 'small';
       btn.textContent = 'Move the touch controls...';
       btn.addEventListener('click', () => { close(); layout.edit(); });
-      move.append(btn);
+      const reset = document.createElement('button');
+      reset.className = 'small';
+      reset.textContent = 'Reset controls to default';
+      reset.addEventListener('click', () => { layout.reset(); reset.textContent = 'Controls reset'; setTimeout(() => { reset.textContent = 'Reset controls to default'; }, 1500); });
+      move.style.gridTemplateColumns = '1fr 1fr';
+      move.append(btn, reset);
     } else {
-      move.append(Object.assign(document.createElement('span'), { className: 'opt-hint', textContent: 'To move the touch buttons, open Options from the pause menu while you are in a world.' }));
+      move.append(Object.assign(document.createElement('span'), { className: 'opt-hint', textContent: 'To move the touch controls, open Options from the pause menu while you are in a world.' }));
     }
     general.prepend(move); // (first: the list scrolls on a phone and this is the thing to find)
     const hint = document.createElement('p');

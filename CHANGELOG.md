@@ -21,6 +21,8 @@ released those lines move under a new version heading. The list of everything th
 - **The version is shown on the title screen** (bottom left), e.g. `v1.0.0-8726a41cae`: the package version plus the build.
 
 ### Changed
+- **New touch controls.** The joystick is now fixed in the bottom left corner instead of floating, and the buttons show symbols instead of words: a pickaxe (attack, dig, mine), a hand (interact, use), an up arrow (jump), a lightning bolt (sprint), a down arrow (crouch), wings (fly, creative) and pause bars. The inventory is a loot bag button attached to the right of the hotbar (it replaces the *Bag* button). The hotbar and loot bag shrink on small screens so they always fit between the joystick and the action buttons.
+- **Moving the controls** now includes the joystick, and the editor is a *Move the controls* window with **Reset** and **Done** (Done returns to Options). *Options -> Reset controls to default* puts everything back without opening the editor.
 - **The Torch button is gone** from the touch controls: put torches in the shield slot and they light your way by themselves (the layout editor forgets the old button).
 - **The goals are back on phones.** The Goals panel had been hidden on any phone held sideways (a screen shorter than 520 px). It now sits top left under the menu buttons, in larger text, and the minimap is smaller with the real-time row left out so everything fits.
 - **Adjusting the field of view shows the world.** While you drag the Field of view slider (or use the arrow keys on it) the pause menu and the rest of Options fade away, so you see the view you paused in with the new angle immediately; they return a moment after you let go. The title screen's fly-around follows the field of view too.

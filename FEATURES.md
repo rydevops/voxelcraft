@@ -74,7 +74,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view (the menus fade away while you adjust it, so you see the result), invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
-| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): floating analog move stick, drag-to-look, Break / Use / Jump / Run / Sneak / Fly / Bag / Pause buttons, hotbar by tap; every button can be dragged to a place you like (Options), and the layout is saved |
+| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): a fixed analog joystick at the bottom left, drag-to-look, symbol buttons for attack / dig / mine, interact / use, jump, sprint, crouch, fly and pause, and a loot bag button on the hotbar for the inventory; the joystick and every button can be dragged to where you like in a layout window (Options), with a reset to the defaults |
 | ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |
 | ✔ | Screens scale to fit small displays (HUD, inventory, options, menus), respect notches and safe areas, and ask for landscape |
 | ◐ | Controllers / gamepads are not supported |

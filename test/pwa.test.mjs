@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { fitScale, hudScale, hudScaleFor, MAX_HUD } from '../src/js/fit.js';
+import { fitScale, hudScale, hudScaleFor, hotbarScaleFor, MAX_HUD } from '../src/js/fit.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -98,6 +98,18 @@ t('the HUD size setting scales the HUD (and cannot run away or break it)', () =>
   assert.ok(Math.abs(hudScaleFor(844, 390, 1.5) - hudScale(844, 390) * 1.5) < 1e-9);
   assert.equal(hudScaleFor(1920, 1080, 5), MAX_HUD);
   assert.equal(hudScaleFor(1920, 1080, NaN), 1); assert.equal(hudScaleFor(1920, 1080, -2), 1);
+});
+
+t('on a touch screen the hotbar and loot bag always fit between the joystick and the action buttons', () => {
+  for (const [w, h] of [[844, 390], [667, 375], [932, 430], [1024, 768], [1366, 1024], [568, 320]]) {
+    const hud = hudScaleFor(w, h, 1.3);
+    const s = hotbarScaleFor(w, h, hud, true);
+    const vmin = Math.min(w, h), stick = Math.min(176, Math.max(112, vmin * 0.31)), pad = vmin * 0.035;
+    assert.ok(s <= hud + 1e-9 && s >= 0.45, `${w}x${h}: scale ${s.toFixed(2)}`);
+    if (s > 0.46) assert.ok(608 * s <= w - 2 * (stick + pad) + 1e-6, `${w}x${h}: hotbar + bag (${Math.round(608 * s)} px) fits between the controls`);
+  }
+  assert.equal(hotbarScaleFor(1920, 1080, 1, false), 1, 'a desktop is left alone');
+  assert.equal(hotbarScaleFor(1920, 1080, 1.5, true), 1.5, 'plenty of room: no cap');
 });
 
 t('nothing in the game requires the Pointer Lock API (iPhone Safari has none): Save & Quit and the pause / death screens must still work', () => {
