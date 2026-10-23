@@ -24,6 +24,9 @@ released those lines move under a new version heading. The list of everything th
 - **Adjusting the field of view shows the world.** While you drag the Field of view slider (or use the arrow keys on it) the pause menu and the rest of Options fade away, so you see the view you paused in with the new angle immediately; they return a moment after you let go. The title screen's fly-around follows the field of view too.
 - **Updates load by themselves.** Every time the app is opened or brought back to the front it checks for a newer version; if one is found while you are on the title screen the game reloads into it at once. In a world it waits and tells you, and the update loads when you quit to the title. The service worker also fetches new files past the browser's HTTP cache, so an update never caches stale copies.
 
+### Fixed
+- **Save & Quit to Title no longer gets stuck on "Saving..."** on an iPhone / iPad. Safari there has no Pointer Lock API, and the game called it without checking, which threw an error before the save finished. The same call is now guarded everywhere (it also left the inventory and map open with the game still running, and the death screen with the game still running). Save & Quit also catches any failure and gives a stalled save only a few seconds, so it can never trap you.
+
 ## [1.0.0]
 
 VoxelCraft is now an installable web app (a PWA) that runs straight from GitHub Pages, on a computer or on a phone or tablet.

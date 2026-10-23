@@ -100,6 +100,15 @@ t('the HUD size setting scales the HUD (and cannot run away or break it)', () =>
   assert.equal(hudScaleFor(1920, 1080, NaN), 1); assert.equal(hudScaleFor(1920, 1080, -2), 1);
 });
 
+t('nothing in the game requires the Pointer Lock API (iPhone Safari has none): Save & Quit and the pause / death screens must still work', () => {
+  const main = read('src/js/main.js');
+  assert.ok(!/document\.exitPointerLock\(\)/.test(main), 'document.exitPointerLock() must be called as exitPointerLock?.()');
+  assert.ok(!/requestPointerLock\(\{/.test(main) || /try \{\s*const p = canvasEl\.requestPointerLock/.test(main), 'requestPointerLock is only called inside try / optional chaining');
+  const quit = main.slice(main.indexOf('async function quitToTitle'), main.indexOf("$('quitbtn').addEventListener"));
+  assert.ok(/try \{[\s\S]*save_\(\)[\s\S]*\} catch/.test(quit), 'quitToTitle survives a failing save and leaves anyway');
+  assert.ok(/setTimeout\(resolve, \d+\)/.test(quit), 'and does not wait forever for a stalled save');
+});
+
 t('the project layout: source in src/, dev tools in scripts/, nothing else is loaded from the root but the build', () => {
   for (const d of ['src/js', 'src/data', 'scripts', 'test']) assert.ok(fs.statSync(path.join(ROOT, d)).isDirectory(), d);
   assert.ok(!fs.existsSync(path.join(ROOT, 'public')), 'public/ moved to src/');
