@@ -62,6 +62,8 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | All textures and item sprites are generated or drawn in code/data: no downloaded art |
 | ✔ | Chunky three-dimensional held tools with a swing animation; flickering furnace and torch flames |
 | ✔ | Smooth lighting with ambient occlusion; sky light and warm untinted block light |
+| ✔ | Fold the clock panel and the goals with a tap; a gear on the clock panel switches parts of the HUD on and off and lets you drag the panels where you like |
+| ✔ | Full Screen button on the title screen (explains the home-screen way on an iPhone) |
 | ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
 | ✔ | Full-screen map (tap the minimap, or N): drag, zoom, remembers the ground you have left |
 | ✔ | Tree leaves rustle in the wind like the grass |
@@ -74,7 +76,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 |---|---|
 | ✔ | Mouse and keyboard with fully remappable keys; mouse sensitivity, field of view (the menus fade away while you adjust it, so you see the result), invert Y, raw input, volumes |
 | ✔ | Esc closes windows, pauses and resumes |
-| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): a fixed analog joystick at the bottom left, drag-to-look, symbol buttons for attack / dig / mine, interact / use, jump, sprint, crouch, fly and pause, and a loot bag button on the hotbar for the inventory; the joystick and every button can be dragged to where you like in a layout window (Options), with a reset to the defaults |
+| ✔ | **Touch controls** on phones and tablets, chosen automatically (and switchable in Options): a fixed analog joystick at the bottom left (it never sprints), drag-to-look from anywhere, symbol buttons for attack / dig / mine, interact / use, jump, sprint, crouch, fly and pause, and a loot bag button on the hotbar for the inventory; the joystick and every button can be dragged to where you like in a layout window (Options), with a reset to the defaults |
 | ✔ | Touch inventory: tap to pick up and place, with a mode button for split / place one and quick move / wear, and a close button |
 | ✔ | Screens scale to fit small displays (HUD, inventory, options, menus), respect notches and safe areas, and ask for landscape |
 | ◐ | Controllers / gamepads are not supported |

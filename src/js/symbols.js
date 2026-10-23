@@ -30,6 +30,7 @@ class Grid {
     }
     return this;
   }
+  erase(cx, cy, rx, ry) { for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) this.px[y][x] = null; return this; }
   ellipse(cx, cy, rx, ry, c) {
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) this.set(x, y, c);
     return this;
@@ -71,6 +72,13 @@ const ART = {
     g.polyline([[7, 12], [4, 10], [2, 8]], 1);
     g.polyline([[9, 12], [12, 10], [14, 8]], 1);
     g.rect(7, 8, 8, 14);
+  },
+  // a gear: a ring with eight teeth
+  gear(g) {
+    g.ellipse(7.5, 7.5, 4.8, 4.8);
+    g.rect(6, 0, 9, 3); g.rect(6, 12, 9, 15); g.rect(0, 6, 3, 9); g.rect(12, 6, 15, 9);
+    g.rect(2, 2, 4, 4); g.rect(11, 2, 13, 4); g.rect(2, 11, 4, 13); g.rect(11, 11, 13, 13);
+    g.erase(7.5, 7.5, 2.2, 2.2);
   },
   // two bars: pause
   menu(g) { g.rect(3, 2, 6, 13); g.rect(9, 2, 12, 13); },

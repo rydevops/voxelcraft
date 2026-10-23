@@ -3,7 +3,7 @@
 // CSS variable --hud. Everything is re-measured whenever a window opens, changes size, or the screen turns.
 
 // the windows that get shrunk (see the matching `transform: scale(var(--fit))` rules in style.css)
-const FITTED = ['.inv-panel', '.pal-panel', '.opt-panel', '.world-panel', '#menu', '#title-menu', '#death-box'];
+const FITTED = ['.hud-menu-panel', '.inv-panel', '.pal-panel', '.opt-panel', '.world-panel', '#menu', '#title-menu', '#death-box'];
 const MARGIN = 12; // px kept free around a window
 
 // 1 when it fits, smaller when it does not (never below a quarter)

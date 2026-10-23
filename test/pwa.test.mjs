@@ -112,6 +112,17 @@ t('on a touch screen the hotbar and loot bag always fit between the joystick and
   assert.equal(hotbarScaleFor(1920, 1080, 1.5, true), 1.5, 'plenty of room: no cap');
 });
 
+t('touch: the joystick only walks (sprint is the button), every action button starts on the right, and a stuck finger cannot lock the controls', () => {
+  const main = read('src/js/main.js'), touch = read('src/js/touch.js'), css = read('src/style.css');
+  assert.ok(!/\bt\.edge\b/.test(main) && !/stickSprints|state\.edge/.test(touch), 'the stick has no say in sprinting');
+  for (const b of ['attack', 'use', 'jump', 'sprint', 'crouch', 'fly']) assert.match(css, new RegExp('\\.tb\\.' + b + '[^{]*\\{[^}]*right:'), b + ' is placed from the right edge');
+  assert.ok(/\.stick \{[^}]*left:/.test(css), 'the joystick is on the left');
+  // a new finger takes over from one whose lift was never reported, and a lost pointer capture ends the touch
+  assert.ok(!/if \(lookId !== null\) return/.test(touch) && !/if \(stickId !== null\) return|stickId !== null\) return/.test(touch.replace(/if \(stickId !== null\) stickEnd/g, '')), 'no "already busy" early returns');
+  assert.ok((touch.match(/lostpointercapture/g) || []).length >= 4, 'lost captures are handled everywhere');
+  assert.ok(/SOFT_LOOK/.test(touch), 'a drag that starts on the HUD or hotbar also turns the camera');
+});
+
 t('nothing in the game requires the Pointer Lock API (iPhone Safari has none): Save & Quit and the pause / death screens must still work', () => {
   const main = read('src/js/main.js');
   assert.ok(!/document\.exitPointerLock\(\)/.test(main), 'document.exitPointerLock() must be called as exitPointerLock?.()');

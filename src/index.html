@@ -23,12 +23,13 @@
   <div id="hud-right">
     <canvas id="minimap" width="196" height="196"></canvas>
     <div id="mm-info">
-      <div class="mm-row"><span>Real time</span><b id="mm-real">--:--:--</b></div>
-      <div class="mm-row"><span>Game time</span><b id="mm-game">--:--</b></div>
-      <div class="mm-row mm-sub"><span id="mm-part"></span></div>
-      <div class="mm-row mm-xyz"><span>X <b id="mm-x">0</b></span><span>Y <b id="mm-y">0</b></span><span>Z <b id="mm-z">0</b></span></div>
+      <button id="hud-gear" type="button" aria-label="HUD settings" title="HUD settings"></button>
+      <div class="mm-row" data-hud="realTime"><span>Real time</span><b id="mm-real">--:--:--</b></div>
+      <div class="mm-row" data-hud="gameTime"><span>Game time</span><b id="mm-game">--:--</b></div>
+      <div class="mm-row mm-sub" data-hud="dayPart"><span id="mm-part"></span></div>
+      <div class="mm-row mm-xyz" data-hud="coords"><span>X <b id="mm-x">0</b></span><span>Y <b id="mm-y">0</b></span><span>Z <b id="mm-z">0</b></span></div>
     </div>
-    <div id="goals"><h3>Goals <span id="goal-count"></span></h3><ul id="goal-list"></ul></div>
+    <div id="goals"><h3><i class="chev"></i>Goals <span id="goal-count"></span></h3><ul id="goal-list"></ul></div>
   </div>
   <div id="blockname"></div>
   <div id="lookat" hidden><img id="lookat-icon" alt=""><div id="lookat-text"><b id="lookat-name"></b><span id="lookat-sub"></span><div id="lookat-pips"></div></div></div>
@@ -95,6 +96,20 @@
     </div>
   </div>
 
+  <!-- the gear on the info panel: what the HUD shows, and where its panels are -->
+  <div id="hud-menu" hidden>
+    <div class="hud-menu-panel">
+      <h2>HUD</h2>
+      <p class="opt-hint">Tap the clock panel or the goals to fold them away or open them again.</p>
+      <div id="hud-menu-list"></div>
+      <div class="hud-menu-buttons">
+        <button id="hud-move" class="small">Move panels...</button>
+        <button id="hud-reset" class="small">Reset</button>
+        <button id="hud-close" class="small">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- full-screen map (tap the minimap) -->
   <div id="fullmap" hidden>
     <canvas id="fullmap-canvas"></canvas>
@@ -141,6 +156,8 @@
       <p id="title-tag">A tiny voxel sandbox &mdash; gather, craft, survive</p>
       <button id="t-play">Play</button>
       <button id="t-options">Options &amp; Key Bindings</button>
+      <button id="t-fullscreen" hidden>Full Screen</button>
+      <p id="fs-hint" hidden></p>
       <button id="t-quit">Quit Game</button>
     </div>
     <p id="music-hint" hidden>&#9835; <span class="pc-only">Click or press any key</span><span class="touch-only">Tap anywhere</span> to start the music</p>

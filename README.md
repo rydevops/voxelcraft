@@ -44,8 +44,8 @@ Every control is a picture, not a word:
 
 | Control | What it does |
 |---|---|
-| **Joystick** (bottom left, stays where it is) | Move: analog, so a small push walks slowly and a full push walks fast; push it to the rim to sprint |
-| Drag anywhere else | Look around (a finger held on a button can drag to look too) |
+| **Joystick** (bottom left, stays where it is) | Move: analog, so a small push walks slowly and a full push walks fast. It never sprints: that is the lightning bolt button |
+| Drag anywhere that is not a button | Look around, wherever the finger starts (even on the minimap, the clock panel or the hotbar; a finger held on a button can drag to look too) |
 | **Pickaxe** button (hold) | Attack, dig and mine: the left mouse button |
 | **Hand** button (hold) | Interact and use: the right mouse button (place a block, open a door or a crafting table, talk to a villager, till, plant, eat) |
 | **Arrow up** | Jump / swim up (tap twice in creative to fly) |
@@ -58,9 +58,13 @@ Every control is a picture, not a word:
 | Tap the hotbar | Pick a slot |
 | Inventory button at the top | What a tap does: pick up / place, split / place one, quick move / wear (torches go to the shield slot) |
 
+The five action buttons (pickaxe, hand, jump, sprint, crouch) all sit on the right, in an arc around where the right thumb rests: attack in the corner, use right above it, jump beside them, sprint and crouch a little further out.
+
+**The HUD panels.** Tap the **clock panel** or the **goals** to fold them to one line and tap again to open them: more of the world on a small screen. The **gear** on the clock panel opens a window where you switch each part of the HUD on or off (minimap, real-world time, game time, time of day, coordinates, goals) and **Move panels...**, which lets you drag the minimap, the clock panel and the goals anywhere on the screen. Everything is remembered; *Reset* in that window puts it all back.
+
 **Put the controls where your thumbs want them:** *Options -> Move the touch controls...* (from the pause menu, in a world) shows the controls over the world with a **Move the controls** window; drag the joystick or any button anywhere on the screen and tap **Done** to go back to Options. **Reset** in that window, or *Reset controls to default* in Options, puts them back. The loot bag stays on the hotbar.
 
-The game asks for full screen and landscape when you press Resume.
+The game asks for full screen and landscape when you press Resume. On the **title screen** a **Full Screen** button hides the browser's address bar and tabs (on an iPhone, where Safari does not allow that to a web page, the button explains how to add the game to the home screen, where it runs full screen).
 
 ## Starting up
 

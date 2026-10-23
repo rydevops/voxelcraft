@@ -3,7 +3,7 @@
 // crouch, fly (creative) and pause, plus a loot bag button on the right of the hotbar that opens the inventory. The player can
 // drag every one of them (but the bag) to where their thumbs like them. This file only handles fingers and drawing; main.js
 // decides what the buttons mean (the `hooks`) and reads the stick / held buttons from `state`.
-import { stickVector, stickSprints, cleanLayout, clampCenter } from './touchmath.js';
+import { stickVector, cleanLayout, clampCenter } from './touchmath.js';
 import { symbolURL } from './symbols.js';
 
 const el = (tag, cls, text, parent) => {
@@ -22,7 +22,7 @@ const INV_MODES = [
 ];
 
 export function createTouchControls(hooks) {
-  const state = { strafe: 0, forward: 0, edge: false, jump: false, crouch: false, sprint: false };
+  const state = { strafe: 0, forward: 0, jump: false, crouch: false, sprint: false };
   let enabled = false;
   let shown = false;
   const held = new Set(); // hold-buttons currently pressed (so a reset can release them)
@@ -47,33 +47,33 @@ export function createTouchControls(hooks) {
     const R = knobTravel();
     const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
     const v = stickVector(dx, dy, R);
-    state.strafe = v.strafe; state.forward = v.forward; state.edge = stickSprints(v);
+    state.strafe = v.strafe; state.forward = v.forward; // (sprinting is the sprint button's job, never the stick's)
     const k = Math.min(1, Math.hypot(dx, dy) / R) * R, a = Math.atan2(dy, dx);
     knob.style.transform = `translate(calc(-50% + ${Math.cos(a) * k}px), calc(-50% + ${Math.sin(a) * k}px))`;
     hooks.changed?.();
   }
   function stickEnd() {
     stickId = null;
-    state.strafe = 0; state.forward = 0; state.edge = false;
+    state.strafe = 0; state.forward = 0;
     knob.style.transform = '';
     hooks.changed?.();
   }
   stick.addEventListener('pointerdown', (e) => {
-    if (editing || stickId !== null) return;
+    if (editing) return;
     e.preventDefault();
-    stickId = e.pointerId;
+    stickId = e.pointerId; // (a new finger always takes over: an old one whose lift was never reported must not lock the stick)
     stick.setPointerCapture(e.pointerId);
     steer(e);
   });
   stick.addEventListener('pointermove', (e) => { if (e.pointerId === stickId) steer(e); });
-  for (const type of ['pointerup', 'pointercancel']) stick.addEventListener(type, (e) => { if (e.pointerId === stickId) stickEnd(); });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) stick.addEventListener(type, (e) => { if (e.pointerId === stickId) stickEnd(); });
 
-  // ---- looking ----
+  // ---- looking: drag a finger over anything that is not a control ----
   let lookId = null, last = { x: 0, y: 0 };
   lookZone.addEventListener('pointerdown', (e) => {
-    if (lookId !== null) return;
+    if (editing) return;
     e.preventDefault();
-    lookId = e.pointerId;
+    lookId = e.pointerId; // (a new finger takes over from one whose lift was never reported)
     lookZone.setPointerCapture(e.pointerId);
     last = { x: e.clientX, y: e.clientY };
   });
@@ -82,7 +82,28 @@ export function createTouchControls(hooks) {
     hooks.look(e.clientX - last.x, e.clientY - last.y);
     last = { x: e.clientX, y: e.clientY };
   });
-  for (const type of ['pointerup', 'pointercancel']) lookZone.addEventListener(type, (e) => { if (e.pointerId === lookId) lookId = null; });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) lookZone.addEventListener(type, (e) => { if (e.pointerId === lookId) lookId = null; });
+
+  // A finger that starts on the minimap, the info panels or the hotbar is a tap there, until it moves: then it is a look drag too,
+  // so no part of the screen is a dead spot for turning around.
+  const SOFT_LOOK = '#hotbar, #minimap, #hud-right, #mm-info, #goals, #bagbtn';
+  let soft = null;
+  window.addEventListener('pointerdown', (e) => {
+    if (!enabled || !shown || editing || e.pointerType === 'mouse' || document.body.classList.contains('hudedit') || !e.target.closest?.(SOFT_LOOK)) return;
+    soft = { id: e.pointerId, x: e.clientX, y: e.clientY, dragging: false };
+  }, true);
+  window.addEventListener('pointermove', (e) => {
+    if (!soft || e.pointerId !== soft.id) return;
+    if (!soft.dragging) {
+      if (Math.hypot(e.clientX - soft.x, e.clientY - soft.y) < 10) return;
+      soft.dragging = true;
+      soft.x = e.clientX; soft.y = e.clientY;
+      return;
+    }
+    hooks.look(e.clientX - soft.x, e.clientY - soft.y);
+    soft.x = e.clientX; soft.y = e.clientY;
+  }, true);
+  for (const type of ['pointerup', 'pointercancel']) window.addEventListener(type, (e) => { if (soft && e.pointerId === soft.id) soft = null; }, true);
 
   // ---- buttons ----
   // `symbol` is a name from symbols.js (or text, for the plain close button); the label is for screen readers
@@ -135,7 +156,6 @@ export function createTouchControls(hooks) {
   function lookWhileHeld(b) {
     let id = null, at = { x: 0, y: 0 };
     b.addEventListener('pointerdown', (e) => {
-      if (id !== null) return;
       id = e.pointerId;
       at = { x: e.clientX, y: e.clientY };
       b.setPointerCapture(e.pointerId);
@@ -145,7 +165,7 @@ export function createTouchControls(hooks) {
       hooks.look(e.clientX - at.x, e.clientY - at.y);
       at = { x: e.clientX, y: e.clientY };
     });
-    for (const type of ['pointerup', 'pointercancel']) b.addEventListener(type, (e) => { if (e.pointerId === id) id = null; });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(type, (e) => { if (e.pointerId === id) id = null; });
   }
   // pressed while a finger is on it
   function holdButton(name, symbol, label, onDown, onUp) {
@@ -153,15 +173,16 @@ export function createTouchControls(hooks) {
     let id = null;
     const release = () => { if (id === null) return; id = null; held.delete(release); b.classList.remove('on'); onUp?.(); };
     b.addEventListener('pointerdown', (e) => {
-      if (editing || id !== null) return;
+      if (editing) return;
       e.preventDefault();
+      if (id !== null) release(); // (the earlier press never reported its lift: let go of it first)
       id = e.pointerId;
       b.setPointerCapture(e.pointerId);
       b.classList.add('on');
       held.add(release);
       onDown();
     });
-    for (const type of ['pointerup', 'pointercancel']) b.addEventListener(type, (e) => { if (e.pointerId === id) release(); });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(type, (e) => { if (e.pointerId === id) release(); });
     return b;
   }
   // one tap does one thing

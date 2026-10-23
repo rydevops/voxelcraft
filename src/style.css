@@ -228,6 +228,31 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 #fullmap-pos { color: #ffe27a; }
 #fullmap-hint { position: absolute; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom)); margin: 0; text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.75); text-shadow: 1px 1px 0 #000; pointer-events: none; }
 
+.mm-row[hidden] { display: none; }
+
+/* ---- the HUD panels can be folded away by tapping them, hidden, and moved (hudpanels.js) ---- */
+#mm-info, #goals { pointer-events: auto; cursor: pointer; position: relative; }
+#mm-info { padding-right: 34px; }
+#hud-gear { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; min-width: 0; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+#hud-gear img { width: 22px; height: 22px; image-rendering: pixelated; pointer-events: none; opacity: 0.85; }
+#hud-gear:hover { background: rgba(255, 255, 255, 0.12); }
+.chev { display: inline-block; width: 0; height: 0; margin-right: 7px; border: 5px solid transparent; border-top: 7px solid #ffe27a; border-bottom: 0; vertical-align: 2px; }
+#goals.collapsed .chev { border: 5px solid transparent; border-left: 7px solid #ffe27a; border-right: 0; vertical-align: 0; }
+#goals.collapsed ul { display: none; }
+#goals.collapsed h3 { margin-bottom: 0; }
+#mm-info.collapsed { padding-top: 4px; padding-bottom: 4px; min-height: 34px; }
+#mm-info.collapsed .mm-row:not([data-hud="gameTime"]) { display: none; }
+.hud-free { position: fixed !important; transform: translate(-50%, -50%) scale(var(--hud, 1)) !important; transform-origin: center !important; right: auto !important; bottom: auto !important; margin: 0 !important; z-index: 6; }
+#mm-info.hud-free, #goals.hud-free { width: 250px; }
+body.hudedit #minimap, body.hudedit #mm-info, body.hudedit #goals { pointer-events: auto; outline: 2px dashed rgba(255, 226, 122, 0.95); outline-offset: 3px; cursor: grab; z-index: 7; touch-action: none; }
+#hud-shield { position: fixed; inset: 0; z-index: 6; touch-action: none; }
+#hud-menu { position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; }
+#hud-menu[hidden] { display: none; }
+.hud-menu-panel { width: min(420px, 92vw); display: flex; flex-direction: column; gap: 8px; padding: 14px 18px; background: #46464e; border: 4px solid #111; border-top-color: #8a8a94; border-left-color: #8a8a94; transform: scale(var(--fit, 1)); transform-origin: center; }
+.hud-menu-panel h2 { margin: 0; text-align: center; text-shadow: 2px 2px 0 #000; }
+.hud-menu-buttons { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+.hud-menu-buttons button { min-width: 0; }
+
 /* ---- instant item tooltip ---- */
 #item-tip { position: fixed; z-index: 31; padding: 6px 10px; background: rgba(16, 10, 28, 0.96); border: 2px solid #3a1f6e; border-top-color: #6a46b8; border-left-color: #6a46b8; font-size: 14px; pointer-events: none; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45); white-space: nowrap; }
 #item-tip[hidden] { display: none; }
@@ -235,7 +260,7 @@ body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px;
 #item-tip span { display: block; margin-top: 2px; font-size: 12px; color: #9fd0ff; }
 
 /* ---- startup: developer logo, title, world selection ---- */
-body.startup #fullmap, body.startup .bagbtn, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
+body.startup #fullmap, body.startup #hud-menu, body.startup #minimap, body.startup #mm-info, body.startup .bagbtn, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
 body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #debug, body.startup #underwater { display: none !important; }
 #intro { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; align-items: center; justify-content: center; }
 #intro[hidden], #title[hidden], #worlds[hidden], #loading[hidden] { display: none; }
@@ -251,6 +276,8 @@ body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #deb
 #title-logo { width: min(86vw, 640px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.45)); animation: bob 3.2s ease-in-out infinite; }
 #title-tag { margin: 0 0 14px; color: #ffe27a; text-shadow: 2px 2px 0 #3a3000; font-size: 15px; text-align: center; }
 #title-menu button { min-width: 320px; }
+#fs-hint { max-width: 320px; margin: 0; padding: 8px 10px; background: rgba(0, 0, 0, 0.55); border: 2px solid #111; font-size: 13px; line-height: 1.35; color: #ffe27a; text-align: center; }
+#fs-hint[hidden] { display: none; }
 #title-credit { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; text-align: center; color: rgba(255, 255, 255, 0.7); text-shadow: 1px 1px 0 #000; font-size: 13px; }
 #title-version { position: absolute; bottom: 14px; left: max(14px, env(safe-area-inset-left)); margin: 0; color: rgba(255, 255, 255, 0.55); text-shadow: 1px 1px 0 #000; font-size: 12px; }
 
@@ -338,14 +365,14 @@ body.touch #hud-right { z-index: 6; }
 body.touch #minimap { width: 120px; height: 120px; }
 body.touch #mm-info, body.touch #goals { font-size: 15px; }
 body.touch #goals h3 { font-size: 15px; }
-body.touch > #goals { position: fixed; z-index: 4; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }
+body.touch > #goals { position: fixed; z-index: 6; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }
 body.touch #controls, body.touch #debug { display: none; }
 body.touch button:hover:not(:disabled) { background: #7a7a82; }
 body.touch #hotbar { z-index: 6; }
 #rotate { display: none; position: fixed; inset: 0; z-index: 60; align-items: center; justify-content: center; padding: 24px; text-align: center; background: #15110e; color: #ffe27a; font-size: 20px; }
 @media (orientation: portrait) { body.touch #rotate { display: flex; } }
 
-:root { --tb: clamp(48px, 13vmin, 84px); --big: calc(var(--tb) * 1.3); --stick: clamp(112px, 31vmin, 176px); --pad: 3.5vmin; --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); --sb: env(safe-area-inset-bottom); --st: env(safe-area-inset-top); }
+:root { --tb: clamp(48px, 13vmin, 84px); --big: calc(var(--tb) * 1.3); --sm: calc(var(--tb) * 0.86); --stick: clamp(112px, 31vmin, 176px); --pad: 3.5vmin; --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); --sb: env(safe-area-inset-bottom); --st: env(safe-area-inset-top); }
 #touch { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
 body.touch #touch:not([hidden]) { display: block; }
 .tz { position: absolute; top: 0; bottom: 0; pointer-events: auto; touch-action: none; }
@@ -363,13 +390,16 @@ body.touch #touch:not([hidden]) { display: block; }
 .tb[hidden] { display: none; }
 .tb.on { background: rgba(255, 226, 122, 0.6); border-color: #ffe27a; }
 .tb.on img { filter: brightness(0.25) contrast(1.2); }
+/* Everything the right thumb does sits in an arc around the corner where it rests: attack in the corner, use right above it, jump just
+   beside them, and sprint and crouch a little further out (all clear of the loot bag on the hotbar and of the HUD panels above). */
 .tb.attack, .tb.use { width: var(--big); height: var(--big); right: calc(var(--pad) + var(--sr)); }
 .tb.attack { bottom: calc(var(--pad) + var(--sb)); background: rgba(190, 60, 50, 0.55); }
-.tb.use { bottom: calc(var(--pad) + var(--sb) + var(--big) + 1.5vmin); background: rgba(50, 120, 190, 0.55); }
-.tb.jump { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 1.5vmin); }
-.tb.fly { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 1.5vmin + var(--tb) + 1.5vmin); }
-.tb.sprint { left: calc(var(--pad) + var(--sl)); bottom: calc(var(--pad) + var(--sb) + var(--stick) + 2vmin); }
-.tb.crouch { left: calc(var(--pad) + var(--sl) + var(--tb) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--stick) + 2vmin); }
+.tb.use { bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin); background: rgba(50, 120, 190, 0.55); }
+.tb.jump, .tb.sprint, .tb.crouch, .tb.fly { width: var(--sm); height: var(--sm); }
+.tb.jump { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin); }
+.tb.sprint { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin + var(--sm) + 1.5vmin); }
+.tb.crouch { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin + var(--sm) + 1.5vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin); }
+.tb.fly { right: calc(var(--pad) + var(--sr) + var(--big) + 2vmin + var(--sm) + 1.5vmin); bottom: calc(var(--pad) + var(--sb) + var(--big) + 2vmin + var(--sm) + 1.5vmin); }
 .tb.menu { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); left: calc(2vmin + var(--sl)); border-radius: 12px; font-size: 14px; }
 
 /* the loot bag: a square button attached to the right end of the hotbar (the hotbar is 534 px wide, scaled by --hud) */
