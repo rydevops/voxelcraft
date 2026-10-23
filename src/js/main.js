@@ -583,7 +583,7 @@ function die(cause) {
   refreshHotbar();
   $('death-cause').textContent = cause + (spilled ? '. Your things are where you fell.' : '');
   $('death').hidden = false;
-  document.exitPointerLock();
+  document.exitPointerLock?.(); // (iPhone Safari has no Pointer Lock API at all)
   setPlaying(false);
 }
 function respawn() {
@@ -701,7 +701,7 @@ function openScreen(kind, context = 'hand', at = null) {
   if (kind === 'inv') ui.openInventory(slot, context, at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
   else if (kind === 'map') fullMap.open();
   else ui.openPalette();
-  document.exitPointerLock();
+  document.exitPointerLock?.(); // (iPhone Safari has no Pointer Lock API at all)
   if (AUTOPLAY || touchMode) setPlaying(false); // (no pointer lock to lose, so there is no unlock event to pause us)
 }
 function hideScreen() {
@@ -892,9 +892,13 @@ async function quitToTitle() {
   quitting = true;
   $('quitbtn').disabled = true;
   $('quitbtn').textContent = 'Saving...';
-  document.exitPointerLock();
-  flushWorld();
-  await save_();
+  document.exitPointerLock?.(); // (iPhone Safari has no Pointer Lock API at all)
+  // Whatever goes wrong while saving, leave anyway: a stuck "Saving..." button traps the player. (The world is also saved every 10 s
+  // and whenever the page is hidden, so waiting longer than a few seconds for a stalled storage would gain little.)
+  try {
+    flushWorld();
+    await Promise.race([save_(), new Promise((resolve) => setTimeout(resolve, 8000))]);
+  } catch (err) { console.error('Save & Quit: could not save before leaving', err); }
   skipSave = true; // nothing may write to the world again after this
   location.href = '?title';
 }
