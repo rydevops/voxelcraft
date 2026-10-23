@@ -8,6 +8,7 @@ released those lines move under a new version heading. The list of everything th
 ## [Unreleased]
 
 ### Added
+- **Look while holding a button.** On a touch device a finger resting on any on-screen button (Break, Use, Jump, Run, Sneak...) can drag to turn the camera, so you can keep mining or placing while you look around. The button stays pressed until the finger lifts; a plain tap does not turn the camera.
 - **Biomes.** The land is now plains, forests, hills, mountains, deserts and tundra, each a few hundred blocks wide. Plains and forests are very flat, hills roll, mountains are tall with bare rock and snow caps, deserts are sand with low dunes and no trees, tundra is snowy with spruces. Climate (temperature, wetness, relief) picks the biome; it is all data in `worldgen.json` "biomes". **New worlds only:** worlds you were already playing keep their original terrain so your builds do not change.
 - **Full-screen map.** Tap the minimap (or press **N**) for a map of everything you have seen, with your arrow. Drag to move, scroll or pinch to zoom, *Find me* to come back. The map remembers ground you have walked away from.
 - **Tree leaves rustle** in the wind, the same wind that sways the grass.

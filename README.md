@@ -43,7 +43,7 @@ On a touch device (primary pointer is a finger) the game switches to on-screen c
 | Control | What it does |
 |---|---|
 | Left thumb, anywhere on the left | Floating move stick (analog: walk slowly or fast); push it to the rim to sprint |
-| Drag on the right | Look around |
+| Drag on the right | Look around (a finger held on any button can drag to look too) |
 | **Break** (hold) / **Use** (hold) | Left click / right click: mine, attack, place, open, till, plant, eat |
 | **Jump** (tap twice in creative to fly) · **Run** · **Sneak** | Jump / swim up, latch sprint, crouch / fly down |
 | **Fly** (creative) | Toggle flying |
