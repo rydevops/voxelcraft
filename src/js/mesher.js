@@ -5,7 +5,7 @@
 // (added on top untinted, so a torch still glows at night) and the face shading that the dim floor is multiplied by
 // (so a cave with no light is dim but never black, whatever the time of day).
 import { CS, CH, idx } from './world.js';
-import { B, FACE_TILE, OPAQUE, GLOW, PLANT, LEAN, PLANT_H, IS_WATER, WATER_LEVEL, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
+import { B, FACE_TILE, OPAQUE, GLOW, PLANT, LEAN, PLANT_H, IS_WATER, ROLE_LEAF, WATER_LEVEL, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
 import { hash2 } from './noise.js';
 import { skyBrightness, blockBrightness, MAX_LIGHT } from './light.js';
 
@@ -107,6 +107,7 @@ function addPlant(buf, kind, x, y, z, u0, v0, us, vs, wx, wz, sky, blk) {
 // lean = [dx, dz] points away from the wall it hangs on; [0, 0] stands on the floor.
 const TORCH_CORNERS = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
 const TORCH_GLOW = 0.78;
+const LEAF_SWAY = 0.85; // wind weight of every leaf vertex (grass tips are 1, its roots 0)
 function addTorch(buf, x, y, z, lean, height, u0, v0, us, vs, sky) {
   const hw = 0.0625, wall = lean[0] !== 0 || lean[1] !== 0;
   const y0 = wall ? 0.2 : 0, y1 = y0 + height;
@@ -141,6 +142,7 @@ export function meshChunk(world, chunk) {
   const solid = new Buf();  // opaque + cutout (leaves, glass)
   const water = new Buf();
   const plants = new Buf(); // swaying foliage, drawn with its own wind material
+  const leaves = new Buf(); // tree leaves: ordinary cubes that rustle in the same wind (every vertex sways, so cubes never tear apart)
   const inset = 0.0004;
   const tsU = 1 / ATLAS_COLS, tsV = 1 / ATLAS_ROWS;
 
@@ -161,7 +163,7 @@ export function meshChunk(world, chunk) {
           continue;
         }
         const isWater = IS_WATER[id] === 1;
-        const buf = isWater ? water : solid;
+        const buf = isWater ? water : ROLE_LEAF[id] ? leaves : solid;
         const px = x + 1, py = y + 1, pz = z + 1;
         const hSelf = isWater ? waterHeight(pad, px, py, pz, id) : 1;
 
@@ -239,6 +241,7 @@ export function meshChunk(world, chunk) {
             const l = shade * vSky[c];
             buf.col.push(l, l, l);
             buf.blk.push(shade * vBlk[c], shade);
+            if (buf === leaves) buf.sway.push(LEAF_SWAY);
           }
           // Flip the diagonal so AO gradients don't produce a visible seam
           const dark = (c) => (isWater ? 0 : AO_LEVELS[ao[c]]) * (vSky[c] + vBlk[c]);
@@ -256,5 +259,6 @@ export function meshChunk(world, chunk) {
     solid: solid.empty ? null : solid.finish(),
     water: water.empty ? null : water.finish(),
     plants: plants.empty ? null : plants.finish(),
+    leaves: leaves.empty ? null : leaves.finish(),
   };
 }

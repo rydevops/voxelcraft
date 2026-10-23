@@ -17,7 +17,9 @@ function toGeometry(buf) {
 }
 
 export class ChunkRenderer {
-  constructor(scene, world, materials, radius = 6) {
+  // onUnload(chunk): called just before a far chunk is dropped (the map remembers what it looked like)
+  constructor(scene, world, materials, radius = 6, onUnload = null) {
+    this.onUnload = onUnload;
     this.world = world;
     this.mats = materials;
     this.radius = radius;
@@ -48,6 +50,7 @@ export class ChunkRenderer {
     const keep = R + 2;
     for (const [k, c] of this.world.chunks) {
       if (Math.max(Math.abs(c.cx - pcx), Math.abs(c.cz - pcz)) > keep) {
+        this.onUnload?.(c);
         this.disposeMeshes(c);
         this.world.chunks.delete(k);
       }
@@ -84,6 +87,7 @@ export class ChunkRenderer {
     };
     add(out.solid, this.mats.solid, 0);
     add(out.plants, this.mats.plant, 0);
+    add(out.leaves, this.mats.leaves, 0);
     add(out.water, this.mats.water, 1);
     c.dirty = false;
   }

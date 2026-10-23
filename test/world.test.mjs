@@ -114,4 +114,62 @@ assert.equal(world.getBlock(CS + 4, 10, CS + 5), c0.data[idx(4, 10, 5)]);
   assert.equal(new World(1337).serializeLegacy().length, 0);
 }
 
+// ---- biomes: flat plains, forests, hills, mountains, deserts and tundra ----
+{
+  const w = new World(1337);
+  const seen = {}, rough = {}, tops = {};
+  for (const seed of [1337, 42]) {
+    const bw = new World(seed);
+    for (let x = -1500; x < 1500; x += 12) for (let z = -1500; z < 1500; z += 12) {
+      const b = bw.biomeAt(x, z), h = bw.heightAt(x, z), hx = bw.heightAt(x + 4, z), hz = bw.heightAt(x, z + 4);
+      seen[b] = (seen[b] || 0) + 1;
+      if (h > SEA + 1 && hx > SEA + 1 && hz > SEA + 1) { const r = (rough[b] ??= { sum: 0, n: 0 }); r.sum += Math.abs(h - hx) + Math.abs(h - hz); r.n++; }
+      (tops[b] ??= []).push(h);
+    }
+  }
+  const total = Object.values(seen).reduce((a, b) => a + b, 0);
+  for (const b of ['plains', 'forest', 'hills', 'mountains', 'desert', 'tundra']) assert.ok(seen[b] / total > 0.04, `${b} covers a fair share of the world (${((seen[b] || 0) / total * 100).toFixed(1)}%)`);
+  const r = (b) => rough[b].sum / rough[b].n;
+  console.log('dry roughness: plains ' + r('plains').toFixed(2) + ', forest ' + r('forest').toFixed(2) + ', hills ' + r('hills').toFixed(2) + ', mountains ' + r('mountains').toFixed(2));
+  assert.ok(r('plains') < 0.7 && r('forest') < 0.7, 'plains and forests are flat');
+  assert.ok(r('hills') > 2 * r('plains'), 'hills roll much more than plains');
+  assert.ok(r('mountains') > r('hills'), 'mountains are the roughest');
+  const mean = (b) => tops[b].reduce((a, c) => a + c, 0) / tops[b].length;
+  assert.ok(mean('mountains') > mean('plains') + 12, 'mountains stand well above the plains');
+  assert.ok(tops.mountains.reduce((a, c) => Math.max(a, c), 0) >= 44, 'mountains reach the snow line');
+  assert.ok(Object.values(tops).every((t) => t.reduce((a, c) => Math.max(a, c), 0) < CH), 'terrain fits the world');
+
+  // what each biome is made of: deserts are sand, tundra is snow, high mountains are bare rock, and no trees grow in a desert
+  const find = (kind) => { for (let x = -1500; x < 1500; x += 8) for (let z = -1500; z < 1500; z += 8) { const h = w.heightAt(x, z); if (w.biomeAt(x, z) === kind && h > SEA + 2 && h < 44) return { x, z, h }; } return null; };
+  const des = find('desert'), tun = find('tundra');
+  assert.ok(des && tun, 'found a desert and a tundra');
+  w.generateChunk(des.x >> 4, des.z >> 4); w.generateChunk(tun.x >> 4, tun.z >> 4);
+  assert.equal(w.getBlock(des.x, des.h, des.z), B.SAND, 'a desert is sand');
+  assert.equal(w.getBlock(des.x, des.h - 3, des.z), B.SAND, 'and sand underneath');
+  assert.equal(w.getBlock(tun.x, tun.h, tun.z), B.SNOW, 'tundra is covered in snow');
+  let desertTrees = 0, forestTrees = 0, plainsTrees = 0;
+  for (let x = -1500; x < 1500; x += 2) for (let z = -300; z < 300; z += 2) {
+    const k = w.biomeAt(x, z);
+    if (k === 'desert' && w.hasTree(x, z)) desertTrees++;
+    else if (k === 'forest' && w.hasTree(x, z)) forestTrees++;
+    else if (k === 'plains' && w.hasTree(x, z)) plainsTrees++;
+  }
+  assert.equal(desertTrees, 0, 'no trees in a desert');
+  assert.ok(forestTrees > plainsTrees * 2, `forests are much denser than plains (${forestTrees} vs ${plainsTrees})`);
+}
+
+// worlds that were played before the biomes keep the original terrain exactly
+{
+  const classic = new World(1337, { terrain: 1 }), modern = new World(1337);
+  assert.equal(classic.terrain, 1); assert.equal(modern.terrain, 2);
+  assert.equal(classic.biomeAt(10, 10), null);
+  let differ = 0;
+  for (let x = -300; x < 300; x += 15) for (let z = -300; z < 300; z += 15) if (classic.heightAt(x, z) !== modern.heightAt(x, z)) differ++;
+  assert.ok(differ > 50, 'the two terrains are different');
+  assert.equal(classic.heightAt(123, -456), new World(1337, { terrain: 1 }).heightAt(123, -456), 'and the original one is stable');
+  // the exact heights the original terrain gave before the biomes existed (guards against editing it by accident)
+  const c1 = new World(1337, { terrain: 1 });
+  assert.deepEqual([[0, 0], [123, -456], [300, 200], [-250, 90]].map(([x, z]) => c1.heightAt(x, z)), [20, 27, 23, 30]);
+}
+
 console.log('all world tests passed');

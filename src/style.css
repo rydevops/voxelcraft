@@ -138,6 +138,12 @@ button.wide { min-width: 304px; }
 .opt-tabs button.active { background: #6c7fbd; }
 .opt-body { overflow-y: auto; padding: 4px 8px; display: flex; flex-direction: column; gap: 8px; min-height: 280px; }
 .opt-body[hidden] { display: none; }
+/* peek (see options.js): while the field of view is being adjusted only its slider stays, so the world behind shows */
+#overlay, #title { transition: opacity 0.15s; }
+body.peek #overlay, body.peek #title { opacity: 0; pointer-events: none; }
+body.peek #options { background: transparent; }
+body.peek .opt-panel { visibility: hidden; }
+body.peek .opt-panel .opt-row.peeking { visibility: visible; padding: 10px 14px; background: rgba(20, 20, 24, 0.82); border: 3px solid #111; }
 .opt-row { display: grid; grid-template-columns: 210px 1fr 56px; align-items: center; gap: 12px; font-size: 14px; }
 .opt-row.toggle { grid-template-columns: 24px 1fr; }
 .opt-row input[type=range] { width: 100%; accent-color: #ffe27a; }
@@ -211,6 +217,17 @@ button.wide { min-width: 304px; }
 .mm-sub { margin-top: -1px; justify-content: flex-end; font-size: 11px; }
 .mm-sub span { color: #8f94a6; }
 
+/* ---- full-screen map ---- */
+#minimap { pointer-events: auto; cursor: pointer; }
+#fullmap { position: fixed; inset: 0; z-index: 30; background: #0c0f13; touch-action: none; }
+#fullmap[hidden] { display: none; }
+#fullmap-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#fullmap-canvas.drag { cursor: grabbing; }
+#fullmap-bar { position: absolute; left: 50%; top: calc(10px + env(safe-area-inset-top)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(20, 20, 26, 0.88); border: 2px solid #111; font-size: 14px; white-space: nowrap; }
+#fullmap-bar button { min-width: 0; padding: 6px 12px; }
+#fullmap-pos { color: #ffe27a; }
+#fullmap-hint { position: absolute; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom)); margin: 0; text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.75); text-shadow: 1px 1px 0 #000; pointer-events: none; }
+
 /* ---- instant item tooltip ---- */
 #item-tip { position: fixed; z-index: 31; padding: 6px 10px; background: rgba(16, 10, 28, 0.96); border: 2px solid #3a1f6e; border-top-color: #6a46b8; border-left-color: #6a46b8; font-size: 14px; pointer-events: none; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45); white-space: nowrap; }
 #item-tip[hidden] { display: none; }
@@ -218,7 +235,7 @@ button.wide { min-width: 304px; }
 #item-tip span { display: block; margin-top: 2px; font-size: 12px; color: #9fd0ff; }
 
 /* ---- startup: developer logo, title, world selection ---- */
-body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #blockname, body.startup #lookat,
+body.startup #fullmap, body.startup #crosshair, body.startup #hotbar, body.startup #bars, body.startup #hud-right, body.startup #goals, body.startup #blockname, body.startup #lookat,
 body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #debug, body.startup #underwater { display: none !important; }
 #intro { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; align-items: center; justify-content: center; }
 #intro[hidden], #title[hidden], #worlds[hidden], #loading[hidden] { display: none; }
@@ -235,6 +252,7 @@ body.startup #eatbar, body.startup #toast, body.startup #hurt, body.startup #deb
 #title-tag { margin: 0 0 14px; color: #ffe27a; text-shadow: 2px 2px 0 #3a3000; font-size: 15px; text-align: center; }
 #title-menu button { min-width: 320px; }
 #title-credit { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; text-align: center; color: rgba(255, 255, 255, 0.7); text-shadow: 1px 1px 0 #000; font-size: 13px; }
+#title-version { position: absolute; bottom: 14px; left: max(14px, env(safe-area-inset-left)); margin: 0; color: rgba(255, 255, 255, 0.55); text-shadow: 1px 1px 0 #000; font-size: 12px; }
 
 #worlds { position: fixed; inset: 0; z-index: 21; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.8)), var(--dirt, #5a4030); background-size: auto, 64px 64px; image-rendering: pixelated; }
 .world-panel { width: min(92vw, 640px); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px; background: rgba(15, 15, 18, 0.78); border: 3px solid #111; }
@@ -314,12 +332,19 @@ body.touch .pc-only { display: none; }
 #death { align-items: center; }
 
 /* ---- touch mode ---- */
+/* Phones are short: the minimap shrinks, the real-time row goes (the phone has a clock) and the goals move to the top left, under
+   the menu buttons (main.js moves #goals out of #hud-right), with larger text than the desktop HUD. */
+body.touch #hud-right { z-index: 6; }
+body.touch #minimap { width: 120px; height: 120px; }
+body.touch #mm-info .mm-row:first-child { display: none; }
+body.touch #mm-info, body.touch #goals { font-size: 15px; }
+body.touch #goals h3 { font-size: 15px; }
+body.touch > #goals { position: fixed; z-index: 4; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }
 body.touch #controls, body.touch #debug { display: none; }
 body.touch button:hover:not(:disabled) { background: #7a7a82; }
 body.touch #hotbar { z-index: 6; }
 #rotate { display: none; position: fixed; inset: 0; z-index: 60; align-items: center; justify-content: center; padding: 24px; text-align: center; background: #15110e; color: #ffe27a; font-size: 20px; }
 @media (orientation: portrait) { body.touch #rotate { display: flex; } }
-@media (max-height: 520px) { body.touch #goals { display: none; } }
 
 :root { --tb: clamp(46px, 12vmin, 78px); --big: calc(var(--tb) * 1.3); --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); --sb: env(safe-area-inset-bottom); --st: env(safe-area-inset-top); }
 #touch { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
@@ -345,10 +370,17 @@ body.touch #touch:not([hidden]) { display: block; }
 .tb.fly { right: calc(3vmin + var(--sr) + var(--big) + 2vmin); bottom: calc(5vmin + var(--sb) + var(--tb) + 1.5vmin); }
 .tb.sprint { left: calc(12vmin + var(--sl)); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
 .tb.crouch { left: calc(12vmin + var(--sl) + var(--tb) + 2vmin); bottom: calc(14vmin + var(--sb) + 116px + 1.5vmin); }
-.tb.menu, .tb.inv, .tb.off { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); border-radius: 12px; font-size: clamp(10px, calc(var(--tb) * 0.2), 14px); }
+.tb.menu, .tb.inv { width: calc(var(--tb) * 0.8); height: calc(var(--tb) * 0.8); top: calc(2vmin + var(--st)); border-radius: 12px; font-size: clamp(10px, calc(var(--tb) * 0.2), 14px); }
 .tb.menu { left: calc(2vmin + var(--sl)); }
 .tb.inv { left: calc(2vmin + var(--sl) + var(--tb) * 0.8 + 1.5vmin); }
-.tb.off { left: calc(2vmin + var(--sl) + (var(--tb) * 0.8 + 1.5vmin) * 2); }
+
+/* layout editor (touch.js edit()): the zones stop catching fingers so the buttons can be dragged */
+#touch.editing .tz, #touch.editing .stick { display: none; }
+#touch.editing .tb { outline: 2px dashed rgba(255, 226, 122, 0.9); outline-offset: 3px; cursor: grab; }
+#touch.editing .tb.moving { background: rgba(255, 226, 122, 0.45); cursor: grabbing; }
+.tedit { position: fixed; z-index: 8; left: 50%; top: calc(8px + var(--st)); transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: rgba(20, 20, 26, 0.88); border: 2px solid #111; font-size: 14px; white-space: nowrap; }
+.tedit[hidden] { display: none; }
+.tedit button { min-width: 0; padding: 6px 14px; }
 
 /* above the inventory / creative palette: close it, and choose what a tap does */
 #t-close { position: fixed; z-index: 12; top: calc(10px + var(--st)); right: calc(10px + var(--sr)); font-size: 22px; border-radius: 12px; background: rgba(120, 30, 30, 0.8); }

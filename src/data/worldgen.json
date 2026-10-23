@@ -20,7 +20,14 @@
     "hillHeight": 7,
     "ridgeScale": 0.011,
     "ridgeHeight": 24,
-    "baseAboveSea": 5
+    "baseAboveSea": 5,
+    "plainsHills": 1.3,
+    "rollingHills": 9,
+    "mountainHeight": 22,
+    "mountainUplift": 5,
+    "duneHeight": 2.6,
+    "duneScale": 0.035,
+    "flatContinent": 0.3
   },
   "rivers": {
     "scale": 0.0065,
@@ -102,7 +109,12 @@
           6
         ],
         "log": "log",
-        "leaves": "leaves"
+        "leaves": "leaves",
+        "biomes": [
+          "plains",
+          "forest",
+          "hills"
+        ]
       },
       {
         "key": "apple",
@@ -117,7 +129,11 @@
           5
         ],
         "log": "log",
-        "leaves": "apple_leaves"
+        "leaves": "apple_leaves",
+        "biomes": [
+          "plains",
+          "forest"
+        ]
       },
       {
         "key": "birch",
@@ -132,13 +148,18 @@
           7
         ],
         "log": "birch_log",
-        "leaves": "birch_leaves"
+        "leaves": "birch_leaves",
+        "biomes": [
+          "plains",
+          "forest",
+          "hills"
+        ]
       },
       {
         "key": "spruce",
         "weight": 4,
         "heights": [
-          30,
+          26,
           99
         ],
         "shape": "cone",
@@ -147,7 +168,12 @@
           9
         ],
         "log": "spruce_log",
-        "leaves": "spruce_leaves"
+        "leaves": "spruce_leaves",
+        "biomes": [
+          "tundra",
+          "mountains",
+          "hills"
+        ]
       },
       {
         "key": "tall_oak",
@@ -162,7 +188,10 @@
           11
         ],
         "log": "log",
-        "leaves": "leaves"
+        "leaves": "leaves",
+        "biomes": [
+          "forest"
+        ]
       },
       {
         "key": "bush",
@@ -177,7 +206,14 @@
           2
         ],
         "log": "log",
-        "leaves": "leaves"
+        "leaves": "leaves",
+        "biomes": [
+          "plains",
+          "forest",
+          "hills",
+          "mountains",
+          "tundra"
+        ]
       }
     ]
   },
@@ -203,5 +239,58 @@
     "treeRadius": 10,
     "waterRadius": 28
   },
-  "beachAboveSea": 1
+  "beachAboveSea": 1,
+  "biomes": {
+    "_comment": "Climate decides the biome of every column. Three slow noise fields: temp (cold..hot), wet (dry..wet) and rel (relief: flat..mountainous), each mostly between -0.35 and 0.35; climateScale is how stretched they are (smaller = bigger biomes). select gives the cut-offs: relief above mountainRel is mountains, above hillsRel is hills; hotter than hotTemp and drier than dryWet is desert, colder than coldTemp is tundra, wetter than forestWet is forest, anything else is plains. blend is how wide the smooth change of terrain shape between two biomes is, in climate units. A biome picks its own ground blocks (surface / filler / fillerDepth), rockFrom (the surface turns to bare stone from this height up) and a trees multiplier on the tree density (denseMin: forests are never thinner than this share of the densest).",
+    "climateScale": 0.0014,
+    "select": {
+      "mountainRel": 0.19,
+      "hillsRel": 0.07,
+      "hotTemp": 0.13,
+      "dryWet": -0.02,
+      "coldTemp": -0.2,
+      "forestWet": 0.04,
+      "blend": 0.08
+    },
+    "types": {
+      "plains": {
+        "surface": "grass",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 0.3
+      },
+      "forest": {
+        "surface": "grass",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 1.0,
+        "denseMin": 0.6
+      },
+      "hills": {
+        "surface": "grass",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 0.55
+      },
+      "mountains": {
+        "surface": "grass",
+        "filler": "dirt",
+        "fillerDepth": 2,
+        "trees": 0.3,
+        "rockFrom": 36
+      },
+      "desert": {
+        "surface": "sand",
+        "filler": "sand",
+        "fillerDepth": 5,
+        "trees": 0
+      },
+      "tundra": {
+        "surface": "snow",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 0.4
+      }
+    }
+  }
 }

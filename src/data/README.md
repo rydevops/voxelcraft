@@ -114,7 +114,7 @@ Without the right tool a block drops nothing.
 * `tiles` (the order is the atlas order) - block textures. Each is `{ "type": ..., ...settings }`:
   * `noise` - base colour with blotchy variation, speckles, optional transparent `holes` and darker `edge` (grass, dirt, stone, sand, leaves, snow)
   * `capped` - top rows from one tile, the rest from another (`cap`, `body`, `depth`)
-  * `bark`, `rings`, `planks`, `cells` (cobblestone), `waves` (water), `bricks`, `ore` (lumps of ore set into a base tile, `clusters` = how many, `color` and `light` for the lump and its lit edge), `stripes` (farmland),
+  * `bark`, `rings`, `planks`, `cells` (cobblestone), `waves` (water; optional `seed` pins the ripple pattern and `phase`, in radians, slides it along, which is how the water animates), `bricks`, `ore` (lumps of ore set into a base tile, `clusters` = how many, `color` and `light` for the lump and its lit edge), `stripes` (farmland),
     `blades` (grass tufts, young crops), `stalks` (ripe wheat) - parameters are the colours and sizes you see in the file
   * `pixelart` - draw it yourself: `rows` of up to 16 characters, each looked up in `palette` (`[r,g,b]` or `[r,g,b,a]`); `.` is transparent
   * `image` - `{ "type": "image", "src": "textures/ruby.png" }` a PNG (any size, scaled to 16x16) placed next to these files
@@ -133,7 +133,8 @@ Each material is a list of layers played together: `{ "type": "noise", "filter":
 Sea level, snow line, which blocks form the surface and filler, terrain and river shape numbers, caves, `ores`
 (noise settings and height range - first match wins, so list rare ores first), `trees`, `groundCover` (grass tufts) and the spawn search.
 Caves: `scale`/`threshold` shape the thin winding tunnels, `caverns` (`scale`, `threshold`, `minY`, `maxY`, `surfaceDepth`) the wide chambers (lower threshold = bigger and more), and `entrances` (`scale`, `threshold`) the columns where tunnels may break through the surface.
-Changing it changes new terrain only; already generated and edited chunks keep what you built.
+`biomes`: three slow noise fields (`temp`, `wet`, `rel`, each mostly between -0.35 and 0.35, stretched by `climateScale`) choose a biome per column using the cut-offs in `select`. Each entry of `types` (`plains`, `forest`, `hills`, `mountains`, `desert`, `tundra`) names its `surface` and `filler` blocks and `fillerDepth`, an optional `rockFrom` height (above it the surface is bare stone) and a `trees` multiplier (`denseMin` keeps forests dense). The shape of the land comes from `terrain` (`plainsHills` / `rollingHills` = how bumpy flat and rolling country is, `mountainHeight`, `mountainUplift`, `duneHeight`, `flatContinent` = how much the big continent noise is flattened on dry land). A tree variant can list `biomes` it grows in.
+Changing it changes new terrain only; already generated and edited chunks keep what you built. A world records which terrain it uses (`terrain` in its save: 1 is the original rolling terrain, 2 the biomes), so playing worlds keep theirs.
 
 ## game.json
 
@@ -178,6 +179,6 @@ Every track is generated live (nothing is recorded). In the game a random track 
 * `worldgen.json` -> `trees.variants`: each tree kind has `key`, `weight`, `heights` (the terrain heights it grows at), `shape` (`round`, `tall`, `cone`, `bush`), `trunk` [min, max], and the `log` and `leaves` blocks. Give the log `"role": "log"` and the leaves `"role": "leaf"` so felling works. Leaves drop what their loot table says (blocks.json `loot` / `shatterLoot`).
 * `blocks.json` plant `"grows": { "trees": ["oak", "tall_oak"], "chancePerSecond": 0.012, "soil": ["grass", "dirt"] }` makes a block a sapling: it turns into one of those trees (picked at random from the list) when there is room. The sapling item is an item with `"plants": { "block": "young_oak", "on": ["grass", "dirt"] }`.
 * `"glow": 0.22` (0-1) on a block makes it shine for itself in the dark (ores) without lighting its neighbours; `light` is the one that lights things.
-* `textures.json` -> `animations`: `"torch": { "frames": ["torch", "torch_b", "torch_c"], "fps": 8 }` cycles those tiles into the atlas, so any block texture can flicker. The first frame must be the tile itself.
+* `textures.json` -> `animations`: `"torch": { "frames": ["torch", "torch_b", "torch_c"], "fps": 8 }` cycles those tiles into the atlas, so any block texture can flicker. Water uses it too: eight `waves` tiles with the same `seed` and growing `phase` loop into moving water. The first frame must be the tile itself.
 * `items.json` `"offhand": true` lets an item sit in the shield slot (torches). `game.json` `tools.wrongToolWear` is how many uses a tool loses on a block it is not made for.
 * `goals.json`: `{ "collectedAny": ["log", "birch_log"] }` completes when any of the listed items has been picked up.

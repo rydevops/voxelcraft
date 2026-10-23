@@ -61,6 +61,7 @@ export class Inventory {
   // Shift-click an inventory slot: wear it if it is wearable (what was worn goes back into that slot). Returns true if worn.
   quickEquip(i) {
     const st = this.slots[i];
+    if (st && isOffhand(st.id)) return this.quickOffhand(i);
     const slotId = st && equipOf(st.id)?.slot;
     if (!slotId || i >= this.capacity) return false;
     if (this.equipment[slotId] && isOffhand(this.equipment[slotId].id)) return false; // keep the offhand stack where it is
@@ -69,6 +70,21 @@ export class Inventory {
     const one = { id: st.id, n: 1, d: st.d };
     if (st.n > 1) { if (cur) return false; st.n -= 1; } else this.slots[i] = cur;
     this.equipment[slotId] = one;
+    return true;
+  }
+
+  // Shift-click a stack of torches: it goes into the shield slot (joining the torches already there, or taking the empty slot).
+  // A shield, or a different offhand item, stays where it is. Returns true if anything moved.
+  quickOffhand(i) {
+    const st = this.slots[i];
+    const cur = this.equipment.shield;
+    if (!st || i >= this.capacity) return false;
+    if (!cur) { this.equipment.shield = { ...st }; this.slots[i] = null; return true; }
+    if (cur.id !== st.id) return false;
+    const take = Math.min(maxStack(st.id) - cur.n, st.n);
+    if (take <= 0) return false;
+    cur.n += take;
+    if (take === st.n) this.slots[i] = null; else st.n -= take;
     return true;
   }
 

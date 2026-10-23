@@ -10,9 +10,10 @@ export const variantByKey = (key) => VARIANTS.find((v) => v.key === key);
 const OAK = variantByKey('oak') ?? VARIANTS[0]; // the original tree: chunks saved before the other kinds existed keep it
 
 // Which kind of tree grows at this column? Chosen by a hash of the position among the variants that suit the terrain height.
-export function pickVariant(seed, wx, wz, groundHeight, legacy = false) {
+// (`biome` is optional: when given, variants that list biomes only grow in those)
+export function pickVariant(seed, wx, wz, groundHeight, legacy = false, biome = null) {
   if (legacy) return OAK;
-  const ok = VARIANTS.filter((v) => groundHeight >= v.heights[0] && groundHeight <= v.heights[1]);
+  const ok = VARIANTS.filter((v) => groundHeight >= v.heights[0] && groundHeight <= v.heights[1] && (!biome || !v.biomes || v.biomes.includes(biome)));
   if (!ok.length) return OAK;
   let r = hash2(wx, wz, seed + 13) * ok.reduce((t, v) => t + v.weight, 0);
   for (const v of ok) { if (r < v.weight) return v; r -= v.weight; }

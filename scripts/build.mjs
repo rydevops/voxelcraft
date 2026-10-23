@@ -55,15 +55,22 @@ html = html.replace('<!--pwa:head-->', [
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">',
 ].join('\n  '));
 const register = `<script>
-    // offline support + installability: the service worker caches the app; tell the game when a newer one is ready
+    // offline support + installability: the service worker caches the app. Every time the app is opened (or brought back
+    // to the front) ask the server for a newer build; when one has been installed and taken over, tell the game
     if ('serviceWorker' in navigator) {
       const hadController = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.register('sw.js').catch(() => {});
-      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) window.dispatchEvent(new Event('vc-update')); });
+      // (a first visit came straight from the network, so there is nothing newer to look for until a worker is in charge)
+      const check = () => navigator.serviceWorker.ready.then((reg) => reg.update()).catch(() => {});
+      if (hadController) check();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && navigator.serviceWorker.controller) check(); });
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) { window.__vcUpdated = true; window.dispatchEvent(new Event('vc-update')); } });
     }
   </script>`;
 html = html.replace('<script type="module" src="js/main.js"></script>', `<script type="module" src="app.js"></script>\n  ${register}`);
+html = html.replace('<!--version-->dev build', 'v' + version); // shown on the title screen
 if (html.includes('js/main.js') || html.includes('importmap')) throw new Error('index.html still points at the unbundled source');
+if (html.includes('<!--version-->')) throw new Error('the version placeholder on the title screen was not filled in');
 outputs.set('index.html', html);
 
 // ---- 3. styles, manifest, service worker, icons ----

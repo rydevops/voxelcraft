@@ -37,8 +37,8 @@ function confirmButton(btn, armedLabel, action) {
 
 // ---- the world behind the title screen ----
 class TitleScene {
-  constructor({ scene, camera, materials, sky, renderer }) {
-    Object.assign(this, { scene, camera, materials, sky, renderer });
+  constructor({ scene, camera, materials, sky, renderer, settings, tickAtlas }) {
+    Object.assign(this, { scene, camera, materials, sky, renderer, settings, tickAtlas });
     this.world = new World(TITLE_SEED);
     this.chunks = new ChunkRenderer(scene, this.world, materials, 6);
     const c = this.world.findSpawn();
@@ -62,6 +62,10 @@ class TitleScene {
     const cam = this.camera;
     cam.position.set(this.cx + Math.cos(this.angle) * R, this.ground + 19 + bob, this.cz + Math.sin(this.angle) * R);
     cam.lookAt(this.cx, this.ground + 1, this.cz); // always looking down at the land, never out at the sky
+    // the Options field of view applies here too (75, the default, keeps the title as it was drawn at 68)
+    const fov = 68 + (this.settings.get('fov') - 75);
+    if (Math.abs(cam.fov - fov) > 0.01) { cam.fov += (fov - cam.fov) * Math.min(1, 8 * dt); cam.updateProjectionMatrix(); }
+    this.tickAtlas(this.elapsed); // moving water
     this.chunks.update(this.cx, this.cz, 8);
 
     const env = this.sky.update(this.dayTime, cam.position, this.elapsed);

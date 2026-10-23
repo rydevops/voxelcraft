@@ -25,6 +25,7 @@ import { buildAtlas, atlasAnimator, blockColors, hungerIcon, heartIcon, armorIco
 import { WaterSim } from './water.js';
 import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
+import { createFullMap } from './fullmap.js';
 import { runStartup } from './startup.js';
 import { openStorage } from './storage.js';
 import { createTouchControls } from './touch.js';
@@ -45,8 +46,21 @@ const forcedTouch = urlParams.has('touch') ? true : urlParams.has('desktop') ? f
 const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
 let touchMode = wantsTouch();
 document.body.classList.toggle('touch', touchMode);
-installFit();
+const refitHud = installFit(() => settings.get('hudSize')); // (also called when the HUD size changes, see applySettings)
 const params = new URLSearchParams(location.search);
+
+// A newer build of the game was installed (the registration script in the built index.html checks every time the app is
+// opened). Before a world is loaded, reload into it straight away, skipping the developer logo; during play just say so:
+// quitting to the title reloads the page, which picks it up.
+let inWorld = false;
+function onUpdate() {
+  if (inWorld) { toast('A new version is ready: it loads when you quit to the title.'); return; }
+  const url = new URL(location.href);
+  url.searchParams.set('title', '');
+  location.replace(url);
+}
+window.addEventListener('vc-update', onUpdate);
+if (window.__vcUpdated) onUpdate(); // it arrived before this script ran
 
 // Only one VoxelCraft tab can run at a time: two tabs would fight over the same saved world.
 async function claimGameSlot() {
@@ -117,6 +131,8 @@ const materials = {
   sprite: new THREE.MeshBasicMaterial({ vertexColors: true }), // items lying on the ground
   // grass + crops: cut-out crossed quads that sway in the wind (vertex shader driven by uTime and each vertex's height weight)
   plant: new THREE.MeshBasicMaterial({ map: atlasTex, vertexColors: true, alphaTest: 0.5, side: THREE.DoubleSide }),
+  // tree leaves: normal cubes, but with the same wind as the grass so the canopy rustles
+  leaves: new THREE.MeshBasicMaterial({ map: atlasTex, vertexColors: true, alphaTest: 0.5 }),
 };
 // Vertex colours carry the sky light; the time-of-day tint multiplies them in the shader, then the block light
 // ("aBlk": torches, a lit furnace) is added on top untinted, so lights still glow at night.
@@ -135,7 +151,7 @@ function withBlockLight(shader) {
 materials.solid.onBeforeCompile = withBlockLight;
 materials.water.onBeforeCompile = withBlockLight;
 const windTime = { value: 0 };
-materials.plant.onBeforeCompile = (shader) => {
+const withWind = (shader) => {
   withBlockLight(shader);
   shader.uniforms.uTime = windTime;
   shader.vertexShader = shader.vertexShader
@@ -147,6 +163,8 @@ materials.plant.onBeforeCompile = (shader) => {
       transformed.x += gust * 0.075 * aSway;
       transformed.z += cos(ph * 0.9 + wp.x * 0.3) * 0.05 * aSway;`);
 };
+materials.plant.onBeforeCompile = withWind;
+materials.leaves.onBeforeCompile = withWind;
 const sky = new Sky(scene, { sun: sunTexture(), moon: moonTexture(), glow: glowTexture() });
 sky.setPixelRatio(renderer.getPixelRatio());
 
@@ -162,6 +180,14 @@ const held = new THREE.Mesh(armGeo, heldArmMat);
 held.renderOrder = 999;
 held.frustumCulled = false;
 camera.add(held);
+// the offhand: a torch in the shield slot is held in the left hand
+const heldOff = new THREE.Mesh(armGeo, heldSpriteMat);
+heldOff.renderOrder = 999;
+heldOff.frustumCulled = false;
+heldOff.visible = false;
+camera.add(heldOff);
+let heldOffKey = 0;
+const OFF_POSE = { pos: [-0.56, -0.2, -0.72], rot: [0.12, 0.5, -0.06], scale: 0.4 };
 const POSES = {
   arm:    { pos: [0.5, -0.5, -0.55], rot: [0.55, -0.35, 0.15], scale: 1 },
   block:  { pos: [0.5, -0.46, -0.8], rot: [0.25, -0.6, 0.05], scale: 0.22 },
@@ -176,6 +202,17 @@ let pose = POSES.arm;
 let heldKey = -1;
 const _flipQ = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, 0).normalize(), Math.PI);
 const _swingQ = new THREE.Quaternion(), _swingE = new THREE.Euler(), _pivot = new THREE.Vector3();
+
+function refreshOffhand() {
+  const id = inventory.equipment.shield && isOffhand(inventory.equipment.shield.id) ? inventory.equipment.shield.id : 0;
+  if (id !== heldOffKey) { heldOffKey = id; if (id) heldOff.geometry = spriteGeometry(id, true); }
+  heldOff.visible = !!id && held.visible && !dead;
+  if (!heldOff.visible) return;
+  // sways a little with your steps, ahead of the other hand's swing
+  heldOff.position.set(OFF_POSE.pos[0] + Math.sin(bob + 1.3) * 0.01, OFF_POSE.pos[1] + Math.abs(Math.cos(bob + 1.3)) * 0.012 + Math.sin(elapsed * 7) * 0.002, OFF_POSE.pos[2]);
+  heldOff.rotation.set(OFF_POSE.rot[0], OFF_POSE.rot[1], OFF_POSE.rot[2]);
+  heldOff.scale.setScalar(OFF_POSE.scale);
+}
 
 function refreshHeld() {
   const st = stackAt(slot);
@@ -289,7 +326,11 @@ function updateParticles(dt) {
 // ---------------------------------------------------------------------------------------
 // Each world is a file on the server (worlds/<id>.json); the startup screens pick one (or create it).
 let optionsOpen = false;
-const options = createOptions(settings, { onClose: () => { optionsOpen = false; } });
+const options = createOptions(settings, {
+  onClose: () => { optionsOpen = false; },
+  // moving the touch buttons: only in a world on a touch device; afterwards the Options screen comes back
+  layout: { available: () => inWorld && touchMode, edit: () => touchCtl.edit(() => { optionsOpen = true; options.open(); }) },
+});
 held.visible = false;
 // The audio engine exists from the start so the title screen can play its theme. Browsers keep it silent until the first
 // click or key press; it starts then.
@@ -300,8 +341,10 @@ audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
 const storage = await openStorage(); // the dev server's worlds folder, or this browser's own storage (installed / hosted app)
 const startup = await runStartup({
   params, autoplay: AUTOPLAY, atlasCanvas, titleLogo: logoArt, openOptions: () => options.open(),
-  renderer, scene, camera, materials, sky, windTime, audio, storage,
+  renderer, scene, camera, materials, sky, windTime, audio, storage, settings,
+  tickAtlas: (t) => { if (animateAtlas(t)) atlasTex.needsUpdate = true; }, // water and flames animate on the title screen too
 });
+inWorld = true;
 held.visible = true;
 audio.setScene('game'); // from here on the shuffled soundtrack plays
 const worldId = startup.id;
@@ -311,16 +354,21 @@ const worldId = startup.id;
 // ---------------------------------------------------------------------------------------
 const save = startup.save;
 const seed = save?.seed ?? Math.floor(Math.random() * 2 ** 31);
-const world = new World(seed);
+// Worlds that were already played keep the original terrain (their builds sit on it); new worlds get the biome terrain
+const world = new World(seed, { terrain: save?.terrain ?? (save?.player ? 1 : 2) });
 if (save?.edits) world.loadEdits(save.edits, save.legacyCaves);
 
-const chunkRenderer = new ChunkRenderer(scene, world, materials, save?.radius ?? 6);
+const chunkRenderer = new ChunkRenderer(scene, world, materials, save?.radius ?? 6, (c) => mapData.chunkColumns(c)); // the map keeps what a chunk looked like when it unloads
 const player = new Player(world);
 const drops = new Drops(scene, world, materials.solid, materials.sprite);
 drops.load(save?.drops);
 // colour a block shows on the map: the average of its top texture
 const mapColor = (id) => { const t = avg[BLOCKS[id]?.top]; return t ? [t[0] * 255, t[1] * 255, t[2] * 255] : [90, 90, 90]; };
-const minimap = new MinimapView($('minimap'), new MinimapData(world, mapColor));
+const mapData = new MinimapData(world, mapColor);
+const minimap = new MinimapView($('minimap'), mapData);
+// tap the minimap (or press the map key) for the full-screen map
+const fullMap = createFullMap({ data: mapData, getPlayer: () => ({ x: player.pos.x, z: player.pos.z, yaw: player.yaw }), onClose: () => closeScreen() });
+$('minimap').addEventListener('click', () => { if (playing && !screen && !dead) openScreen('map'); });
 const waterSim = new WaterSim(world);
 // Blocks with "gravity" (sand) fall when unsupported; each falling block is drawn as a small cube until it lands
 const fallingBlockMeshes = new Map();
@@ -612,9 +660,9 @@ const touchCtl = createTouchControls({
     lastJump = now;
   },
   fly: () => setFlying(!player.flying),
-  offhand: () => { if (playing) useOffhand(); },
   inventory: () => { if (playing && !screen) openScreen(creative ? 'palette' : 'inv'); },
   closeScreen: () => closeScreen(),
+  layoutChanged: (l) => settings.set('touchLayout', l),
   menu: () => { if (!playing) return; setPlaying(false); $('play').textContent = 'Resume'; save_(); },
 });
 touchCtl.setEnabled(touchMode);
@@ -651,12 +699,13 @@ function setFlying(on) {
 function openScreen(kind, context = 'hand', at = null) {
   screen = kind;
   if (kind === 'inv') ui.openInventory(slot, context, at && WINDOWS[context]?.furnace ? furnaces.get(at.x, at.y, at.z) : null);
+  else if (kind === 'map') fullMap.open();
   else ui.openPalette();
   document.exitPointerLock();
   if (AUTOPLAY || touchMode) setPlaying(false); // (no pointer lock to lose, so there is no unlock event to pause us)
 }
 function hideScreen() {
-  if (screen === 'inv') ui.closeInventory(); else if (screen === 'palette') ui.closePalette();
+  if (screen === 'inv') ui.closeInventory(); else if (screen === 'palette') ui.closePalette(); else if (screen === 'map') fullMap.close();
   screen = null;
   refreshHotbar();
 }
@@ -690,7 +739,8 @@ window.addEventListener('keydown', (e) => {
   if (e.repeat) { if (playing) { keys.add(e.code); syncInput(); } return; }
 
   const action = settings.actionFor(e.code);
-  if (screen && (action === 'inventory' || e.code === 'Escape')) { e.preventDefault(); closeScreen(); return; }
+  if (screen && (action === 'inventory' || (action === 'map' && screen === 'map') || e.code === 'Escape')) { e.preventDefault(); closeScreen(); return; }
+  if (action === 'map' && playing) { openScreen('map'); return; }
   if (action === 'inventory' && playing) { openScreen(creative ? 'palette' : 'inv'); return; }
   if (action === 'music') { toggleMusic(); return; }
   if (action === 'debug') { $('debug').hidden = !$('debug').hidden; return; }
@@ -824,7 +874,7 @@ document.addEventListener('pointerlockchange', () => {
 // Back into the game from the pause menu. Browsers want a click or key press to capture the mouse again, and Esc
 // does not count, so we resume right away and capture it on the next key press or click (see ensureLock).
 function resumeGame() {
-  if (playing || dead || screen || optionsOpen) return;
+  if (playing || dead || screen || optionsOpen || touchCtl.editing) return;
   audio.start();
   setPlaying(true);
   if (!AUTOPLAY) { suppressUnlockUntil = performance.now() + 700; lock(); lastLockTry = performance.now(); }
@@ -885,7 +935,7 @@ function renderControlsTable() {
     [k('inventory'), 'Inventory & crafting', k('music'), 'Toggle music'],
     [k('skipTime'), 'Skip time of day', `${k('renderDown')} ${k('renderUp')}`, 'Render distance'],
     [k('fly'), 'Fly (creative only)', k('debug'), 'Debug info'],
-    [k('offhand'), 'Place the torch in your shield slot', '', ''],
+    [k('offhand'), 'Place the torch held in your shield slot', k('map'), 'Full-screen map (or tap the minimap)'],
   ];
   $('controls').replaceChildren(...rows.map((r) => {
     const tr = document.createElement('tr');
@@ -896,6 +946,10 @@ function renderControlsTable() {
 
 function applySettings() {
   audio.setVolumes(settings.get('musicVolume'), settings.get('sfxVolume'));
+  refitHud();
+  const goalsHome = touchMode ? document.body : $('hud-right'); // on a phone the goals sit top left, out of the crowded right column
+  if ($('goals').parentNode !== goalsHome) goalsHome.appendChild($('goals'));
+  touchCtl.setLayout(settings.get('touchLayout'));
   const was = touchMode;
   touchMode = wantsTouch();
   if (touchMode !== was) {
@@ -909,8 +963,6 @@ function applySettings() {
 }
 settings.onChange(applySettings);
 applySettings();
-// the service worker installed a newer build of the game (see the registration script in the built index.html)
-window.addEventListener('vc-update', () => toast('A new version is ready. Reload to play it.'));
 
 // ---- armor: a row of shield icons above the health bar, one icon per two armor points worn ----
 let shownArmor = -1;
@@ -1445,6 +1497,7 @@ let skipSave = false;
 function snapshot() {
   return JSON.stringify({
     seed,
+    terrain: world.terrain,
     edits: world.serializeEdits(),
     legacyCaves: world.serializeLegacy(),
     player: dead ? { x: spawnPoint.x, y: spawnPoint.y, z: spawnPoint.z, yaw: 0, pitch: 0, flying: false } : { x: player.pos.x, y: player.pos.y, z: player.pos.z, yaw: player.yaw, pitch: player.pitch, flying: player.flying },
@@ -1566,6 +1619,7 @@ function frame(now) {
       pose.pos[2] - sw * 0.08 + eatBlend * 0.2);
     held.rotation.set(pose.rot[0] - sw * 0.9 + eatBlend * 0.5, pose.rot[1] + sw * 0.25, pose.rot[2]);
   }
+  refreshOffhand();
   held.scale.setScalar(pose.scale * (1 - 0.35 * eatBlend * Math.min(1, eating / GAME.eating.seconds))); // it gets eaten away
   if (eatBlend > 0.05 && !pose.pivot) held.rotation.z += Math.sin(elapsed * 26) * 0.07 * eatBlend; // chewing wobble
 

@@ -146,4 +146,26 @@ assert.equal(armorOf(I.IRON_HELMET) + armorOf(I.IRON_CHESTPLATE) + armorOf(I.IRO
   assert.equal(bad.equipment.helmet, null);
 }
 
+// ---- shift-click / quick wear sends torches to the shield slot (the offhand): a whole stack, topping up what is there ----
+{
+  const inv = new Inventory();
+  inv.add(I.TORCH, 20, 0);
+  assert.ok(inv.quickEquip(0), 'torches can be worn in the shield slot');
+  assert.equal(inv.equipment.shield.id, I.TORCH); assert.equal(inv.equipment.shield.n, 20);
+  assert.equal(inv.count(I.TORCH), 0, 'and they left the bag');
+  inv.add(I.TORCH, 50, 0);
+  assert.ok(inv.quickEquip(0), 'more torches join the stack');
+  assert.equal(inv.equipment.shield.n, maxStack(I.TORCH), 'up to a full stack');
+  assert.equal(inv.count(I.TORCH), 70 - maxStack(I.TORCH), 'the rest stays in the bag');
+  assert.ok(!inv.quickEquip(0), 'a full offhand takes no more');
+  // an iron shield in the slot is not pushed out by torches
+  const inv2 = new Inventory();
+  inv2.equipment.shield = { id: I.IRON_SHIELD, n: 1, d: 0 };
+  inv2.add(I.TORCH, 5, 0);
+  assert.ok(!inv2.quickEquip(0));
+  assert.equal(inv2.equipment.shield.id, I.IRON_SHIELD); assert.equal(inv2.count(I.TORCH), 5);
+  // a bag slot that is not usable (beyond capacity) is refused
+  assert.ok(!new Inventory().quickEquip(0), 'an empty slot does nothing');
+}
+
 console.log('all equipment tests passed');

@@ -7,13 +7,30 @@ released those lines move under a new version heading. The list of everything th
 
 ## [Unreleased]
 
+### Added
+- **Look while holding a button.** On a touch device a finger resting on any on-screen button (Break, Use, Jump, Run, Sneak...) can drag to turn the camera, so you can keep mining or placing while you look around. The button stays pressed until the finger lifts; a plain tap does not turn the camera.
+- **Biomes.** The land is now plains, forests, hills, mountains, deserts and tundra, each a few hundred blocks wide. Plains and forests are very flat, hills roll, mountains are tall with bare rock and snow caps, deserts are sand with low dunes and no trees, tundra is snowy with spruces. Climate (temperature, wetness, relief) picks the biome; it is all data in `worldgen.json` "biomes". **New worlds only:** worlds you were already playing keep their original terrain so your builds do not change.
+- **Full-screen map.** Tap the minimap (or press **N**) for a map of everything you have seen, with your arrow. Drag to move, scroll or pinch to zoom, *Find me* to come back. The map remembers ground you have walked away from.
+- **Tree leaves rustle** in the wind, the same wind that sways the grass.
+- **A torch in the shield slot is held in your left hand**, and shift-clicking torches (or the *quick move / wear* tap mode) sends the whole stack there.
+- **Move the touch controls.** On a phone or tablet, *Options > Move the touch controls...* (from the pause menu, in a world) lets you drag every button wherever suits your thumbs. Buttons stay on screen, **Reset** puts them back, and the layout is saved and kept when you turn the phone.
+- **HUD size** slider in Options (70-180%) for the hotbar, hearts, minimap, clock and goals; it starts at 130% on a touch device. The screen shows the world while you adjust it, like the field of view.
+- **Animated water.** The water surface ripples: eight frames of the wave texture play in a loop (also on the title screen). It is data: `waves` textures take a `seed` and a `phase`, and `water` is listed under `animations` in `textures.json`.
+- **The version is shown on the title screen** (bottom left), e.g. `v1.0.0-8726a41cae`: the package version plus the build.
+
+### Changed
+- **The Torch button is gone** from the touch controls: put torches in the shield slot and they light your way by themselves (the layout editor forgets the old button).
+- **The goals are back on phones.** The Goals panel had been hidden on any phone held sideways (a screen shorter than 520 px). It now sits top left under the menu buttons, in larger text, and the minimap is smaller with the real-time row left out so everything fits.
+- **Adjusting the field of view shows the world.** While you drag the Field of view slider (or use the arrow keys on it) the pause menu and the rest of Options fade away, so you see the view you paused in with the new angle immediately; they return a moment after you let go. The title screen's fly-around follows the field of view too.
+- **Updates load by themselves.** Every time the app is opened or brought back to the front it checks for a newer version; if one is found while you are on the title screen the game reloads into it at once. In a world it waits and tells you, and the update loads when you quit to the title. The service worker also fetches new files past the browser's HTTP cache, so an update never caches stale copies.
+
 ## [1.0.0]
 
 VoxelCraft is now an installable web app (a PWA) that runs straight from GitHub Pages, on a computer or on a phone or tablet.
 
 ### Added
 - **Installable and offline.** A web app manifest and a service worker let you install the game ("Install" in Chrome / Edge, "Add to Home Screen" on phones) and play with no network. It opens full screen in landscape, and a new version is picked up automatically (a message tells you to reload).
-- **Touch controls** on phones and tablets: a floating move stick (push it to the rim to sprint), drag anywhere on the right to look, and buttons for Break, Use, Jump, Run, Sneak, Fly (creative), Torch (offhand), Bag (inventory) and Pause. A finger held on any button can still drag to look around. In the inventory a button chooses what a tap does: pick up / place, split / place one, or quick move / wear. A close button leaves the window. Touch controls switch on by themselves on a touch device and can be turned on or off in Options (`?touch` and `?desktop` in the address force either).
+- **Touch controls** on phones and tablets: a floating move stick (push it to the rim to sprint), drag anywhere on the right to look, and buttons for Break, Use, Jump, Run, Sneak, Fly (creative), Torch (offhand), Bag (inventory) and Pause. In the inventory a button chooses what a tap does: pick up / place, split / place one, or quick move / wear. A close button leaves the window. Touch controls switch on by themselves on a touch device and can be turned on or off in Options (`?touch` and `?desktop` in the address force either).
 - **Screens fit small displays**: the hotbar, hearts, minimap, inventory, options and menus scale down to fit a phone, honour the notch and rounded corners, and a "turn your device sideways" message shows in portrait.
 - **Worlds are saved in the browser** (IndexedDB) when there is no server, so the installed / hosted game keeps your worlds. The Node dev server still saves them as files in `worlds/`.
 - `npm run build` turns the source into the flat web app in the repository root (`index.html`, `app.js`, `style.css`, `manifest.webmanifest`, `sw.js`, icons); `npm run build:check` verifies it is up to date and `npm run preview` serves it the way GitHub Pages does.

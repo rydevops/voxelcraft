@@ -5,7 +5,8 @@ const $ = (id) => document.getElementById(id);
 
 const SLIDERS = [
   { key: 'sensitivity', label: 'Look sensitivity (mouse / touch)', min: 0.1, max: 3, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
-  { key: 'fov', label: 'Field of view', min: 60, max: 110, step: 1, fmt: (v) => v + '°' },
+  { key: 'fov', label: 'Field of view', min: 60, max: 110, step: 1, fmt: (v) => v + '°', peek: true },
+  { key: 'hudSize', label: 'HUD size (hotbar, hearts, map, goals)', min: 0.7, max: 1.8, step: 0.05, fmt: (v) => Math.round(v * 100) + '%', peek: true },
   { key: 'musicVolume', label: 'Music volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
   { key: 'sfxVolume', label: 'Sound effects volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
 ];
@@ -15,16 +16,32 @@ const TOGGLES = [
   { key: 'touchControls', label: 'On-screen touch controls (sticks and buttons)' },
 ];
 
-export function createOptions(settings, { onClose }) {
+// `layout` (optional): { available() -> boolean, edit() } for moving the touch buttons around
+export function createOptions(settings, { onClose, layout }) {
   const root = $('options');
   const general = $('opt-general');
   const keys = $('opt-keys');
   let open = false;
   let capturing = null; // { action, button }
 
+  // "Peek": while a setting that changes the picture (the field of view) is being adjusted, everything but its slider fades
+  // away so the world you paused in is in plain view. It lingers a moment after you let go, then the menus come back.
+  let peeking = false, peekRow = null, peekTimer = 0;
+  const setPeek = (on) => {
+    peeking = on;
+    document.body.classList.toggle('peek', on);
+    peekRow?.classList.toggle('peeking', on);
+  };
+  const lingerThenRestore = () => { clearTimeout(peekTimer); peekTimer = setTimeout(() => { if (!held) setPeek(false); }, 900); };
+  let held = false; // a pointer is down on the slider
+  const letGo = () => { if (!held) return; held = false; lingerThenRestore(); };
+  window.addEventListener('pointerup', letGo);
+  window.addEventListener('pointercancel', letGo);
+
   // ---- general tab -----------------------------------------------------------------------
   function buildGeneral() {
     general.replaceChildren();
+    peekRow = null;
     for (const s of SLIDERS) {
       const row = document.createElement('label');
       row.className = 'opt-row';
@@ -40,7 +57,9 @@ export function createOptions(settings, { onClose }) {
         const v = Number(input.value);
         val.textContent = s.fmt(v);
         settings.set(s.key, v);
+        if (s.peek) { peekRow = row; setPeek(true); lingerThenRestore(); } // (arrow keys: no pointer is held, so it fades back by itself)
       });
+      if (s.peek) input.addEventListener('pointerdown', () => { held = true; peekRow = row; setPeek(true); });
       row.append(name, input, val);
       general.appendChild(row);
     }
@@ -56,6 +75,20 @@ export function createOptions(settings, { onClose }) {
       row.append(box, name);
       general.appendChild(row);
     }
+    // phones and tablets: drag the on-screen buttons wherever suits your thumbs (only while a world is open)
+    const move = document.createElement('div');
+    move.className = 'opt-row touch-only';
+    move.style.gridTemplateColumns = '1fr';
+    if (layout?.available()) {
+      const btn = document.createElement('button');
+      btn.className = 'small';
+      btn.textContent = 'Move the touch controls...';
+      btn.addEventListener('click', () => { close(); layout.edit(); });
+      move.append(btn);
+    } else {
+      move.append(Object.assign(document.createElement('span'), { className: 'opt-hint', textContent: 'To move the touch buttons, open Options from the pause menu while you are in a world.' }));
+    }
+    general.prepend(move); // (first: the list scrolls on a phone and this is the thing to find)
     const hint = document.createElement('p');
     hint.className = 'opt-hint';
     hint.textContent = 'Tip: sensitivity changes apply instantly. Raw input takes effect the next time you click Resume.';
@@ -145,6 +178,7 @@ export function createOptions(settings, { onClose }) {
   }
   function close() {
     cancelCapture();
+    held = false; clearTimeout(peekTimer); setPeek(false);
     open = false;
     root.hidden = true;
     onClose();
