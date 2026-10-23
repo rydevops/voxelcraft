@@ -380,6 +380,50 @@
         ]
       ],
       "at": "table"
+    },
+    {
+      "out": "planks_stairs",
+      "n": 4,
+      "in": [
+        [
+          "planks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "cobble_stairs",
+      "n": 4,
+      "in": [
+        [
+          "cobble",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "brick_stairs",
+      "n": 4,
+      "in": [
+        [
+          "brick",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "door",
+      "n": 3,
+      "in": [
+        [
+          "planks",
+          6
+        ]
+      ],
+      "at": "table"
     }
   ],
   "smelting": [

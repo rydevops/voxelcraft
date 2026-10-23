@@ -90,6 +90,14 @@
     {
       "text": "Wear a piece of equipment",
       "flag": "equipped"
+    },
+    {
+      "text": "Find a village",
+      "flag": "village"
+    },
+    {
+      "text": "Talk to a villager",
+      "flag": "talked"
     }
   ]
 }

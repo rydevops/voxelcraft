@@ -318,6 +318,14 @@
           "dirt"
         ]
       }
+    },
+    {
+      "id": 134,
+      "key": "door",
+      "name": "Wooden Door",
+      "fuel": 10,
+      "creative": true,
+      "door": "door_b_x_c"
     }
   ]
 }

@@ -947,6 +947,433 @@
           "crop": false
         }
       }
+    },
+    {
+      "id": 46,
+      "key": "path",
+      "name": "Dirt Path",
+      "tiles": {
+        "top": "path_top",
+        "bottom": "dirt",
+        "side": "dirt"
+      },
+      "hardness": 0.7,
+      "tool": "shovel",
+      "sound": "dirt",
+      "creative": true
+    },
+    {
+      "id": 47,
+      "key": "planks_stairs",
+      "name": "Oak Stairs",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "creative": true,
+      "fuel": 15
+    },
+    {
+      "id": 48,
+      "key": "planks_stairs_e",
+      "name": "Oak Stairs",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "variantOf": "planks_stairs"
+    },
+    {
+      "id": 49,
+      "key": "planks_stairs_s",
+      "name": "Oak Stairs",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "variantOf": "planks_stairs"
+    },
+    {
+      "id": 50,
+      "key": "planks_stairs_w",
+      "name": "Oak Stairs",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "planks"
+      },
+      "hardness": 1.4,
+      "tool": "axe",
+      "sound": "wood",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "variantOf": "planks_stairs"
+    },
+    {
+      "id": 51,
+      "key": "cobble_stairs",
+      "name": "Cobblestone Stairs",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 52,
+      "key": "cobble_stairs_e",
+      "name": "Cobblestone Stairs",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "cobble_stairs"
+    },
+    {
+      "id": 53,
+      "key": "cobble_stairs_s",
+      "name": "Cobblestone Stairs",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "cobble_stairs"
+    },
+    {
+      "id": 54,
+      "key": "cobble_stairs_w",
+      "name": "Cobblestone Stairs",
+      "tiles": {
+        "top": "cobble",
+        "bottom": "cobble",
+        "side": "cobble"
+      },
+      "hardness": 3.5,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "cobble_stairs"
+    },
+    {
+      "id": 55,
+      "key": "brick_stairs",
+      "name": "Brick Stairs",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "n"
+      },
+      "need": 1,
+      "creative": true
+    },
+    {
+      "id": 56,
+      "key": "brick_stairs_e",
+      "name": "Brick Stairs",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "e"
+      },
+      "need": 1,
+      "variantOf": "brick_stairs"
+    },
+    {
+      "id": 57,
+      "key": "brick_stairs_s",
+      "name": "Brick Stairs",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "s"
+      },
+      "need": 1,
+      "variantOf": "brick_stairs"
+    },
+    {
+      "id": 58,
+      "key": "brick_stairs_w",
+      "name": "Brick Stairs",
+      "tiles": {
+        "top": "brick",
+        "bottom": "brick",
+        "side": "brick"
+      },
+      "hardness": 4,
+      "tool": "pickaxe",
+      "sound": "stone",
+      "opaque": false,
+      "model": {
+        "type": "stairs",
+        "facing": "w"
+      },
+      "need": 1,
+      "variantOf": "brick_stairs"
+    },
+    {
+      "id": 59,
+      "key": "door_b_x_c",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_bottom"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": true,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "x",
+        "half": "bottom",
+        "open": false
+      }
+    },
+    {
+      "id": 60,
+      "key": "door_t_x_c",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_top"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": true,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "x",
+        "half": "top",
+        "open": false
+      }
+    },
+    {
+      "id": 61,
+      "key": "door_b_z_c",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_bottom"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": true,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "z",
+        "half": "bottom",
+        "open": false
+      }
+    },
+    {
+      "id": 62,
+      "key": "door_t_z_c",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_top"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": true,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "z",
+        "half": "top",
+        "open": false
+      }
+    },
+    {
+      "id": 63,
+      "key": "door_b_x_o",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_bottom"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "x",
+        "half": "bottom",
+        "open": true
+      }
+    },
+    {
+      "id": 64,
+      "key": "door_t_x_o",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_top"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "x",
+        "half": "top",
+        "open": true
+      }
+    },
+    {
+      "id": 65,
+      "key": "door_b_z_o",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_bottom"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "z",
+        "half": "bottom",
+        "open": true
+      }
+    },
+    {
+      "id": 66,
+      "key": "door_t_z_o",
+      "name": "Wooden Door",
+      "tiles": {
+        "top": "planks",
+        "bottom": "planks",
+        "side": "door_top"
+      },
+      "hardness": 1.2,
+      "tool": "axe",
+      "sound": "wood",
+      "solid": false,
+      "opaque": false,
+      "loot": "door",
+      "model": {
+        "type": "door",
+        "axis": "z",
+        "half": "top",
+        "open": true
+      }
     }
   ]
 }

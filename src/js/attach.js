@@ -20,7 +20,7 @@ export class AttachSim {
     const id = this.world.getBlock(x, y, z);
     if (!HAS_SUPPORT[id]) return true;
     const sx = x + SUPPORT[id * 3], sy = y + SUPPORT[id * 3 + 1], sz = z + SUPPORT[id * 3 + 2];
-    return SOLID[this.world.getBlock(sx, sy, sz)] === 1;
+    return SOLID[this.world.getBlock(sx, sy, sz)] > 0;
   }
 
   update() {

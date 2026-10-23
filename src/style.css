@@ -332,11 +332,10 @@ body.touch .pc-only { display: none; }
 #death { align-items: center; }
 
 /* ---- touch mode ---- */
-/* Phones are short: the minimap shrinks, the real-time row goes (the phone has a clock) and the goals move to the top left, under
+/* Phones are short: the minimap shrinks and the goals move to the top left, under
    the menu buttons (main.js moves #goals out of #hud-right), with larger text than the desktop HUD. */
 body.touch #hud-right { z-index: 6; }
 body.touch #minimap { width: 120px; height: 120px; }
-body.touch #mm-info .mm-row:first-child { display: none; }
 body.touch #mm-info, body.touch #goals { font-size: 15px; }
 body.touch #goals h3 { font-size: 15px; }
 body.touch > #goals { position: fixed; z-index: 4; left: calc(2vmin + var(--sl)); top: calc(2vmin + var(--st) + var(--tb) * 0.8 + 1.5vmin); width: 250px; transform: scale(var(--hud, 1)); transform-origin: top left; }

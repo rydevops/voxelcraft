@@ -5,7 +5,7 @@
 // (added on top untinted, so a torch still glows at night) and the face shading that the dim floor is multiplied by
 // (so a cave with no light is dim but never black, whatever the time of day).
 import { CS, CH, idx } from './world.js';
-import { B, FACE_TILE, OPAQUE, GLOW, PLANT, LEAN, PLANT_H, IS_WATER, ROLE_LEAF, WATER_LEVEL, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
+import { B, FACE_TILE, OPAQUE, GLOW, PLANT, LEAN, PLANT_H, IS_WATER, ROLE_LEAF, WATER_LEVEL, SHAPE, BOXES, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
 import { hash2 } from './noise.js';
 import { skyBrightness, blockBrightness, MAX_LIGHT } from './light.js';
 
@@ -137,6 +137,38 @@ function addTorch(buf, x, y, z, lean, height, u0, v0, us, vs, sky) {
   buf.n += 4;
 }
 
+// Stairs and doors: a few boxes inside the cell. A face that lies on the edge of the cell and looks at an opaque block is left out;
+// the picture on each face is cropped to the part of the tile that face covers. Lit like the cell they stand in.
+function addBoxes(buf, id, x, y, z, pad, px, py, pz, sky, blk) {
+  const boxes = BOXES.get(id);
+  const tsU = 1 / ATLAS_COLS, tsV = 1 / ATLAS_ROWS, inset = 0.0004;
+  const s = skyBrightness(sky), g = blockBrightness(blk);
+  boxes.forEach((box, bi) => {
+    for (let f = 0; f < 6; f++) {
+      const F = FACES[f];
+      const axis = F.n[0] ? 0 : F.n[1] ? 1 : 2, up = F.n[axis] > 0;
+      if (SHAPE[id] === 1 && bi === 1 && f === 5) continue; // the underside of a stair's upper step sits inside the lower one
+      if ((up ? box[axis + 3] === 1 : box[axis] === 0) && OPAQUE[pad[pidx(px + F.n[0], py + F.n[1], pz + F.n[2])]]) continue;
+      const tile = FACE_TILE[id * 3 + F.k];
+      const u0 = (tile % ATLAS_COLS) * tsU + inset, v0 = 1 - (Math.floor(tile / ATLAS_COLS) + 1) * tsV + inset;
+      const us = tsU - inset * 2, vs = tsV - inset * 2;
+      const i1 = F.t1[0] ? 0 : F.t1[1] ? 1 : 2, i2 = F.t2[0] ? 0 : F.t2[1] ? 1 : 2;
+      const sg1 = F.t1[i1], sg2 = F.t2[i2];
+      const base = buf.n;
+      for (const [a, b] of CORNERS) {
+        const c = [0, 1, 2].map((i) => box[i] + (F.o[i] + F.t1[i] * a + F.t2[i] * b) * (box[i + 3] - box[i])); // position in the cell
+        buf.pos.push(x + c[0], y + c[1], z + c[2]);
+        buf.uv.push(u0 + us * sg1 * (c[i1] - F.o[i1]), v0 + vs * sg2 * (c[i2] - F.o[i2]));
+        const l = F.shade * s;
+        buf.col.push(l, l, l);
+        buf.blk.push(F.shade * g, F.shade);
+      }
+      buf.ind.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      buf.n += 4;
+    }
+  });
+}
+
 export function meshChunk(world, chunk) {
   const { pad, sky: litS, blk: litB } = buildPadded(world, chunk);
   const solid = new Buf();  // opaque + cutout (leaves, glass)
@@ -160,6 +192,11 @@ export function meshChunk(world, chunk) {
           } else {
             addPlant(plants, PLANT[id], x, y, z, tu, tv, tsU - inset * 2, tsV - inset * 2, chunk.cx * CS + x, chunk.cz * CS + z, litS[here], litB[here]);
           }
+          continue;
+        }
+        if (SHAPE[id]) { // stairs, doors
+          const here = pidx(x + 1, y + 1, z + 1);
+          addBoxes(solid, id, x, y, z, pad, x + 1, y + 1, z + 1, litS[here], litB[here]);
           continue;
         }
         const isWater = IS_WATER[id] === 1;

@@ -189,6 +189,11 @@
       {
         "item": "apple_sapling"
       }
+    ],
+    "door": [
+      {
+        "item": "door"
+      }
     ]
   }
 }

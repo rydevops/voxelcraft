@@ -292,5 +292,24 @@
         "trees": 0.4
       }
     }
+  },
+  "villages": {
+    "_comment": "Villages: each square region of the world (regionSize blocks) may hold one, with probability chance, on level dry ground in one of biomes (the site must be flatter than flatRange over flatRadius blocks; attempts = how many places are tried). Two roads cross at a well, armLength blocks long each way; houses and farms line them (emptyLot = chance a plot is left bare) and a village needs at least minBuildings. maxStep: ground this far from the village floor is levelled, further is left out. maxVillagers: people per village.",
+    "regionSize": 192,
+    "chance": 0.75,
+    "attempts": 30,
+    "flatRadius": 20,
+    "flatRange": 3,
+    "maxStep": 3,
+    "minAboveSea": 2,
+    "armLength": 33,
+    "emptyLot": 0.2,
+    "minBuildings": 3,
+    "maxVillagers": 8,
+    "biomes": [
+      "plains",
+      "forest",
+      "desert"
+    ]
   }
 }

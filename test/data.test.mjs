@@ -72,7 +72,7 @@ assert.notDeepEqual(paintTile('stone', 3, reg.tiles, {}), paintTile('stone', 4, 
 // ---- NEW CONTENT WITH JSON ONLY: a ruby ore, a ruby gem, a ruby sword recipe, loot, a goal ----
 function addRuby(d) {
   d.textures.tiles.ruby_ore = { type: 'ore', base: 'stone', color: [190, 20, 50], light: [255, 110, 130], clusters: 7 };
-  d.blocks.blocks.push({ id: 60, key: 'ruby_ore', name: 'Ruby Ore', tiles: { top: 'ruby_ore', bottom: 'ruby_ore', side: 'ruby_ore' }, hardness: 6, tool: 'pickaxe', need: 4, sound: 'stone', loot: 'ruby_ore', creative: true });
+  d.blocks.blocks.push({ id: 95, key: 'ruby_ore', name: 'Ruby Ore', tiles: { top: 'ruby_ore', bottom: 'ruby_ore', side: 'ruby_ore' }, hardness: 6, tool: 'pickaxe', need: 4, sound: 'stone', loot: 'ruby_ore', creative: true });
   d.items.items.push({ id: 150, key: 'ruby', name: 'Ruby' }, { id: 151, key: 'ruby_pickaxe', name: 'Ruby Pickaxe', tool: { type: 'pickaxe', tier: 'ruby' } });
   d.items.tiers.ruby = { level: 4, speed: 9, durability: 800, head: 'ruby' };
   d.textures.toolHeads.ruby = { light: [255, 150, 170], base: [220, 30, 70], dark: [120, 10, 40] };
@@ -86,7 +86,7 @@ function addRuby(d) {
 {
   const r = buildRegistry(addRuby(await fresh()));
   const rubyOre = r.idOfKey.get('ruby_ore'), ruby = r.idOfKey.get('ruby');
-  assert.equal(rubyOre, 60);
+  assert.equal(rubyOre, 95);
   assert.deepEqual(r.loot.ruby_ore.map((e) => [e.id, e.min, e.max]), [[ruby, 1, 3], [r.idOfKey.get('coal'), 1, 1]]);
   const rp = r.recipes.find((x) => x.out === r.idOfKey.get('ruby_pickaxe'));
   assert.deepEqual(rp.ins, [[ruby, 3], [r.idOfKey.get('stick'), 2]]);
@@ -115,7 +115,7 @@ function addRuby(d) {
   const out = spawnSync(process.execPath, ['--input-type=module', '-e', probe], { env: { ...process.env, VOXELCRAFT_DATA: dir }, encoding: 'utf8' });
   assert.equal(out.status, 0, out.stderr);
   const got = JSON.parse(out.stdout.trim().split('\n').pop());
-  assert.equal(got.id, 60);
+  assert.equal(got.id, 95);
   assert.ok(got.inPalette, 'shows up in the creative palette');
   assert.equal(got.ruby, 150);
   assert.ok(got.ore > 0, `ruby ore is generated in the world (${got.ore} blocks)`);

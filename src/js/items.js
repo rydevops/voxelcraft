@@ -49,6 +49,14 @@ export function toolWear(blockId, heldId) {
   if (!t) return 0;
   return BLOCKS[blockId]?.tool === t.type ? 1 : REG.game.tools.wrongToolWear;
 }
+// The inventory item that stands for a block you look at (middle click): stairs turned any way are the usual stairs, doors the door item
+const DOOR_ITEM = REG.items.find((it) => it.door)?.id ?? 0;
+export function itemForBlock(blockId) {
+  const def = REG.blockById.get(blockId);
+  if (def?.model?.type === 'door' && DOOR_ITEM) return DOOR_ITEM;
+  return def?.variantOf || blockId;
+}
+export const isDoorItem = (id) => !!ITEM.get(id)?.door; // a door: places a closed, two-block-tall door
 export const placesOf = (id) => ITEM.get(id)?.places ?? null; // torch etc: { up, north, ... } -> block placed on the face you click
 
 // ---- loot ---------------------------------------------------------------------------------------
@@ -67,14 +75,14 @@ export function dropsFor(blockId, canHarvest, rand = Math.random) {
   if (!canHarvest) return [];
   const def = REG.blockById.get(blockId);
   const table = def?.loot ? REG.loot[def.loot] : null;
-  return table ? roll(table, rand) : [{ id: blockId, n: 1 }];
+  return table ? roll(table, rand) : [{ id: def?.variantOf || blockId, n: 1 }]; // (stairs turned another way drop the usual stairs)
 }
 
 // What a block gives when it is smashed apart (e.g. a falling tree): "shatterLoot" if it has one, else its normal loot.
 export function shatterDrops(blockId, rand = Math.random) {
   const def = REG.blockById.get(blockId);
   const table = def?.shatterLoot ? REG.loot[def.shatterLoot] : def?.loot ? REG.loot[def.loot] : null;
-  return table ? roll(table, rand) : [{ id: blockId, n: 1 }];
+  return table ? roll(table, rand) : [{ id: def?.variantOf || blockId, n: 1 }];
 }
 
 // Can this held item harvest the block, and how long does breaking take (seconds)?

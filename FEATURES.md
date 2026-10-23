@@ -10,6 +10,9 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | | Feature |
 |---|---|
 | ✔ | Endless procedural terrain from a seed: continents, oceans, beaches, rivers, snow caps |
+| ✔ | Villages in new worlds: a well, dirt roads, houses with glass windows, doors and stair roofs, wheat farms, lamp posts, different every time |
+| ✔ | Villagers: wander about their village, look at you, and talk when you right-click / use them |
+| ✔ | Stairs (planks, cobblestone, brick; half-block steps you walk up), openable doors, glass (smelted from sand), dirt paths |
 | ✔ | Biomes: flat plains, forests, rolling hills, tall mountains, deserts and snowy tundra, each with its own ground and trees (new worlds; playing worlds keep their terrain) |
 | ✔ | Biome-style variety of trees: oak, apple, birch, spruce, tall oak, bush; forests and clearings |
 | ✔ | Caves: winding tunnels, wide caverns and openings onto the surface; coal and iron ore veins |

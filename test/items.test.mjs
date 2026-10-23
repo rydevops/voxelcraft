@@ -128,6 +128,7 @@ progress.flags.add('ate');
 gather(I.IRON_INGOT, 5);
 craft(I.IRON_HELMET);
 progress.flags.add('equipped');
+progress.flags.add('village'); progress.flags.add('talked'); // found a village, spoke to someone there
 assert.equal(GOALS.filter((x) => x.done(progress)).length, GOALS.length, 'every goal is completable');
 
 // ---- tool wear ----

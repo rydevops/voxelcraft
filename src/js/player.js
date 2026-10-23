@@ -1,5 +1,7 @@
 // Player physics (AABB vs voxels) and voxel raycasting. No rendering code.
-import { B, SOLID, PLANT, PLANT_H, PLANT_HALF, IS_WATER } from './blocks.js';
+import { B, SOLID, SHAPE, BOXES, PLANT, PLANT_H, PLANT_HALF, IS_WATER } from './blocks.js';
+
+const FULL = [[0, 0, 0, 1, 1, 1]];
 
 const HW = 0.3;        // half width
 const HEIGHT = 1.8;
@@ -38,18 +40,51 @@ export class Player {
   solidAt(x, y, z) {
     if (y < 0) return true;
     if (!this.world.isLoaded(x, z)) return true;
-    return SOLID[this.world.getBlock(x, y, z)] === 1;
+    return SOLID[this.world.getBlock(x, y, z)] >= 1; // (stairs count: they are partly solid, see boxesAt)
   }
 
-  collides(x, y, z, height = this.height) {
+  // What is solid inside cell (x, y, z): a list of boxes in cell coordinates, or null for nothing (stairs are two boxes)
+  boxesAt(x, y, z) {
+    if (y < 0 || !this.world.isLoaded(x, z)) return FULL;
+    const id = this.world.getBlock(x, y, z);
+    const s = SOLID[id];
+    return s === 1 ? FULL : s === 2 ? BOXES.get(id) : null;
+  }
+
+  // Call fn(minX, minY, minZ, maxX, maxY, maxZ) for every solid box a body at (x, y, z) overlaps; stop (and return true) when fn does
+  overlapping(x, y, z, height, fn) {
     const x0 = Math.floor(x - HW + 1e-5), x1 = Math.floor(x + HW - 1e-5);
     const y0 = Math.floor(y + 1e-5), y1 = Math.floor(y + height - 1e-5);
     const z0 = Math.floor(z - HW + 1e-5), z1 = Math.floor(z + HW - 1e-5);
     for (let by = y0; by <= y1; by++)
       for (let bz = z0; bz <= z1; bz++)
-        for (let bx = x0; bx <= x1; bx++)
-          if (this.solidAt(bx, by, bz)) return true;
+        for (let bx = x0; bx <= x1; bx++) {
+          const boxes = this.boxesAt(bx, by, bz);
+          if (!boxes) continue;
+          for (const b of boxes) {
+            if (boxes !== FULL && !(x + HW - 1e-5 > bx + b[0] && x - HW + 1e-5 < bx + b[3] && y + height - 1e-5 > by + b[1] && y + 1e-5 < by + b[4] && z + HW - 1e-5 > bz + b[2] && z - HW + 1e-5 < bz + b[5])) continue;
+            if (fn(bx + b[0], by + b[1], bz + b[2], bx + b[3], by + b[4], bz + b[5])) return true;
+          }
+        }
     return false;
+  }
+
+  collides(x, y, z, height = this.height) {
+    return this.overlapping(x, y, z, height, () => true);
+  }
+
+  // After pushing into something along `axis`: how far the body may go. Returns the position of the nearest face in the way
+  // (null if there is none): the lowest face when moving up / towards +x, +z, the highest top when moving down / -x, -z.
+  limit(axis, positive) {
+    const p = this.pos;
+    const i = axis === 'x' ? 0 : axis === 'y' ? 1 : 2;
+    let best = null;
+    this.overlapping(p.x, p.y, p.z, this.height, (a, b, c, d, e, f) => {
+      const lo = [a, b, c][i], hi = [d, e, f][i];
+      if (positive) best = best === null ? lo : Math.min(best, lo); else best = best === null ? hi : Math.max(best, hi);
+      return false;
+    });
+    return best;
   }
 
   // Is there solid ground under any part of the feet at this position? (crouching stops you walking off edges)
@@ -73,18 +108,28 @@ export class Player {
     for (let i = 0; i < steps; i++) {
       p[axis] += step;
       if (!this.collides(p.x, p.y, p.z)) continue;
-      // Step-assist: walking into a block that is one level high (with headroom above it) just climbs it
+      // Step-assist: walking into something up to a block high (a full block, or half of one: a stair or a slab) with
+      // headroom above it just climbs it
       if (this.canStep && axis !== 'y') {
-        const up = Math.floor(p.y + EPS) + 1 + EPS;
-        if (up - p.y <= 1.0 + 2 * EPS && !this.collides(p.x, up, p.z)) {
+        const f = Math.floor(p.y + EPS);
+        let climbed = false;
+        for (const up of [f + 0.5 + EPS, f + 1 + EPS]) {
+          if (up <= p.y + EPS || up - p.y > 1.0 + 2 * EPS || this.collides(p.x, up, p.z)) continue;
           this.stepSmooth += up - p.y;
           p.y = up;
-          continue;
+          climbed = true;
+          break;
         }
+        if (climbed) continue;
       }
-      if (axis === 'x') p.x = step > 0 ? Math.floor(p.x + HW) - HW - EPS : Math.floor(p.x - HW) + 1 + HW + EPS;
-      else if (axis === 'z') p.z = step > 0 ? Math.floor(p.z + HW) - HW - EPS : Math.floor(p.z - HW) + 1 + HW + EPS;
-      else p.y = step > 0 ? Math.floor(p.y + this.height) - this.height - EPS : Math.floor(p.y) + 1 + EPS;
+      // Otherwise stop flush against the face that is in the way (a stair's step is only half a cell wide)
+      const lim = this.limit(axis, step > 0);
+      if (axis === 'y') {
+        if (lim !== null) p.y = step > 0 ? lim - this.height - EPS : lim + EPS;
+        else p.y = step > 0 ? Math.floor(p.y + this.height) - this.height - EPS : Math.floor(p.y) + 1 + EPS;
+      } else if (lim !== null) p[axis] = step > 0 ? lim - HW - EPS : lim + HW + EPS;
+      else if (axis === 'x') p.x = step > 0 ? Math.floor(p.x + HW) - HW - EPS : Math.floor(p.x - HW) + 1 + HW + EPS;
+      else p.z = step > 0 ? Math.floor(p.z + HW) - HW - EPS : Math.floor(p.z - HW) + 1 + HW + EPS;
       this.vel[axis] = 0;
       return true;
     }
@@ -226,7 +271,7 @@ export function raycast(world, o, d, maxDist = 6) {
 
   while (t <= maxDist) {
     const id = world.getBlock(x, y, z);
-    if (SOLID[id]) return { x, y, z, nx, ny, nz, id };
+    if (SOLID[id] || SHAPE[id] === 2) return { x, y, z, nx, ny, nz, id }; // (an open door is not solid, but you can still aim at it to close it)
     if (PLANT[id]) {
       const p = rayPlant(o, d, x, y, z, PLANT_H[id], PLANT_HALF[id]);
       if (p && p.t <= maxDist) {

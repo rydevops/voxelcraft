@@ -11,6 +11,7 @@ const IDS = WG.ids;
 import { CS, CH, chunkKey, idx } from './voxel.js';
 import { Lighting } from './light.js';
 import { pickVariant, treeBlocks } from './trees.js';
+import { applyVillages, inVillage } from './villages.js';
 export { CS, CH, chunkKey, idx };
 export const SEA = WG.seaLevel;
 export const SNOW_LINE = WG.snowLine;
@@ -38,9 +39,9 @@ export class Chunk {
 }
 
 export class World {
-  // terrain: 2 = the biome terrain (plains, forests, hills, mountains, deserts, tundra); 1 = the original rolling terrain, which
-  // worlds that were already being played keep so the ground under their builds does not change
-  constructor(seed, { terrain = 2 } = {}) {
+  // terrain: 3 = biomes and villages; 2 = the biomes without villages; 1 = the original rolling terrain. Worlds keep the terrain they were
+  // started with (it is saved), so the ground under what people built never changes.
+  constructor(seed, { terrain = 3 } = {}) {
     this.seed = seed;
     this.terrain = terrain;
     this.noise = new Noise(seed);
@@ -188,6 +189,7 @@ export class World {
     const hv = hash2(wx, wz, this.seed);
     if (hv >= WG.trees.baseDensity + WG.trees.forestDensity) return false; // cheap reject before the noise lookup
     if (hv >= this.forestDensity(wx, wz, this.biomeAt(wx, wz))) return false;
+    if (this.terrain >= 3 && inVillage(this, wx, wz, 5)) return false; // (the same rule as growTrees)
     const h = this.heightAt(wx, wz);
     return h >= SEA + WG.trees.minAboveSea && h < SNOW_LINE - WG.trees.belowSnowLine;
   }
@@ -239,6 +241,7 @@ export class World {
     }
 
     this.growTrees(chunk);
+    if (this.terrain >= 3) applyVillages(this, chunk); // levelled ground, houses, roads
     this.applyEdits(chunk);
     for (let i = 0; i < d.length; i++) { if (PLANT[d[i]]) chunk.plants.add(i); if (HYDRATES[d[i]]) chunk.hydrating.add(i); }
     this.chunks.set(chunkKey(cx, cz), chunk);
@@ -266,6 +269,7 @@ export class World {
         if (hv >= WG.trees.baseDensity + WG.trees.forestDensity) continue; // (cheap reject before the noise lookups)
         const biome = this.biomeAt(wx, wz);
         if (hv >= this.forestDensity(wx, wz, biome)) continue;
+        if (this.terrain >= 3 && inVillage(this, wx, wz, 5)) continue; // villages are kept clear of trees
         const h = this.heightAt(wx, wz);
         if (h < SEA + WG.trees.minAboveSea || h >= SNOW_LINE - WG.trees.belowSnowLine) continue;
         const variant = pickVariant(this.seed, wx, wz, h, legacy, biome);
@@ -366,6 +370,7 @@ export class World {
           const z = Math.round(Math.sin((a * Math.PI) / 4) * r);
           const h = this.heightAt(x, z);
           if (h <= SEA + WG.beachAboveSea || h >= SNOW_LINE - 4) continue;
+          if (this.terrain >= 3 && inVillage(this, x, z, 12)) continue; // (the village floor is not at this terrain height)
           if (needTrees && this.treesNear(x, z, WG.spawn.treeRadius) < WG.spawn.minTrees) continue;
           if (needWater && !this.hasWaterNear(x, z, WG.spawn.waterRadius)) continue;
           return { x: x + 0.5, y: h + 1, z: z + 0.5 };

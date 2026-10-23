@@ -45,9 +45,18 @@ export const GLOW = new Float32Array(BLOCK_COUNT);          // 0-1: the block sh
 export const FILTER = new Uint8Array(BLOCK_COUNT);         // how much light is lost passing through it (leaves, water)
 export const HYDRATES = new Uint8Array(BLOCK_COUNT);         // 1 = soil that tracks moisture (fast check)
 export const HYDRATION = new Map();                        // soil id -> { wet, dry, decayInto, decayRate }
+export const SHAPE = new Uint8Array(BLOCK_COUNT);          // 0 = a plain cube, 1 = stairs, 2 = door (the "model" of the block)
+export const BASE_OF = new Uint8Array(BLOCK_COUNT);        // the block it counts as when broken or picked: itself, or the stairs it is a turned copy of
+export const STAIRS = new Map();                           // base stairs id -> [n, e, s, w]: the four ways round (n = the tall back is on the north side)
+export const FACING_OF = new Int8Array(BLOCK_COUNT).fill(-1); // stairs: 0-3 = n, e, s, w
+export const BOXES = new Map();                            // id -> [[x0, y0, z0, x1, y1, z1], ...] inside the cell: what stairs and doors are made of
+export const DOOR = new Map();                             // door block id -> { top, open, axis, partner, toggled }
+export const DOOR_PLACE = {};                              // axis -> [lower half, upper half] block ids of a closed door
 export const OPENS = new Map();                           // block id -> crafting window it opens when used
 
 export const WATER_FLOW = [0, 0, 0, 0, 0, 0, 0]; // flowing level (1..6) -> block id
+const FACINGS = ['n', 'e', 's', 'w'];
+const T3 = 0.40625, T3b = 0.59375, EDGE = 0.1875; // a door is 3/16 thick
 for (const b of REG.blocks) {
   FACE_TILE[b.id * 3] = tile(b.top);
   FACE_TILE[b.id * 3 + 1] = tile(b.bottom);
@@ -64,6 +73,24 @@ for (const b of REG.blocks) {
     PLANT[b.id] = 3; PLANT_H[b.id] = b.model.height; PLANT_HALF[b.id] = 0.16; SOLID[b.id] = 0; OPAQUE[b.id] = 0;
     LEAN[b.id * 2] = b.model.lean[0]; LEAN[b.id * 2 + 1] = b.model.lean[1];
   }
+  BASE_OF[b.id] = b.variantOf || b.id;
+  if (b.model?.type === 'stairs') {
+    SHAPE[b.id] = 1; SOLID[b.id] = 2; // 2 = only part of the cell is solid: see BOXES
+    const f = FACINGS.indexOf(b.model.facing);
+    FACING_OF[b.id] = f;
+    const back = [[0, 0.5, 0, 1, 1, 0.5], [0.5, 0.5, 0, 1, 1, 1], [0, 0.5, 0.5, 1, 1, 1], [0, 0.5, 0, 0.5, 1, 1]][f];
+    BOXES.set(b.id, [[0, 0, 0, 1, 0.5, 1], back]);
+    const base = b.variantOf || b.id;
+    if (!STAIRS.has(base)) STAIRS.set(base, [0, 0, 0, 0]);
+    STAIRS.get(base)[f] = b.id;
+  }
+  if (b.model?.type === 'door') {
+    SHAPE[b.id] = 2;
+    const { axis, half, open } = b.model;
+    // closed: a thin plate across the cell; open: the plate has swung round to the edge (the other way)
+    BOXES.set(b.id, [open ? (axis === 'x' ? [0, 0, 0, EDGE, 1, 1] : [0, 0, 0, 1, 1, EDGE]) : (axis === 'x' ? [0, 0, T3, 1, 1, T3b] : [T3, 0, 0, T3b, 1, 1])]);
+    DOOR.set(b.id, { top: half === 'top', open: !!open, axis, partner: 0, toggled: 0 });
+  }
   if (b.support) { HAS_SUPPORT[b.id] = 1; SUPPORT.set(b.support, b.id * 3); }
   if (b.role === 'log') ROLE_LOG[b.id] = 1;
   if (b.role === 'leaf') ROLE_LEAF[b.id] = 1;
@@ -75,6 +102,16 @@ for (const b of REG.blocks) {
   GLOW[b.id] = b.glow;
   FILTER[b.id] = b.lightFilter;
   if (b.hydration) { HYDRATION.set(b.id, b.hydration); HYDRATES[b.id] = 1; }
+}
+
+// link the halves of each door, and the open / closed copy of each
+{
+  const find = (axis, top, open) => { for (const [id, d] of DOOR) if (d.axis === axis && d.top === top && d.open === open) return id; return 0; };
+  for (const [id, d] of DOOR) {
+    d.partner = find(d.axis, !d.top, d.open);
+    d.toggled = find(d.axis, d.top, !d.open);
+  }
+  for (const axis of ['x', 'z']) DOOR_PLACE[axis] = [find(axis, false, false), find(axis, true, false)];
 }
 
 // Everything available in creative mode's block palette

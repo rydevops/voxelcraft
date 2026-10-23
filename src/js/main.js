@@ -1,9 +1,9 @@
 // VoxelCraft: game bootstrap, input, interaction, HUD and the main loop.
 import * as THREE from 'three';
 import { World } from './world.js';
-import { B, BLOCKS, PALETTE, PLANT, PLANT_H, PLANT_HALF, LEAN, SUPPORT, SOLID, IS_WATER, TILLS_INTO, OPENS, ROLE_LOG, HYDRATION } from './blocks.js';
+import { B, BLOCKS, STAIRS, DOOR, DOOR_PLACE, PALETTE, PLANT, PLANT_H, PLANT_HALF, LEAN, SUPPORT, SOLID, IS_WATER, TILLS_INTO, OPENS, ROLE_LOG, HYDRATION } from './blocks.js';
 import { REG } from './registry.js';
-import { I, isBlockItem, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
+import { I, isBlockItem, itemForBlock, isDoorItem, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
 import { Inventory } from './inventory.js';
 import { ChunkRenderer } from './chunks.js';
 import { Player, raycast } from './player.js';
@@ -26,6 +26,8 @@ import { WaterSim } from './water.js';
 import { MinimapData, gameClock, gameDayPart } from './minimap.js';
 import { MinimapView } from './minimapview.js';
 import { createFullMap } from './fullmap.js';
+import { createVillagers } from './villagers.js';
+import { villagesNear } from './villages.js';
 import { runStartup } from './startup.js';
 import { openStorage } from './storage.js';
 import { createTouchControls } from './touch.js';
@@ -355,7 +357,7 @@ const worldId = startup.id;
 const save = startup.save;
 const seed = save?.seed ?? Math.floor(Math.random() * 2 ** 31);
 // Worlds that were already played keep the original terrain (their builds sit on it); new worlds get the biome terrain
-const world = new World(seed, { terrain: save?.terrain ?? (save?.player ? 1 : 2) });
+const world = new World(seed, { terrain: save?.terrain ?? (save?.player ? 1 : 3) });
 if (save?.edits) world.loadEdits(save.edits, save.legacyCaves);
 
 const chunkRenderer = new ChunkRenderer(scene, world, materials, save?.radius ?? 6, (c) => mapData.chunkColumns(c)); // the map keeps what a chunk looked like when it unloads
@@ -369,6 +371,7 @@ const minimap = new MinimapView($('minimap'), mapData);
 // tap the minimap (or press the map key) for the full-screen map
 const fullMap = createFullMap({ data: mapData, getPlayer: () => ({ x: player.pos.x, z: player.pos.z, yaw: player.yaw }), onClose: () => closeScreen() });
 $('minimap').addEventListener('click', () => { if (playing && !screen && !dead) openScreen('map'); });
+const villagers = createVillagers({ scene, world });
 const waterSim = new WaterSim(world);
 // Blocks with "gravity" (sand) fall when unsupported; each falling block is drawn as a small cube until it lands
 const fallingBlockMeshes = new Map();
@@ -427,7 +430,7 @@ const progress = {
 };
 const MAX_FOOD = GAME.player.maxFood;
 let food = Math.min(MAX_FOOD, save?.food ?? MAX_FOOD);
-let saturation = Math.min(food, save?.saturation ?? GAME.hunger.respawnSaturation); // the hidden reserve that heals you (see survival.js)
+let saturation = save?.saturation ?? GAME.hunger.respawnSaturation; // the hidden reserve that heals you (see survival.js)
 let eating = 0;                                     // seconds spent chewing the current food item
 const MAX_HEALTH = GAME.player.maxHealth;
 let health = save?.health > 0 ? Math.min(MAX_HEALTH, save.health) : MAX_HEALTH;
@@ -605,12 +608,12 @@ function respawn() {
 $('respawn').addEventListener('click', respawn);
 
 let toastTimer = 0;
-function toast(msg) {
+function toast(msg, ms = 2200) {
   const el = $('toast');
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
 refreshHotbar();
@@ -808,10 +811,11 @@ window.addEventListener('mousedown', (e) => {
     e.preventDefault();
     const hit = lookTarget();
     if (!hit) return;
+    const want = itemForBlock(hit.id);
     if (creative) {
-      if (PALETTE.includes(hit.id)) { creativeHotbar[slot] = hit.id; selectSlot(slot); }
+      if (PALETTE.includes(want)) { creativeHotbar[slot] = want; selectSlot(slot); }
     } else {
-      const i = inventory.slots.slice(0, 9).findIndex((s) => s && s.id === hit.id);
+      const i = inventory.slots.slice(0, 9).findIndex((s) => s && s.id === want);
       if (i >= 0) selectSlot(i);
     }
   }
@@ -1125,6 +1129,11 @@ function breakBlock(hit) {
     spawnBurst(hit.x, hit.y + 1, hit.z, above);
     if (!creative) for (const d of dropsFor(above, true)) drops.spawn(d.id, d.n, hit.x + 0.5, hit.y + 1.4, hit.z + 0.5);
   }
+  const door = DOOR.get(hit.id);
+  if (door) { // the other half of a door goes with it
+    const oy = door.top ? hit.y - 1 : hit.y + 1;
+    if (world.getBlock(hit.x, oy, hit.z) === door.partner) { world.setBlock(hit.x, oy, hit.z, B.AIR); spawnBurst(hit.x, oy, hit.z, hit.id); }
+  }
   if (WINDOWS[OPENS.get(hit.id)]?.furnace) { // whatever was in the furnace falls out
     for (const st of furnaces.remove(hit.x, hit.y, hit.z)) drops.spawn(st.id, st.n, hit.x + 0.5, hit.y + 0.6, hit.z + 0.5, { d: st.d });
   }
@@ -1156,7 +1165,8 @@ function placeBlock(hit) {
   const st = stackAt(slot);
   if (!st || !isBlockItem(st.id) || PLANT[st.id]) return;
   if (player.intersectsBlock(x, y, z)) return;
-  world.setBlock(x, y, z, st.id);
+  const id = STAIRS.has(st.id) ? STAIRS.get(st.id)[lookFacing()] : st.id; // stairs climb away from you, whichever way you face
+  world.setBlock(x, y, z, id);
   chunkRenderer.remeshNow(neighbourChunks(x, z));
   audio.block(BLOCKS[st.id].sound, 'place');
   swing = 1;
@@ -1164,6 +1174,49 @@ function placeBlock(hit) {
     if (--st.n <= 0) inventory.slots[slot] = null;
     refreshHotbar();
   }
+}
+
+// Which way you are looking, as 0-3 = north, east, south, west (yaw 0 looks north, towards -z)
+function lookFacing() {
+  const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+  return Math.abs(fz) >= Math.abs(fx) ? (fz < 0 ? 0 : 2) : (fx > 0 ? 1 : 3);
+}
+
+// A door: two blocks tall, a plate that spans the way you are NOT looking (so you walk through it), standing on something solid
+function placeDoor(hit) {
+  const replacing = !!PLANT[hit.id];
+  const x = replacing ? hit.x : hit.x + hit.nx, y = replacing ? hit.y : hit.y + hit.ny, z = replacing ? hit.z : hit.z + hit.nz;
+  if (!canPlaceAt(x, y, z) || !canPlaceAt(x, y + 1, z)) return;
+  const free = (yy) => { const b = world.getBlock(x, yy, z); return b === B.AIR || !!PLANT[b]; };
+  if (!free(y) || !free(y + 1)) return;
+  if (!SOLID[world.getBlock(x, y - 1, z)]) return; // nothing to stand on
+  if (player.intersectsBlock(x, y, z) || player.intersectsBlock(x, y + 1, z)) return;
+  const f = lookFacing();
+  const [lower, upper] = DOOR_PLACE[f % 2 === 0 ? 'x' : 'z']; // looking north / south: the plate runs east-west
+  world.setBlock(x, y, z, lower);
+  world.setBlock(x, y + 1, z, upper);
+  chunkRenderer.remeshNow(neighbourChunks(x, z));
+  audio.block('wood', 'place');
+  swing = 1;
+  if (!creative) {
+    const st = inventory.slots[slot];
+    if (st && --st.n <= 0) inventory.slots[slot] = null;
+    refreshHotbar();
+  }
+}
+
+// Right-click an existing door: it swings open or shut (both halves together). It will not shut on top of you.
+function toggleDoor(hit) {
+  const d = DOOR.get(hit.id);
+  if (!d) return;
+  const oy = d.top ? hit.y - 1 : hit.y + 1;
+  const hasPartner = world.getBlock(hit.x, oy, hit.z) === d.partner;
+  if (!d.open && (player.intersectsBlock(hit.x, hit.y, hit.z) || (hasPartner && player.intersectsBlock(hit.x, oy, hit.z)))) return;
+  world.setBlock(hit.x, hit.y, hit.z, d.toggled);
+  if (hasPartner) world.setBlock(hit.x, oy, hit.z, DOOR.get(d.partner).toggled);
+  chunkRenderer.remeshNow(neighbourChunks(hit.x, hit.z));
+  audio.block('wood', d.open ? 'break' : 'place');
+  swing = 1;
 }
 
 // Torches: the block you get depends on the face you click (up = standing on the floor, a side = hanging on that wall).
@@ -1365,6 +1418,16 @@ function updateInteraction(dt) {
     if (breakTarget) resetBreak();
   }
 
+  // right-click (or Use) on a villager in reach, nearer than whatever block is behind it: they say something
+  if (mouseDown.right && rightFresh && placeTimer <= 0 && !eating) {
+    const e = player.eye;
+    const vh = villagers.pick(e, lookDir, 4.5);
+    if (vh && vh.dist < (hit ? Math.hypot(hit.x + 0.5 - e.x, hit.y + 0.5 - e.y, hit.z + 0.5 - e.z) - 0.6 : Infinity)) {
+      talkTo(vh.villager);
+      mouseDown.right = false; rightFresh = false; placeTimer = 0.6;
+    }
+  }
+
   updateEating(dt, hit);
 
   if (mouseDown.right && hit && placeTimer <= 0 && !eating) {
@@ -1376,6 +1439,11 @@ function updateInteraction(dt) {
     if (fresh && OPENS.has(hit.id)) {
       mouseDown.right = false;
       openScreen('inv', OPENS.get(hit.id), hit); // use the station instead of placing a block against it
+    } else if (fresh && DOOR.has(hit.id)) {
+      mouseDown.right = false;
+      toggleDoor(hit); // use a door instead of placing a block against it
+    } else if (heldStack && isDoorItem(heldStack.id)) {
+      placeDoor(hit);
     } else if (tool?.type === 'hoe') {
       tillBlock(hit, fresh);
     } else if (heldStack && plantsOf(heldStack.id)) {
@@ -1385,6 +1453,32 @@ function updateInteraction(dt) {
     } else {
       placeBlock(hit);
     }
+  }
+}
+
+// A villager answers: something about their job, or the night. (They turn to look at you and stand still for a moment.)
+function talkTo(v) {
+  v.target = null; v.timer = 4;
+  toast(`${v.name} the ${v.job}: \u201C${v.speak(gameDayPart(dayTime) === 'Night')}\u201D`, 4500);
+  audio.villager();
+  swing = 1;
+  progress.flags.add('talked');
+  checkGoals();
+}
+
+// Walking into a village says so (once per visit); finding the first one is a goal
+let inVillageKey = null, villageCheckAt = 0;
+function checkVillage(now) {
+  if (now - villageCheckAt < 700) return;
+  villageCheckAt = now;
+  const here = villagesNear(world, player.pos.x, player.pos.z, player.pos.x, player.pos.z, 3)[0];
+  const key = here ? here.key : null;
+  if (key === inVillageKey) return;
+  inVillageKey = key;
+  if (here) {
+    toast(`Welcome to ${here.name}`, 3000);
+    progress.flags.add('village');
+    checkGoals();
   }
 }
 
@@ -1404,7 +1498,7 @@ function updateClocks(now) {
 // ---- "what am I looking at" HUD (top centre) ------------------------------------------------
 const lookIcons = new Map();
 const lookIcon = (id) => {
-  if (!lookIcons.has(id)) lookIcons.set(id, (PLANT[id] ? plantIcon(atlasCanvas, id) : itemIcon(atlasCanvas, id, 44)).toDataURL());
+  if (!lookIcons.has(id)) lookIcons.set(id, (PLANT[id] ? plantIcon(atlasCanvas, id) : itemIcon(atlasCanvas, itemForBlock(id), 44)).toDataURL());
   return lookIcons.get(id);
 };
 const _look = new THREE.Vector3();
@@ -1634,6 +1728,8 @@ function frame(now) {
   updateClocks(now);
   updateParticles(dt);
   updateEnvironment();
+  villagers.update(playing || screen ? dt : 0, { x: player.pos.x, z: player.pos.z }, tintUniform.value, now);
+  checkVillage(now);
   renderer.render(scene, camera);
 
   if (!$('debug').hidden) {
@@ -1654,7 +1750,7 @@ window.__vc = {
   get elapsed() { return elapsed; }, POSES, held, furnaces, attachSim, worldId, quitToTitle, resumeGame, openScreen, closeScreen, tossStack, settings, options, growPlants,
   get food() { return food; }, set food(v) { food = v; shownFood = -1; renderHunger(); },
   get creative() { return creative; },
-  REG, waterSim, damage, respawn, advanceTime, fallingTrees, startTreeFall, sky,
+  REG, villagers, waterSim, damage, respawn, advanceTime, fallingTrees, startTreeFall, sky,
   get health() { return health; }, set health(v) { health = v; shownHealth = -1; renderHealth(); },
   get dead() { return dead; }, get playing() { return playing; }, get screen() { return screen; },
   get dayTime() { return dayTime; }, set dayTime(v) { dayTime = v; },

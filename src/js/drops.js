@@ -46,7 +46,7 @@ export class Drops {
   }
 
   solid(x, y, z) {
-    return SOLID[this.world.getBlock(Math.floor(x), Math.floor(y), Math.floor(z))] === 1;
+    return SOLID[this.world.getBlock(Math.floor(x), Math.floor(y), Math.floor(z))] > 0;
   }
 
   // onPickup(item) -> true if the inventory accepted it

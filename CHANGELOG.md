@@ -8,6 +8,8 @@ released those lines move under a new version heading. The list of everything th
 ## [Unreleased]
 
 ### Added
+- **Villages and villagers.** New worlds have villages on flat ground in plains, forests and deserts: a well where two dirt roads cross, houses with glass windows, doors and gabled stair roofs, wheat farms and lamp posts, each village different but always the same when you come back. Villagers (farmer, blacksmith, librarian, cleric, mason) wander about, look at you, and say something when you right-click or use them. *Welcome to <village>* appears when you walk in, and there are two new goals (find a village, talk to a villager). Older worlds are left exactly as they were.
+- **Stairs, doors and paths.** Oak, cobblestone and brick **stairs** (6 blocks make 4; they face the way you place them, and you walk up them without jumping), a wooden **door** (6 planks make 3; right-click to open and close, it is two blocks tall) and a **dirt path** block. Glass was already smelted from sand in a furnace and still is. The look-at panel and inventory show proper stair and door icons.
 - **Look while holding a button.** On a touch device a finger resting on any on-screen button (Break, Use, Jump, Run, Sneak...) can drag to turn the camera, so you can keep mining or placing while you look around. The button stays pressed until the finger lifts; a plain tap does not turn the camera.
 - **Biomes.** The land is now plains, forests, hills, mountains, deserts and tundra, each a few hundred blocks wide. Plains and forests are very flat, hills roll, mountains are tall with bare rock and snow caps, deserts are sand with low dunes and no trees, tundra is snowy with spruces. Climate (temperature, wetness, relief) picks the biome; it is all data in `worldgen.json` "biomes". **New worlds only:** worlds you were already playing keep their original terrain so your builds do not change.
 - **Full-screen map.** Tap the minimap (or press **N**) for a map of everything you have seen, with your arrow. Drag to move, scroll or pinch to zoom, *Find me* to come back. The map remembers ground you have walked away from.
@@ -25,6 +27,8 @@ released those lines move under a new version heading. The list of everything th
 - **Updates load by themselves.** Every time the app is opened or brought back to the front it checks for a newer version; if one is found while you are on the title screen the game reloads into it at once. In a world it waits and tells you, and the update loads when you quit to the title. The service worker also fetches new files past the browser's HTTP cache, so an update never caches stale copies.
 
 ### Fixed
+- **Saturation only goes down when it heals you.** Walking, sprinting and mining used to drag the hidden saturation reserve down with the hunger bar; now they only cost hunger, and the reserve is spent on healing and nothing else.
+- **The real-life clock is back on phones.** The minimap panel had dropped its "Real time" row on touch screens; both clocks show again.
 - **Save & Quit to Title no longer gets stuck on "Saving..."** on an iPhone / iPad. Safari there has no Pointer Lock API, and the game called it without checking, which threw an error before the save finished. The same call is now guarded everywhere (it also left the inventory and map open with the game still running, and the death screen with the game still running). Save & Quit also catches any failure and gives a stalled save only a few seconds, so it can never trap you.
 
 ## [1.0.0]
