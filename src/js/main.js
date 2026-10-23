@@ -50,7 +50,7 @@ const wantsTouch = () => forcedTouch ?? !!settings.get('touchControls');
 let touchMode = wantsTouch();
 document.body.classList.toggle('touch', touchMode);
 const hud = createHudPanels(settings); // the panels at the top: fold, hide, move (the gear on the clock panel)
-const refitHud = installFit(() => settings.get('hudSize')); // (also called when the HUD size changes, see applySettings)
+const refitHud = installFit(() => settings.get('hudSize'), () => settings.get('hotbarSize'), () => settings.get('touchButtonSize')); // (also called when the HUD size changes, see applySettings)
 const params = new URLSearchParams(location.search);
 
 // A newer build of the game was installed (the registration script in the built index.html checks every time the app is
