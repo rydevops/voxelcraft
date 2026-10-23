@@ -1,7 +1,7 @@
 // Items, tools, loot, recipes and goals for the engine, built from the data files (src/data/*.json).
 // Nothing here is hand-written content: add an item, recipe or loot table in the JSON and it appears in the game.
 import { REG } from './registry.js';
-import { BLOCKS, EMIT, BED, UNBREAKABLE } from './blocks.js';
+import { BLOCKS, EMIT, BED, UNBREAKABLE, PLANT } from './blocks.js';
 
 // I.STICK, I.WOOD_PICKAXE, ... : numeric ids by item key (upper-cased). Blocks live in B (blocks.js).
 export const I = {};
@@ -9,6 +9,9 @@ for (const it of REG.items) I[it.key.toUpperCase()] = it.id;
 
 const ITEM = new Map(REG.items.map((it) => [it.id, it]));
 export const isBlockItem = (id) => REG.blockById.has(id);
+// Is this item a flat plant (a flower, a fern, a sapling, a tuft of grass)? It is drawn as its flat picture when it lies on the ground, is held
+// in the hand or sits in the inventory, never as a little cube.
+export const drawsFlat = (id) => PLANT[id] > 0;
 export const itemName = (id) => (isBlockItem(id) ? BLOCKS[id].name : ITEM.get(id)?.name ?? 'Unknown');
 export const toolOf = (id) => ITEM.get(id)?.tool ?? null;
 export const foodValue = (id) => ITEM.get(id)?.food ?? 0;

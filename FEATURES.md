@@ -86,7 +86,8 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Hotbar size and touch button size settings, smaller by default on phones |
 | ✔ | Full-screen map (tap the minimap, or press **M**): drag, zoom, remembers the ground you have left |
 | ✔ | **A visible arm and hand** that holds whatever is selected (block, tool, food) and swings, bobs and lifts it to your mouth; a left arm when a torch is in your off hand |
-| ✔ | Creatures built from boxes with walking animation, a red flash when hit and tipping over when defeated |
+| ✔ | Creatures built from boxes with walking animation, a red flash when hit and tipping over when defeated; cows, pigs and sheep are painted with patches, faces, hooves, horns, ears and tails |
+| ✔ | Flowers and other flat plants are drawn flat on the ground, in your hand and in the inventory |
 | ✔ | Tree leaves rustle in the wind like the grass |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |
 | ✔ | Generated music: six in-game tracks in shuffled order and a looping title theme; generated sound effects |
