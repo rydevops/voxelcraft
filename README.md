@@ -157,7 +157,7 @@ so new content needs no code. Tests prove it by adding a whole new ore, item, to
 - **Registry** (`registry.js`): loads the JSON, checks every cross-reference, resolves names to ids; `blocks.js` / `items.js` build the engine tables from it.
 - **Startup** (`startup.js`, `pixelfont.js`): the logo, title scene and world selection run before the game loads.
 - **Music** (`music.js`, `audio.js`): the playlist and per-bar note planning are pure logic (tested in Node); `audio.js` turns the notes into piano, bell, pluck, pad, strings, bass and drone voices.
-- **Sky** (`sky.js`) and **audio** (`audio.js`): 8-minute day/night cycle; generative piano-and-pad score and synthesized sound effects.
+- **Sky** (`sky.js`) and **audio** (`audio.js`): 20-minute day/night cycle (10 minutes of day, 10 of night); generative piano-and-pad score and synthesized sound effects.
 
 ## Ideas for next steps
 

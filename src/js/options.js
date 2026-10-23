@@ -7,6 +7,8 @@ const SLIDERS = [
   { key: 'sensitivity', label: 'Look sensitivity (mouse / touch)', min: 0.1, max: 3, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
   { key: 'fov', label: 'Field of view', min: 60, max: 110, step: 1, fmt: (v) => v + '°', peek: true },
   { key: 'hudSize', label: 'HUD size (hotbar, hearts, map, goals)', min: 0.7, max: 1.8, step: 0.05, fmt: (v) => Math.round(v * 100) + '%', peek: true },
+  { key: 'hotbarSize', label: 'Hotbar size (hotbar, hearts, loot bag)', min: 0.4, max: 1.5, step: 0.05, fmt: (v) => Math.round(v * 100) + '%', peek: true },
+  { key: 'touchButtonSize', label: 'Touch button size (joystick, buttons, icons)', min: 0.5, max: 1.5, step: 0.05, fmt: (v) => Math.round(v * 100) + '%', peek: true, touchOnly: true },
   { key: 'musicVolume', label: 'Music volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
   { key: 'sfxVolume', label: 'Sound effects volume', min: 0, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' },
 ];
@@ -44,7 +46,7 @@ export function createOptions(settings, { onClose, layout }) {
     peekRow = null;
     for (const s of SLIDERS) {
       const row = document.createElement('label');
-      row.className = 'opt-row';
+      row.className = 'opt-row' + (s.touchOnly ? ' touch-only' : '');
       const name = document.createElement('span');
       name.textContent = s.label;
       const input = document.createElement('input');

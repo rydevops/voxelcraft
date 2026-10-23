@@ -38,7 +38,7 @@
     "waterAbove": 1
   },
   "time": {
-    "dayLengthSeconds": 480,
+    "dayLengthSeconds": 1200,
     "startTime": 0.08
   },
   "treeFall": {

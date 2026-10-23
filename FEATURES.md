@@ -65,6 +65,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | Fold the clock panel and the goals with a tap; a gear on the clock panel switches parts of the HUD on and off and lets you drag the panels where you like |
 | ✔ | Full Screen button on the title screen (explains the home-screen way on an iPhone) |
 | ✔ | HUD size setting (hotbar, hearts, map, goals), larger by default on phones; the goals show on phones too |
+| ✔ | Hotbar size and touch button size settings, smaller by default on phones |
 | ✔ | Full-screen map (tap the minimap, or N): drag, zoom, remembers the ground you have left |
 | ✔ | Tree leaves rustle in the wind like the grass |
 | ✔ | Circular minimap with compass, real clock, game clock and coordinates; "what you are looking at" HUD |

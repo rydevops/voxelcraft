@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { fitScale, hudScale, hudScaleFor, hotbarScaleFor, MAX_HUD } from '../src/js/fit.js';
+import { fitScale, hudScale, hudScaleFor, hotbarScaleFor, buttonScaleFor, MAX_HUD } from '../src/js/fit.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -110,6 +110,26 @@ t('on a touch screen the hotbar and loot bag always fit between the joystick and
   }
   assert.equal(hotbarScaleFor(1920, 1080, 1, false), 1, 'a desktop is left alone');
   assert.equal(hotbarScaleFor(1920, 1080, 1.5, true), 1.5, 'plenty of room: no cap');
+});
+
+t('the hotbar size and touch button size settings scale the hotbar and the buttons (and cannot break them)', () => {
+  for (const [w, h] of [[844, 390], [667, 375], [1024, 768]]) {
+    const hud = hudScaleFor(w, h, 1.3), full = hotbarScaleFor(w, h, hud, true);
+    const small = hotbarScaleFor(w, h, hud, true, 0.75);
+    assert.ok(Math.abs(small - full * 0.75) < 1e-9, `${w}x${h}: smaller hotbar`);
+    assert.ok(small < full, `${w}x${h}: 75% is smaller than 100%`);
+  }
+  assert.ok(hotbarScaleFor(1920, 1080, 1, false, 0.5) === 0.5, 'a desktop hotbar follows the setting');
+  assert.equal(hotbarScaleFor(1920, 1080, 1, false, NaN), 1);
+  assert.ok(hotbarScaleFor(844, 390, 0.5, true, 0.01) >= 0.25, 'never vanishes');
+  assert.equal(buttonScaleFor(1), 1);
+  assert.equal(buttonScaleFor(0.8), 0.8);
+  assert.equal(buttonScaleFor(0.01), 0.4); assert.equal(buttonScaleFor(9), 1.5); assert.equal(buttonScaleFor(NaN), 1);
+  const css = read('src/style.css'), opts = read('src/js/options.js'), set = read('src/js/settings.js');
+  assert.match(css, /--tb: calc\([^;]*var\(--btn\)/, 'the button size follows --btn');
+  assert.match(css, /--stick: calc\([^;]*var\(--btn\)/, 'the joystick follows --btn');
+  assert.ok(/key: 'hotbarSize'/.test(opts) && /key: 'touchButtonSize'/.test(opts), 'both have a slider in Options');
+  assert.ok(/hotbarSize: browserWantsTouch\(\) \? 0\.\d+/.test(set) && /touchButtonSize: browserWantsTouch\(\) \? 0\.\d+/.test(set), 'both start smaller on a phone');
 });
 
 t('touch: the joystick only walks (sprint is the button), every action button starts on the right, and a stuck finger cannot lock the controls', () => {
