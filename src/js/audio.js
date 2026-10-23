@@ -431,6 +431,14 @@ export class AudioEngine {
     this.noiseHit(t + 0.05, 0.05, 'highpass', 3200, 0.8, 0.18);
   }
 
+  // a villager's "hmm": two short low notes
+  villager() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime, f = 150 + Math.random() * 40;
+    this.tone(t, f, f * 1.15, 0.11, 0.2, 'triangle');
+    this.tone(t + 0.14, f * 1.2, f * 0.95, 0.15, 0.18, 'triangle');
+  }
+
   click() {
     if (!this.ctx) return;
     this.tone(this.ctx.currentTime, 900, 700, 0.04, 0.08, 'square');

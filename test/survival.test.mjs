@@ -129,10 +129,19 @@ assert.ok(!isStarving(1) && isStarving(0));
   assert.equal(s3.saturation, 8);
   assert.equal(s3.food, 20);
 
-  // saturation never exceeds food as food drops while walking
+  // saturation only goes down when it heals you: hunger draining from walking, sprinting and mining never touches it
   const s4 = state(20, 20, 20);
-  run(s4, 100, { moving: true, sprinting: true });
-  assert.ok(s4.saturation <= s4.food + 1e-9);
+  run(s4, 100, { moving: true, sprinting: true, mining: true });
+  assert.ok(s4.food < 20, 'the hunger bar drained');
+  assert.equal(s4.saturation, 20, 'but the reserve did not, because nothing needed healing');
+  // even with the bar drained far below the reserve, until health is lost the reserve stays whole
+  const s5 = state(3, 20, 15);
+  run(s5, 30, { moving: true, sprinting: false });
+  assert.equal(s5.saturation, 15);
+  // and when you are hurt it is spent only as it heals (1 per half heart), never faster
+  const s6 = state(20, 10, 8);
+  run(s6, 3 * 1.5 + 0.01, { moving: false, sprinting: false });
+  assert.equal(s6.saturation, 8 - 3 * H.saturationPerHeal);
   // eating bread to full and then being hurt: a few seconds of healing, not an endless supply
   const meal = { food: 18, saturation: 0 };
   eat(meal, foodValue(I.BREAD), saturationValue(I.BREAD));

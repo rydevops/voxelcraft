@@ -3,7 +3,7 @@
 // below are drawn in code. No image files are required.
 import { mulberry32 } from './noise.js';
 import { REG } from './registry.js';
-import { TILE_NAMES, BLOCKS, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
+import { TILE_NAMES, BLOCKS, SHAPE, ATLAS_COLS, ATLAS_ROWS } from './blocks.js';
 import { isBlockItem, itemKey } from './items.js';
 import { paintTile, paintSprite, imageSources, T } from './tilegen.js';
 import { crackPixels, CRACK_STAGES } from './mining.js';
@@ -206,6 +206,27 @@ export function blockIcon(atlas, id, size = 44) {
     x.restore();
   };
   const cx = a;
+  if (SHAPE[id] === 1) { // stairs: a low step along the front and a tall one behind it
+    // each part is a box (A, B along the two floor directions, Y up, all 0-1); its faces are cut out of the same tiles
+    const part = (A0, A1, B0, B1, Y0, Y1) => {
+      const sub = (name, m, u0, v0, u1, v1, shade) => { // the piece (u0..u1, v0..v1 of the tile) of a face whose local frame is m
+        const [sx, sy] = tileXY(name);
+        x.save();
+        x.transform(...m);
+        x.drawImage(atlas, sx + u0 * T, sy + v0 * T, (u1 - u0) * T, (v1 - v0) * T, u0 * T, v0 * T, (u1 - u0) * T, (v1 - v0) * T);
+        x.fillStyle = `rgba(0,0,0,${shade})`;
+        x.fillRect(u0 * T, v0 * T, (u1 - u0) * T, (v1 - v0) * T);
+        x.restore();
+      };
+      // the matrices put each face at the outer edge of the whole cube, so a box that is smaller is moved in to where its face is
+      sub(def.top, [a / T, b / T, -a / T, b / T, cx, (1 - Y1) * h], A0, B0, A1, B1, 0);                          // top: lowered to Y1
+      sub(def.side, [a / T, b / T, 0, h / T, cx - a, b], A0, 1 - Y1, A1, 1 - Y0, 0.25);                       // left: the B = 1 side
+      sub(def.side, [a / T, -b / T, 0, h / T, cx + (A1 - 1) * a, 2 * b + (A1 - 1) * b], 1 - B1, 1 - Y1, 1 - B0, 1 - Y0, 0.45); // right: the A = A1 side
+    };
+    part(0, 1, 0, 1, 0, 0.5);
+    part(0, 0.5, 0, 1, 0.5, 1);
+    return c;
+  }
   face(def.top, [a / T, b / T, -a / T, b / T, cx, 0], 0);                 // top
   face(def.side, [a / T, b / T, 0, h / T, cx - a, b], 0.25);               // left
   face(def.side, [a / T, -b / T, 0, h / T, cx, 2 * b], 0.45);              // right

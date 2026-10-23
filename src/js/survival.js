@@ -2,7 +2,8 @@
 // (tuning is in game.json "hunger").
 //
 //  food        the hunger bar, 0-20 points (2 points = one icon)
-//  saturation  a hidden reserve that eating tops up (capped at maxSaturation and never more than the food you have).
+//  saturation  a hidden reserve that eating tops up (capped at maxSaturation and, when you eat, at the food you then have).
+//              It only goes down when it is spent on healing: hunger draining from walking or sprinting never touches it.
 //              It is what heals you: once the hunger bar is full, healing spends saturation, one half-heart at a time.
 //              When that reserve runs dry half an icon of hunger disappears, and healing stops until you eat again.
 //              An empty reserve on its own never drains the hunger bar.
@@ -49,7 +50,7 @@ export function eat(s, foodPoints, saturationPoints) {
 // Returns { healed, starved } where starved is the damage to apply now (0 = none).
 export function tickHunger(s, dt, { moving, sprinting, mining = false, maxHealth }) {
   const out = { healed: false, starved: 0 };
-  s.saturation = Math.min(s.saturation ?? 0, s.food);
+  s.saturation = s.saturation ?? 0;
 
   // healing: a full hunger bar, something in the reserve and some health to win back
   if (barFull(s.food) && s.saturation > 0 && s.health < maxHealth) {
@@ -73,6 +74,6 @@ export function tickHunger(s, dt, { moving, sprinting, mining = false, maxHealth
 
   if (moving) s.food = Math.max(0, s.food - dt * (H.drainPerSecond + (sprinting ? H.sprintDrainPerSecond : 0)));
   if (mining) s.food = Math.max(0, s.food - dt * H.miningDrainPerSecond); // working at a block, even while standing still
-  s.saturation = Math.min(s.saturation, s.food);
+  // (saturation is left alone here: walking, sprinting and mining only ever cost food. The reserve is spent on nothing but healing.)
   return out;
 }

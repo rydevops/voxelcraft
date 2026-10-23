@@ -22,7 +22,7 @@ for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = 
 function isGrounded(world, x, y, z) {
   if (y <= 0 || !world.isLoaded(x, z)) return true;
   const below = world.getBlock(x, y - 1, z);
-  return SOLID[below] === 1 && !ROLE_LOG[below] && !ROLE_LEAF[below];
+  return SOLID[below] > 0 && !ROLE_LOG[below] && !ROLE_LEAF[below];
 }
 
 // Work out which blocks fall after the log at (bx, by, bz) was broken.

@@ -8,7 +8,7 @@ import { GLYPHS } from './pixelfont.js';
 export class DataError extends Error {}
 
 const FILES = ['blocks', 'items', 'loot', 'recipes', 'goals', 'textures', 'sounds', 'worldgen', 'game', 'music'];
-const KNOWN_FLAGS = ['tilled', 'planted', 'ate', 'equipped'];
+const KNOWN_FLAGS = ['tilled', 'planted', 'ate', 'equipped', 'village', 'talked'];
 const TILE_TYPES = ['noise', 'capped', 'bark', 'rings', 'planks', 'cells', 'waves', 'bricks', 'ore', 'stripes', 'blades', 'stalks', 'pixelart', 'image', 'layers', 'ref'];
 const KEY_RE = /^[a-z][a-z0-9_]*$/;
 
@@ -117,7 +117,13 @@ export function buildRegistry(data) {
     if (b.shatterLoot != null && !lootIn[b.shatterLoot]) err(`${where}: shatterLoot table "${b.shatterLoot}" is not defined in loot.json`);
     if (b.role != null && !['log', 'leaf'].includes(b.role)) err(`${where}: "role" must be "log" or "leaf"`);
     if (b.opens != null && !windowsIn[b.opens]) err(`${where}: opens "${b.opens}" is not a window in recipes.json`);
-    if (b.model != null && !(b.model.type === 'torch' && isNum(b.model.height) && b.model.height > 0 && b.model.height <= 1)) err(`${where}: "model" must be { "type": "torch", "height": 0-1, "lean": [dx, dz] }`);
+    if (b.model != null) {
+      const m = b.model;
+      if (m.type === 'torch') { if (!(isNum(m.height) && m.height > 0 && m.height <= 1)) err(`${where}: a torch "model" needs "height": 0-1 (and "lean": [dx, dz])`); }
+      else if (m.type === 'stairs') { if (!['n', 'e', 's', 'w'].includes(m.facing)) err(`${where}: a stairs "model" needs "facing": n, e, s or w (the side the tall back is on)`); }
+      else if (m.type === 'door') { if (!(['x', 'z'].includes(m.axis) && ['bottom', 'top'].includes(m.half) && typeof m.open === 'boolean')) err(`${where}: a door "model" needs "axis": x or z, "half": bottom or top and "open": true or false`); }
+      else err(`${where}: "model" type must be torch, stairs or door`);
+    }
     if (b.model?.lean != null && !(isArr(b.model.lean) && b.model.lean.length === 2 && b.model.lean.every(Number.isInteger))) err(`${where}: model.lean must be [dx, dz]`);
     if (b.support != null && !(isArr(b.support) && b.support.length === 3 && b.support.every(Number.isInteger))) err(`${where}: "support" must be [dx, dy, dz]: where the block it hangs on is`);
     if (b.fuel != null && !(isNum(b.fuel) && b.fuel > 0)) err(`${where}: "fuel" must be the seconds it burns in a furnace`);
@@ -132,7 +138,8 @@ export function buildRegistry(data) {
       waterLevel: b.water ? b.water.level : 0,
       role: b.role ?? null, opens: b.opens ?? null,
       gravity: !!b.gravity, // falls when nothing is underneath (sand)
-      model: b.model ? { type: b.model.type, height: b.model.height, lean: b.model.lean ?? [0, 0] } : null, // drawn as a small model instead of a cube (torches)
+      model: b.model ? { type: b.model.type, height: b.model.height, lean: b.model.lean ?? [0, 0], facing: b.model.facing, axis: b.model.axis, half: b.model.half, open: !!b.model.open } : null, // drawn as a small model instead of a cube (torches, stairs, doors)
+      variantOf: b.variantOf ? needBlock(b.variantOf, `${where} variantOf`) : 0, // another way round of the same block (stairs facing other ways): it drops and picks as that block
       support: b.support ?? null, // [dx, dy, dz] of the solid block this one hangs on; it drops as an item when that goes
       fuel: b.fuel ?? 0, // seconds it burns in a furnace
       glow: b.glow ?? 0, // self-illumination 0-1 (ores): the block stays visible in the dark without lighting its surroundings
@@ -203,6 +210,7 @@ export function buildRegistry(data) {
         return [face, needBlock(k, `${where} places.${face}`)];
       })) : null, // block placed for the face you click (torches); no "down": they cannot hang from a ceiling
 
+      door: it.door ? needBlock(it.door, `${where} door`) : 0, // places a two-block-tall door: the block key of its closed lower half
       plants: it.plants ? { block: needBlock(it.plants.block, `${where} plants.block`), on: [].concat(it.plants.on).map((k) => needBlock(k, `${where} plants.on`)) } : null, // `on` may be one block or a list
     };
   });

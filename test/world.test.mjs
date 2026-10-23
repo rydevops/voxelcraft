@@ -161,7 +161,7 @@ assert.equal(world.getBlock(CS + 4, 10, CS + 5), c0.data[idx(4, 10, 5)]);
 // worlds that were played before the biomes keep the original terrain exactly
 {
   const classic = new World(1337, { terrain: 1 }), modern = new World(1337);
-  assert.equal(classic.terrain, 1); assert.equal(modern.terrain, 2);
+  assert.equal(classic.terrain, 1); assert.equal(modern.terrain, 3);
   assert.equal(classic.biomeAt(10, 10), null);
   let differ = 0;
   for (let x = -300; x < 300; x += 15) for (let z = -300; z < 300; z += 15) if (classic.heightAt(x, z) !== modern.heightAt(x, z)) differ++;
