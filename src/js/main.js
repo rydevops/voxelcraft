@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { World, LATEST_TERRAIN } from './world.js';
 import { B, BLOCKS, STAIRS, DOOR, DOOR_PLACE, DOOR_KINDS, PALETTE, PLANT, PLANT_H, PLANT_HALF, LEAN, SUPPORT, SOLID, IS_WATER, TILLS_INTO, OPENS, ROLE_LOG, HYDRATION, UNBREAKABLE, BED, CHEST, PLACE_ON, AXIS_VARIANTS } from './blocks.js';
 import { REG } from './registry.js';
-import { I, isBlockItem, itemForBlock, isDoorItem, doorBlockOf, bedOf, upgradeOf, isShears, toolDigs, rollLoot, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
+import { I, isBlockItem, drawsFlat, itemForBlock, isDoorItem, doorBlockOf, bedOf, upgradeOf, isShears, toolDigs, rollLoot, itemName, toolOf, toolWear, heldLight, isOffhand, foodValue, saturationValue, plantsOf, placesOf, WINDOWS, tierName, miningInfo, dropsFor, shatterDrops, GOALS, GROWTH_INFO } from './items.js';
 import { Inventory } from './inventory.js';
 import { ChunkRenderer } from './chunks.js';
 import { Player, raycast } from './player.js';
@@ -269,7 +269,7 @@ function refreshHeld() {
   if (id === heldKey) return;
   heldKey = id;
   if (!id) { held.visible = false; pose = POSES.arm; }
-  else if (isBlockItem(id)) { held.geometry = blockGeometry(id); held.material = heldBlockMat; pose = POSES.block; held.visible = true; }
+  else if (isBlockItem(id) && !drawsFlat(id)) { held.geometry = blockGeometry(id); held.material = heldBlockMat; pose = POSES.block; held.visible = true; }
   else { held.geometry = spriteGeometry(id, true); held.material = heldSpriteMat; pose = !toolOf(id) ? POSES.sprite : toolOf(id).type === 'axe' ? POSES.axe : POSES.tool; held.visible = true; }
 }
 

@@ -1,7 +1,7 @@
 // Items lying in the world: they pop out of broken blocks, fall, spin, and get sucked into the inventory.
 import * as THREE from 'three';
 import { SOLID } from './blocks.js';
-import { isBlockItem } from './items.js';
+import { isBlockItem, drawsFlat } from './items.js';
 import { blockGeometry, spriteGeometry } from './models.js';
 
 const MAX_DROPS = 160;
@@ -19,7 +19,7 @@ export class Drops {
 
   spawn(id, n, x, y, z, { d = 0, delay = 0.5, vx, vy, vz, life = LIFETIME, age = 0 } = {}) {
     if (this.items.length >= MAX_DROPS) this.remove(0);
-    const block = isBlockItem(id);
+    const block = isBlockItem(id) && !drawsFlat(id); // (a flower lying on the ground is the flower, not a cube of it)
     const mesh = new THREE.Mesh(block ? blockGeometry(id) : spriteGeometry(id), block ? this.blockMat : this.spriteMat);
     mesh.scale.setScalar(block ? 0.28 : 0.5);
     this.group.add(mesh);
