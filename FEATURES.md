@@ -18,7 +18,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | ✔ | **Weather**: rain, thunderstorms with lightning and thunder, snow and blizzards in cold biomes, sandstorms in the heat, and rare hurricanes at sea; rain particles only fall where there is open sky, storms darken the sky, hide the sun and shorten how far you see, and the grass and leaves sway harder; the clock panel shows biome and weather |
 | ✔ | Villages in new worlds: a well, dirt roads, houses with glass windows, doors and stair roofs, wheat farms, lamp posts, different every time |
 | ✔ | **Five to seven villagers per village (new worlds), each with a house of their own and a bed** in it; at night they open their own door, go in, lie down and sleep, and get up at dawn |
-| ✔ | **Villager quests**: right-click a villager to see the job they have for you (bring items, or defeat monsters), **accept or decline** it and hand it in for a reward; the harder the job (easy, medium, hard) the better the loot pool |
+| ✔ | **Villager quests**: right-click a villager to see the job they have for you (bring items, or defeat monsters), **accept or decline** it and hand it in for a reward (a villager **glows gold** once your job for them is done); the harder the job (easy, medium, hard) the better the loot pool |
 | ✔ | **Animals**: cows (beef, leather), pigs (porkchops) and sheep (wool, lamb chops, and shearing) wander in herds on grass, graze, run when hurt, and are saved with the world |
 | ✔ | **Monsters**: zombies, skeletons (they shoot arrows) and spiders appear only where the light level is below 6 (night, caves), never too many at once, never close, never in villages; they attack when they see you, burn away in daylight, drop loot of their own and give experience |
 | ✔ | Stairs (planks, cobblestone, brick; half-block steps you walk up), openable doors, glass (smelted from sand), dirt paths |
@@ -53,6 +53,7 @@ Legend: **✔** works today · **◐** partly there / limited · **✘** not bui
 | | Feature |
 |---|---|
 | ✔ | Mining with exact timing and crack animation; tool tiers (wood, stone, iron); tools wear out, faster on the wrong block |
+| ✔ | **Bridge assist**: with nothing targeted, placing a block builds forwards off the block you stand on (a bridge without crouching); an Options toggle |
 | ✔ | Placing blocks, falling sand and gravel-type blocks, plants that uproot when their soil goes |
 | ✔ | Trees fall over when a log is cut, shatter into logs and leaf loot; saplings regrow trees |
 | ✔ | Farming: hoes, farmland that is damp near water and dries out, seeds, wheat, bread |

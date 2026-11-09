@@ -15,6 +15,7 @@ const SLIDERS = [
 const TOGGLES = [
   { key: 'invertY', label: 'Invert mouse Y axis' },
   { key: 'rawInput', label: 'Raw mouse input (no OS acceleration)' },
+  { key: 'bridgeAssist', label: 'Bridge assist (place a block ahead when nothing is targeted)' },
   { key: 'touchControls', label: 'On-screen touch controls (sticks and buttons)' },
 ];
 

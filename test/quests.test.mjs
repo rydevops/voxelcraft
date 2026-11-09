@@ -143,4 +143,18 @@ t('quests are saved with the world', () => {
   assert.equal(back.activeCount, q.activeCount);
 });
 
+t('readyKeys: only the villagers whose accepted job is finished (and not yet handed in) are listed', () => {
+  const q = new Quests(7);
+  const inv = new Inventory();
+  q.accept('V:1', 'farmer', { name: 'Ann', village: 'X' });
+  q.accept('V:2', 'blacksmith', { name: 'Bo', village: 'X' });
+  q.of('V:3', 'cleric'); // offered, not accepted
+  assert.equal(q.readyKeys(inv).size, 0, 'nothing done yet');
+  const o = q.of('V:1', 'farmer').offer;
+  if (o.type === 'fetch') inv.add(o.item, o.count); else for (let i = 0; i < o.count; i++) q.recordKill(o.mob);
+  assert.deepEqual([...q.readyKeys(inv)], ['V:1'], 'only the finished, accepted one');
+  q.complete('V:1', 'farmer', inv);
+  assert.equal(q.readyKeys(inv).size, 0, 'handed in: the glow goes out');
+});
+
 console.log('quests: ' + n + ' checks passed');
