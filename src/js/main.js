@@ -44,6 +44,7 @@ import { daylight } from './daylight.js';
 import { bedCells, bedGroup, bedDrops, bedSpawn, isBed, sleepTime } from './beds.js';
 import { Chests, ChestSource, chestTier } from './chests.js';
 import { Quests } from './quests.js';
+import { bridgeHit } from './bridge.js';
 import { createDialog } from './dialog.js';
 import { setDoorOpen } from './doors.js';
 import { bedtime } from './villagerai.js';
@@ -1683,9 +1684,29 @@ function pickUp(it) {
   return true;
 }
 
+// Nothing under the crosshair while holding a plain block: build forwards off the block you stand on (see bridge.js), so a bridge
+// goes out without crouching and looking at the side of the last block. Returns a hit to place against, or null.
+function plainBlockHeld() {
+  const st = stackAt(slot);
+  return !!st && isBlockItem(st.id) && !PLANT[st.id] && !isDoorItem(st.id) && !bedOf(st.id) && !PLACE_ON.has(st.id) && !plantsOf(st.id) && !placesOf(st.id) && toolOf(st.id)?.type !== 'hoe';
+}
+function bridgeTarget() {
+  if (!settings.get('bridgeAssist') || !player.onGround || player.flying || lookDir.y > 0.6 || !plainBlockHeld()) return null; // (not looking steeply up at the sky)
+  const h = bridgeHit(world, player.pos, player.hw, lookFacing());
+  if (!h) return null;
+  const x = h.x + h.nx, y = h.y + h.ny, z = h.z + h.nz;
+  if (!canPlaceAt(x, y, z) || player.intersectsBlock(x, y, z)) return null;
+  return Math.hypot(x + 0.5 - player.eye.x, y + 0.5 - player.eye.y, z + 0.5 - player.eye.z) <= GAME.player.reach ? h : null;
+}
+
 function updateInteraction(dt) {
   const hit = lookTarget();
-  if (hit) {
+  const bridge = hit || mouseDown.left ? null : bridgeTarget();
+  if (bridge) { // (a preview of where the block will go: the outline sits on the empty spot)
+    outline.visible = true;
+    outline.scale.set(1, 1, 1);
+    outline.position.set(bridge.x + bridge.nx + 0.5, bridge.y + bridge.ny + 0.5, bridge.z + bridge.nz + 0.5);
+  } else if (hit) {
     outline.visible = true;
     // plants get a box that matches their size; everything else a full block
     const ph = PLANT[hit.id] ? PLANT_H[hit.id] : 1;
@@ -1759,6 +1780,12 @@ function updateInteraction(dt) {
   }
 
   updateEating(dt, hit);
+
+  if (mouseDown.right && bridge && placeTimer <= 0 && !eating) {
+    placeTimer = 0.22;
+    rightFresh = false;
+    placeBlock(bridge);
+  }
 
   if (mouseDown.right && hit && placeTimer <= 0 && !eating) {
     placeTimer = 0.22;
@@ -2035,6 +2062,7 @@ let plantTimer = 0;
 let regenTimer = 0, starveTimer = 0;
 let eatBlend = 0; // 0..1: how far the held item is raised to the mouth
 
+let readyVillagers = new Set(), readyAt = 0;
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); // (the very first frame can report a time just before ours)
@@ -2140,7 +2168,8 @@ function frame(now) {
   updateClocks(now);
   updateParticles(dt);
   updateEnvironment();
-  villagers.update(playing || screen ? dt : 0, { x: player.pos.x, z: player.pos.z }, tintUniform.value, now, { night: bedtime(dayTime), setDoor: setDoorFor });
+  if (now - readyAt > 250) { readyAt = now; readyVillagers = quests.readyKeys(inventory); } // (who glows: a finished job waiting to be handed in)
+  villagers.update(playing || screen ? dt : 0, { x: player.pos.x, z: player.pos.z }, tintUniform.value, now, { night: bedtime(dayTime), setDoor: setDoorFor, ready: readyVillagers });
   checkVillage(now);
   renderer.render(scene, camera);
 

@@ -95,6 +95,9 @@ export class Quests {
     return out;
   }
 
+  // The villagers (keys) whose job you have finished but not handed in yet: they glow in the world so you know whom to go back to
+  readyKeys(inventory) { return new Set(this.activeList(inventory).filter((j) => j.ready).map((j) => j.key)); }
+
   get activeCount() { return Object.values(this.state).filter((s) => s.status === 'active').length; }
 
   serialize() { return { completed: this.completed, state: JSON.parse(JSON.stringify(this.state)) }; }

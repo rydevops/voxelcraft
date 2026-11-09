@@ -5,6 +5,8 @@ import { World } from '../src/js/world.js';
 import { villageOfRegion } from '../src/js/villages.js';
 import { Villager, pickVillager, JOBS } from '../src/js/villagerai.js';
 import { SOLID, IS_WATER } from '../src/js/blocks.js';
+import * as THREE from 'three';
+import { createVillagers } from '../src/js/villagers.js';
 
 let n = 0;
 const t = (name, fn) => { try { fn(); n++; } catch (e) { e.message = name + ': ' + e.message; throw e; } };
@@ -80,6 +82,21 @@ t('every job has something to say by day and by night, and it mentions the villa
     }
   }
   assert.ok([...seen].some((l) => l.includes(village.name)), 'someone welcomes you to the village by name');
+});
+
+t('a villager whose job is finished glows (an aura and a diamond), and only that one, and it goes out when it is handed in', () => {
+  const scene = new THREE.Scene();
+  const vs = createVillagers({ scene, world });
+  const pl = { x: village.cx, z: village.cz }, tint = new THREE.Color(1, 1, 1);
+  vs.update(5, pl, tint, 1000, { night: false });
+  const all = vs.all();
+  assert.ok(all.length >= 2, 'the village has people');
+  const glows = () => { const out = []; scene.traverse((o) => { if (o.userData?.gem && o.visible) out.push(o); }); return out; };
+  assert.equal(glows().length, 0, 'nobody glows by default');
+  vs.update(0.05, pl, tint, 1100, { night: false, ready: new Set([all[0].key]) });
+  assert.equal(glows().length, 1, 'one glows');
+  vs.update(0.05, pl, tint, 1200, { night: false, ready: new Set() });
+  assert.equal(glows().length, 0, 'and it stops once handed in');
 });
 
 console.log(`villagers: ${n} checks passed`);

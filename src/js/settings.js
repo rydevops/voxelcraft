@@ -38,6 +38,7 @@ const DEFAULTS = {
   hudSize: browserWantsTouch() ? 1.3 : 1, // multiplier on the HUD (hotbar, hearts, minimap, clock): bigger by default on a phone
   hotbarSize: browserWantsTouch() ? 0.75 : 1, // multiplier on the hotbar (and the hearts and loot bag attached to it): smaller by default on a phone
   touchButtonSize: browserWantsTouch() ? 0.8 : 1, // multiplier on the on-screen joystick and buttons (and their icons)
+  bridgeAssist: true, // with nothing under the crosshair, placing a block builds forwards off the block you stand on (bridges without crouching)
   hudShow: {},      // parts of the HUD the player switched off (see hudmath.js HUD_ITEMS); empty = everything shown
   hudCollapsed: {}, // panels folded away by tapping them: { info: true }
   hudLayout: {},    // where the player dragged the HUD panels to (see hudmath.js cleanHudLayout); empty = the built-in places

@@ -24,6 +24,23 @@ function mat(rgb) {
   return m;
 }
 
+// A villager whose job you have finished glows: a pulsing gold aura around them and a gold diamond turning above their head. These
+// are not in `materials`, so the time-of-day tint does not dim them: they stand out at night too.
+const auraMat = new THREE.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false });
+const gemMat = new THREE.MeshBasicMaterial({ color: 0xffe35a });
+function buildGlow() {
+  const g = new THREE.Group();
+  const aura = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.0, 0.75), auraMat);
+  aura.position.y = 1.0;
+  const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.22), gemMat);
+  gem.scale.y = 1.5;
+  gem.position.y = 2.4;
+  g.add(aura, gem);
+  g.visible = false;
+  g.userData = { gem };
+  return g;
+}
+
 function box(w, h, d, rgb, x, y, z, pivotTop = false) {
   const g = new THREE.BoxGeometry(w, h, d);
   if (pivotTop) g.translate(0, -h / 2, 0); // the box hangs from its origin (a leg swings from the hip)
@@ -54,7 +71,9 @@ function buildModel(v) {
   g.add(head);
   if (v.job === 'blacksmith') g.add(box(0.5, 0.56, 0.04, [0.22, 0.17, 0.14], 0, 0.9, -0.18)); // a leather apron
   if (v.job === 'librarian') g.add(box(0.1, 0.62, 0.34, [0.6, 0.12, 0.12], 0, 1.02, 0)); // a red stole down the middle
-  g.userData = { legL, legR, head };
+  const glow = buildGlow();
+  g.add(glow);
+  g.userData = { legL, legR, head, glow };
   return g;
 }
 
@@ -124,6 +143,7 @@ export function createVillagers({ scene, world }) {
         for (const v of near) if (!active.has(v.key) && Math.hypot(v.cx - player.x, v.cz - player.z) < SPAWN_RANGE + 20) spawnVillage(v, !!env?.night);
         for (const [key, a] of [...active]) if (Math.hypot(a.village.cx - player.x, a.village.cz - player.z) > KEEP_RANGE) removeVillage(key);
       }
+      auraMat.opacity = 0.2 + 0.2 * (0.5 + 0.5 * Math.sin(now * 0.005)); // (one pulse for everybody)
       for (const a of active.values()) {
         for (const { v, mesh } of a.list) {
           const d = Math.hypot(v.x - player.x, v.z - player.z);
@@ -131,6 +151,14 @@ export function createVillagers({ scene, world }) {
           mesh.visible = on;
           if (!on) continue;
           v.update(Math.min(dt, 0.05), player, now, env);
+          const glow = mesh.userData.glow, ready = !!env?.ready?.has(v.key); // (env.ready: the keys of the villagers waiting for you to hand in a finished job)
+          glow.visible = ready;
+          if (ready) {
+            const gem = glow.userData.gem;
+            gem.visible = v.mode !== 'sleeping'; // (lying down, the diamond would float sideways)
+            gem.rotation.y = now * 0.003;
+            gem.position.y = 2.4 + 0.08 * Math.sin(now * 0.004);
+          }
           if (v.mode === 'sleeping') { // lying on the bed, head on the pillow
             const p = v.sleepPose();
             mesh.position.set(p.x, p.y + 0.02, p.z);
