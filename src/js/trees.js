@@ -10,10 +10,10 @@ export const variantByKey = (key) => VARIANTS.find((v) => v.key === key);
 const OAK = variantByKey('oak') ?? VARIANTS[0]; // the original tree: chunks saved before the other kinds existed keep it
 
 // Which kind of tree grows at this column? Chosen by a hash of the position among the variants that suit the terrain height.
-// (`biome` is optional: when given, variants that list biomes only grow in those)
-export function pickVariant(seed, wx, wz, groundHeight, legacy = false, biome = null) {
+// (`biome` is optional: when given, variants that list biomes only grow in those; a variant with `since: 4` only grows in terrain 4 worlds)
+export function pickVariant(seed, wx, wz, groundHeight, legacy = false, biome = null, terrain = 1) {
   if (legacy) return OAK;
-  const ok = VARIANTS.filter((v) => groundHeight >= v.heights[0] && groundHeight <= v.heights[1] && (!biome || !v.biomes || v.biomes.includes(biome)));
+  const ok = VARIANTS.filter((v) => v.since <= terrain && groundHeight >= v.heights[0] && groundHeight <= v.heights[1] && (!biome || !v.biomes || v.biomes.includes(biome)));
   if (!ok.length) return OAK;
   let r = hash2(wx, wz, seed + 13) * ok.reduce((t, v) => t + v.weight, 0);
   for (const v of ok) { if (r < v.weight) return v; r -= v.weight; }
@@ -48,6 +48,10 @@ export function treeBlocks(v, seed, wx, h, wz) {
     const radii = [0, 1, 1, 2, 2, 3, 3]; // from the tip down
     const layers = Math.min(radii.length, trunk - 1);
     for (let i = 0; i < layers; i++) layer(out, wx, top + 1 - i, wz, radii[i], v.leavesId, seed, 'always');
+  } else if (v.shape === 'flat') { // an acacia: a wide, flat crown on a bare trunk
+    layer(out, wx, top, wz, 3, v.leavesId, seed, 'always');
+    layer(out, wx, top + 1, wz, 2, v.leavesId, seed, 'always');
+    layer(out, wx, top - 1, wz, 1, v.leavesId, seed, 'random');
   } else { // bush: a little ball of leaves around a stump
     layer(out, wx, top, wz, 1, v.leavesId, seed, 'random');
     layer(out, wx, top + 1, wz, 1, v.leavesId, seed, 'random');

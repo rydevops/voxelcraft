@@ -1,0 +1,335 @@
+{
+  "_comment": "What villagers ask for. Every job has easy / medium / hard jobs; the harder the job, the better the loot table (tiers.loot) it pays from. fetch = bring items (taken from you), slay = defeat monsters while the quest is open.",
+  "tiers": {
+    "easy": {
+      "label": "Easy",
+      "loot": "quest_easy",
+      "xp": 10,
+      "weight": 5,
+      "reward": "Food, coal, torches and seeds"
+    },
+    "medium": {
+      "label": "Medium",
+      "loot": "quest_medium",
+      "xp": 25,
+      "weight": 3,
+      "reward": "Iron, cooked meat, dyes and the odd stone weapon"
+    },
+    "hard": {
+      "label": "Hard",
+      "loot": "quest_hard",
+      "xp": 60,
+      "weight": 1.5,
+      "reward": "Plenty of iron, iron tools, weapons and armor"
+    }
+  },
+  "jobs": {
+    "farmer": {
+      "easy": [
+        {
+          "type": "fetch",
+          "item": "wheat",
+          "count": [
+            6,
+            10
+          ],
+          "text": "My bread oven is cold. Bring me {n} wheat?"
+        },
+        {
+          "type": "fetch",
+          "item": "apple",
+          "count": [
+            2,
+            4
+          ],
+          "text": "I would love {n} apples for a pie."
+        }
+      ],
+      "medium": [
+        {
+          "type": "fetch",
+          "item": "bread",
+          "count": [
+            4,
+            8
+          ],
+          "text": "The whole village is hungry. Could you bake {n} loaves?"
+        },
+        {
+          "type": "fetch",
+          "item": "steak",
+          "count": [
+            2,
+            4
+          ],
+          "text": "A feast needs meat: {n} steaks, if you can."
+        }
+      ],
+      "hard": [
+        {
+          "type": "fetch",
+          "item": "wheat",
+          "count": [
+            24,
+            40
+          ],
+          "text": "The harvest failed. Bring {n} wheat and we will survive the winter."
+        },
+        {
+          "type": "slay",
+          "mob": "zombie",
+          "count": [
+            4,
+            6
+          ],
+          "text": "Zombies trample my fields at night. Put down {n} of them."
+        }
+      ]
+    },
+    "blacksmith": {
+      "easy": [
+        {
+          "type": "fetch",
+          "item": "coal",
+          "count": [
+            6,
+            10
+          ],
+          "text": "The forge is nearly out of fuel. {n} coal would do."
+        },
+        {
+          "type": "fetch",
+          "item": "stick",
+          "count": [
+            8,
+            14
+          ],
+          "text": "I need {n} sticks for handles."
+        }
+      ],
+      "medium": [
+        {
+          "type": "fetch",
+          "item": "iron_ingot",
+          "count": [
+            3,
+            6
+          ],
+          "text": "Bring me {n} iron ingots and I will pay you well."
+        },
+        {
+          "type": "slay",
+          "mob": "skeleton",
+          "count": [
+            2,
+            3
+          ],
+          "text": "Skeletons raid my ore carts. Defeat {n} of them."
+        }
+      ],
+      "hard": [
+        {
+          "type": "fetch",
+          "item": "iron_ingot",
+          "count": [
+            12,
+            18
+          ],
+          "text": "A big order came in: {n} iron ingots, please."
+        },
+        {
+          "type": "slay",
+          "mob": "spider",
+          "count": [
+            4,
+            6
+          ],
+          "text": "Spiders have nested in my mine. Clear out {n}."
+        }
+      ]
+    },
+    "librarian": {
+      "easy": [
+        {
+          "type": "fetch",
+          "item": "planks",
+          "count": [
+            8,
+            14
+          ],
+          "text": "We need {n} planks for new shelves."
+        },
+        {
+          "type": "fetch",
+          "item": "torch",
+          "count": [
+            6,
+            10
+          ],
+          "text": "It is too dark to read. Bring {n} torches!"
+        }
+      ],
+      "medium": [
+        {
+          "type": "fetch",
+          "item": "glass",
+          "count": [
+            6,
+            10
+          ],
+          "text": "Windows for the library: {n} glass, please."
+        },
+        {
+          "type": "fetch",
+          "item": "wool",
+          "count": [
+            4,
+            8
+          ],
+          "text": "Cushions need stuffing: {n} wool."
+        }
+      ],
+      "hard": [
+        {
+          "type": "slay",
+          "mob": "skeleton",
+          "count": [
+            5,
+            7
+          ],
+          "text": "The old crypt is full of bones. Defeat {n} skeletons to make it safe."
+        },
+        {
+          "type": "fetch",
+          "item": "bed_double_white",
+          "count": 1,
+          "text": "A guest is coming. Could you make a double bed?"
+        }
+      ]
+    },
+    "cleric": {
+      "easy": [
+        {
+          "type": "fetch",
+          "item": "rose",
+          "count": [
+            3,
+            5
+          ],
+          "text": "The shrine needs {n} roses."
+        },
+        {
+          "type": "fetch",
+          "item": "dandelion",
+          "count": [
+            3,
+            6
+          ],
+          "text": "Yellow flowers for the altar: {n} dandelions."
+        }
+      ],
+      "medium": [
+        {
+          "type": "fetch",
+          "item": "lamb_chop",
+          "count": [
+            3,
+            5
+          ],
+          "text": "The pilgrims need feeding. {n} lamb chops, please."
+        },
+        {
+          "type": "slay",
+          "mob": "zombie",
+          "count": [
+            3,
+            4
+          ],
+          "text": "The dead walk by night. Lay {n} zombies to rest."
+        }
+      ],
+      "hard": [
+        {
+          "type": "slay",
+          "mob": "zombie",
+          "count": [
+            8,
+            10
+          ],
+          "text": "A great darkness is coming. Defeat {n} zombies and bring peace."
+        },
+        {
+          "type": "fetch",
+          "item": "rotten_flesh",
+          "count": [
+            10,
+            16
+          ],
+          "text": "I must study the curse. Bring me {n} pieces of rotten flesh."
+        }
+      ]
+    },
+    "mason": {
+      "easy": [
+        {
+          "type": "fetch",
+          "item": "cobble",
+          "count": [
+            16,
+            32
+          ],
+          "text": "I am short of stone: {n} cobblestone, please."
+        },
+        {
+          "type": "fetch",
+          "item": "sand",
+          "count": [
+            10,
+            16
+          ],
+          "text": "Mortar needs {n} sand."
+        }
+      ],
+      "medium": [
+        {
+          "type": "fetch",
+          "item": "brick",
+          "count": [
+            8,
+            14
+          ],
+          "text": "We are building a wall. {n} bricks?"
+        },
+        {
+          "type": "fetch",
+          "item": "stone_bricks",
+          "count": [
+            8,
+            14
+          ],
+          "text": "The new hall needs {n} stone bricks."
+        }
+      ],
+      "hard": [
+        {
+          "type": "fetch",
+          "item": "stone_bricks",
+          "count": [
+            32,
+            48
+          ],
+          "text": "A tower! I need {n} stone bricks, a lot of them."
+        },
+        {
+          "type": "fetch",
+          "item": "iron_ingot",
+          "count": [
+            8,
+            12
+          ],
+          "text": "Iron braces for the tower: {n} ingots."
+        }
+      ]
+    }
+  }
+}

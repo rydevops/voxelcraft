@@ -22,7 +22,7 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 const CHECK = process.argv.includes('--check');
-const DATA_FILES = ['blocks', 'items', 'loot', 'recipes', 'goals', 'textures', 'sounds', 'worldgen', 'game', 'music'];
+const DATA_FILES = ['blocks', 'items', 'loot', 'recipes', 'goals', 'textures', 'sounds', 'worldgen', 'game', 'music', 'mobs', 'quests', 'weather'];
 
 // every file the build writes into the root (and nothing else in the root may be touched)
 export const OUTPUTS = ['index.html', 'app.js', 'style.css', 'manifest.webmanifest', 'sw.js', '.nojekyll', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon.png'];

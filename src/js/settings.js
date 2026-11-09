@@ -17,8 +17,10 @@ export const ACTIONS = [
   { id: 'fly', label: 'Toggle flight (creative)', group: 'Actions', key: 'KeyF' },
   { id: 'offhand', label: 'Use offhand item (place a torch from the shield slot)', group: 'Actions', key: 'KeyG' },
   ...Array.from({ length: 9 }, (_, i) => ({ id: 'slot' + (i + 1), label: 'Hotbar slot ' + (i + 1), group: 'Hotbar', key: 'Digit' + (i + 1) })),
-  { id: 'map', label: 'Full-screen map (or tap the minimap)', group: 'Actions', key: 'KeyN' },
-  { id: 'music', label: 'Toggle music', group: 'Other', key: 'KeyM' },
+  { id: 'map', label: 'Full-screen map (or tap the minimap)', group: 'Actions', key: 'KeyM' },
+  { id: 'quests', label: 'Quest book (goals and jobs)', group: 'Actions', key: 'KeyL' },
+  { id: 'hudMenu', label: 'HUD settings (show, hide and move the panels)', group: 'Actions', key: 'KeyH' },
+  { id: 'music', label: 'Toggle music', group: 'Other', key: 'KeyN' },
   { id: 'skipTime', label: 'Skip time of day', group: 'Other', key: 'KeyT' },
   { id: 'renderUp', label: 'Render distance +', group: 'Other', key: 'BracketRight' },
   { id: 'renderDown', label: 'Render distance -', group: 'Other', key: 'BracketLeft' },
@@ -33,11 +35,11 @@ const DEFAULTS = {
   musicVolume: 0.8,
   sfxVolume: 0.9,
   touchControls: browserWantsTouch(), // on-screen sticks and buttons: on by default on phones and tablets
-  hudSize: browserWantsTouch() ? 1.3 : 1, // multiplier on the HUD (hotbar, hearts, minimap, clock, goals): bigger by default on a phone
+  hudSize: browserWantsTouch() ? 1.3 : 1, // multiplier on the HUD (hotbar, hearts, minimap, clock): bigger by default on a phone
   hotbarSize: browserWantsTouch() ? 0.75 : 1, // multiplier on the hotbar (and the hearts and loot bag attached to it): smaller by default on a phone
   touchButtonSize: browserWantsTouch() ? 0.8 : 1, // multiplier on the on-screen joystick and buttons (and their icons)
   hudShow: {},      // parts of the HUD the player switched off (see hudmath.js HUD_ITEMS); empty = everything shown
-  hudCollapsed: {}, // panels folded away by tapping them: { info: true, goals: true }
+  hudCollapsed: {}, // panels folded away by tapping them: { info: true }
   hudLayout: {},    // where the player dragged the HUD panels to (see hudmath.js cleanHudLayout); empty = the built-in places
   touchLayout: {}, // where the player moved the touch buttons to (see touchmath.js cleanLayout); empty = the built-in places
 };
@@ -73,6 +75,8 @@ export class Settings {
         for (const a of ACTIONS) if (raw.binds && a.id in raw.binds) this.binds[a.id] = raw.binds[a.id];
         // before crouching existed Shift was the sprint key: move saved settings to the new layout (Tab sprints, Shift crouches)
         if (raw.binds && !('crouch' in raw.binds) && raw.binds.sprint === 'ShiftLeft') this.binds.sprint = 'Tab';
+        // the map used to be N and the music M: the map is M now (move anyone still on the old pair over)
+        if (raw.binds && raw.binds.map === 'KeyN' && raw.binds.music === 'KeyM') { this.binds.map = 'KeyM'; this.binds.music = 'KeyN'; }
       }
     } catch { /* private mode / corrupt data: just use defaults */ }
     this.rebuild();

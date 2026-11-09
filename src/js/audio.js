@@ -450,4 +450,72 @@ export class AudioEngine {
     this.noiseHit(t, 0.5, 'bandpass', 1200, 0.6, 0.5);
     this.noiseHit(t + 0.05, 0.4, 'highpass', 3000, 0.5, 0.2);
   }
+
+  // ---- weather ----------------------------------------------------------------------------
+  // Two looping noises, one for rain (a hiss) and one for wind (a low moan), whose loudness follows the weather. rain, wind: 0-1.
+  setWeatherSound(rain, wind) {
+    if (!this.ctx || !this.noise) return;
+    if (!this.weatherSound) {
+      const ctx = this.ctx, mk = (type, freq, q) => {
+        const src = ctx.createBufferSource(); src.buffer = this.noise; src.loop = true;
+        const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+        const g = ctx.createGain(); g.gain.value = 0;
+        src.connect(f); f.connect(g); g.connect(this.sfxBus); src.start();
+        return { g, f };
+      };
+      this.weatherSound = { rain: mk('bandpass', 2200, 0.5), rain2: mk('highpass', 5200, 0.7), wind: mk('lowpass', 420, 0.9) };
+    }
+    const t = this.ctx.currentTime, w = this.weatherSound;
+    w.rain.g.gain.setTargetAtTime(rain * 0.28, t, 0.6);
+    w.rain2.g.gain.setTargetAtTime(rain * 0.07, t, 0.6);
+    w.wind.g.gain.setTargetAtTime(wind * 0.5, t, 0.9);
+    w.wind.f.frequency.setTargetAtTime(300 + wind * 380 + Math.sin(t * 0.37) * 120, t, 0.8); // the howl rises and falls
+  }
+
+  // Thunder from a strike `distance` blocks away: a crack, then a long rumble, arriving later the further it is (sound is slow)
+  thunder(distance = 100) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + Math.min(5, distance / 90);
+    const loud = Math.max(0.25, 1 - distance / 260);
+    this.noiseHit(t, 0.25, 'highpass', 1800, 0.6, 0.5 * loud);
+    this.noiseHit(t + 0.05, 3.4, 'lowpass', 160 + Math.random() * 60, 0.8, 1.0 * loud);
+    this.noiseHit(t + 0.6, 2.4, 'lowpass', 110, 0.8, 0.6 * loud);
+    this.tone(t, 70, 32, 2.4, 0.5 * loud, 'sawtooth');
+  }
+
+  // ---- creatures ---------------------------------------------------------------------------
+  // The noises animals and monsters make (all synthesized). loud: 0-1, quieter the further away.
+  creature(call, loud = 1) {
+    if (!this.ctx || loud <= 0.02) return;
+    const t = this.ctx.currentTime, g = loud;
+    switch (call) {
+      case 'moo': this.tone(t, 120, 96, 0.8, 0.34 * g, 'sawtooth'); this.noiseHit(t, 0.7, 'lowpass', 400, 0.8, 0.12 * g); break;
+      case 'oink': this.tone(t, 250, 170, 0.12, 0.3 * g, 'square'); this.tone(t + 0.16, 230, 150, 0.14, 0.26 * g, 'square'); this.noiseHit(t, 0.28, 'bandpass', 900, 1.5, 0.1 * g); break;
+      case 'baa': this.tone(t, 360, 320, 0.55, 0.22 * g, 'sawtooth'); this.tone(t, 368, 326, 0.55, 0.2 * g, 'sawtooth'); break;
+      case 'groan': this.tone(t, 96, 58, 0.9, 0.34 * g, 'sawtooth'); this.noiseHit(t, 0.8, 'bandpass', 320, 1.2, 0.2 * g); break;
+      case 'rattle': for (let i = 0; i < 5; i++) this.noiseHit(t + i * 0.07, 0.05, 'highpass', 2800 + Math.random() * 800, 0.9, 0.3 * g); break;
+      case 'hiss': this.noiseHit(t, 0.6, 'highpass', 3600, 0.7, 0.3 * g); break;
+      default: this.tone(t, 200, 150, 0.2, 0.2 * g);
+    }
+  }
+
+  // a blow landing on a creature, and it dying
+  mobHit() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.noiseHit(t, 0.1, 'bandpass', 700, 1, 0.5);
+    this.tone(t, 220, 110, 0.12, 0.3, 'triangle');
+  }
+  arrowShot() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.noiseHit(t, 0.12, 'highpass', 2400, 0.8, 0.22);
+    this.tone(t, 620, 240, 0.1, 0.12, 'triangle');
+  }
+  // a soft chime as the screen fades when you go to sleep
+  sleep() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    for (const [i, f] of [392, 523, 659, 784].entries()) this.tone(t + i * 0.18, f, f, 0.9, 0.1, 'sine');
+  }
 }

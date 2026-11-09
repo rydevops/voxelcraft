@@ -112,5 +112,55 @@
   "tools": {
     "_comment": "wrongToolWear: how many uses a tool loses when it breaks a block it is not made for (a pickaxe on dirt, a shovel on stone); the right tool loses 1.",
     "wrongToolWear": 3
+  },
+  "world": {
+    "_comment": "tickCeiling: nothing ticks above this height (plants do not grow, water does not flow, sand does not fall): it is just somewhere to climb to.",
+    "tickCeiling": 120
+  },
+  "breath": {
+    "_comment": "Air under water: max points (2 per bubble), how fast it runs out and refills, and the damage once it is gone.",
+    "max": 20,
+    "drainPerSecond": 1,
+    "refillPerSecond": 10,
+    "drownEverySeconds": 1,
+    "drownDamage": 2
+  },
+  "combat": {
+    "_comment": "Hitting things. A weapon does weapons[type] + tierBonus[tier] damage (hand: handDamage); armor softens what monsters do to you. attackCooldown is the pause between hits.",
+    "handDamage": 1,
+    "attackCooldown": 0.45,
+    "knockback": 7,
+    "reach": 4.5,
+    "weapons": {
+      "sword": 4,
+      "axe": 3,
+      "hammer": 5,
+      "pickaxe": 2,
+      "shovel": 1.5,
+      "hoe": 1,
+      "shears": 1
+    },
+    "tierBonus": {
+      "wood": 0,
+      "stone": 1,
+      "iron": 2
+    },
+    "weaponWear": {
+      "sword": 1
+    }
+  },
+  "xp": {
+    "_comment": "Experience from monsters (for the armour and tool augments to come). Level n needs perLevel * n points on top of the last level.",
+    "perLevel": 30
+  },
+  "sleep": {
+    "_comment": "Sleeping in a bed flips day and night. A monster closer than monsterRadius stops you.",
+    "monsterRadius": 14,
+    "fadeSeconds": 2.4,
+    "healTo": 20
+  },
+  "chests": {
+    "_comment": "craftRange: crafting also uses the items in chests this close (blocks).",
+    "craftRange": 10
   }
 }

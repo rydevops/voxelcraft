@@ -37,10 +37,10 @@ export function blockBrightness(level) {
 
 // A coordinate packed into one number so queues can be plain arrays
 const OFFSET = 32768;
-const pack = (x, y, z) => ((x + OFFSET) * 65536 + (z + OFFSET)) * 64 + y;
+const pack = (x, y, z) => ((x + OFFSET) * 65536 + (z + OFFSET)) * CH + y;
 function unpack(k, out) {
-  out[1] = k % 64;
-  const rest = Math.floor(k / 64);
+  out[1] = k % CH;
+  const rest = Math.floor(k / CH);
   out[0] = Math.floor(rest / 65536) - OFFSET;
   out[2] = (rest % 65536) - OFFSET;
 }
@@ -106,6 +106,12 @@ export class Lighting {
     if (!c) return MAX_LIGHT;
     const v = c.light[idx(x & 15, y, z & 15)];
     return Math.max(v >> 4, v & 15);
+  }
+
+  // How bright it is for a creature standing here: block light (torches), or sky light dimmed by the time of day (daylight 0-1). A cave stays
+  // dark at noon and open ground is dim at night.
+  effective(x, y, z, daylight = 1) {
+    return Math.max(this.get(x, y, z, BLK), Math.round(Math.max(0, this.get(x, y, z, SKY)) * daylight), 0);
   }
 
   set(x, y, z, ch, val) {
@@ -189,15 +195,21 @@ export class Lighting {
   }
 
   // ---- a chunk has just been generated (or loaded): light it and let it exchange light with its neighbours ----
-  initChunk(chunk, { clear = true } = {}) {
+  initChunk(chunk, { clear = true, recomputeTop = false } = {}) {
     const w = this.world, d = chunk.data, ox = chunk.cx * CS, oz = chunk.cz * CS;
+    if (recomputeTop) chunk.recomputeTop();
     if (clear) chunk.light.fill(0);
-    // 1. sky columns and emitters
+    // 1. sky columns and emitters (everything above the highest block is open sky: filled in one go)
     const emit = this.hasEmitters;
+    const top = Math.min(CH, chunk.top || CH);
+    chunk.light.fill(MAX_LIGHT << 4, top * CS * CS);
+    let limit = top; // rows above this are open sky in this chunk and in its neighbours: nothing there can spread
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) limit = Math.max(limit, w.getChunk(chunk.cx + dx, chunk.cz + dz)?.top ?? 0);
+    limit = Math.min(CH, limit + 1);
     for (let z = 0; z < CS; z++) {
       for (let x = 0; x < CS; x++) {
         let level = MAX_LIGHT;
-        for (let y = CH - 1; y >= 0; y--) {
+        for (let y = top - 1; y >= 0; y--) {
           const i = idx(x, y, z), b = d[i];
           if (OPAQUE[b]) level = 0; else level = Math.max(0, level - FILTER[b]);
           let v = level << 4;
@@ -214,7 +226,7 @@ export class Lighting {
     // 2. seeds: cells that may brighten a neighbour (lit, with a darker clear neighbour); everything on the chunk edge
     const sky = [], blk = [];
     const edge = (x, z) => x === 0 || z === 0 || x === CS - 1 || z === CS - 1;
-    for (let y = 0; y < CH; y++) {
+    for (let y = 0; y < limit; y++) {
       for (let z = 0; z < CS; z++) {
         for (let x = 0; x < CS; x++) {
           const v = chunk.light[idx(x, y, z)];
@@ -241,7 +253,7 @@ export class Lighting {
     for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const n = w.getChunk(chunk.cx + dx, chunk.cz + dz);
       if (!n) continue;
-      for (let y = 0; y < CH; y++) {
+      for (let y = 0; y < limit; y++) {
         for (let i = 0; i < CS; i++) {
           const lx = dx === 1 ? 0 : dx === -1 ? 15 : i, lz = dz === 1 ? 0 : dz === -1 ? 15 : i; // the neighbour's cell next to the border
           const v = n.light[idx(lx, y, lz)];
@@ -258,7 +270,7 @@ export class Lighting {
   rebuildAll() {
     const chunks = [...this.world.chunks.values()];
     for (const c of chunks) c.light.fill(0);
-    for (const c of chunks) this.initChunk(c, { clear: false });
+    for (const c of chunks) this.initChunk(c, { clear: false, recomputeTop: true });
     for (const c of chunks) c.dirty = true;
   }
 

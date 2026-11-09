@@ -11,7 +11,8 @@
     "beach": "sand",
     "beachFiller": "sand",
     "snowSurface": "snow",
-    "snowFiller": "stone"
+    "snowFiller": "stone",
+    "bedrock": "bedrock"
   },
   "terrain": {
     "continentScale": 0.0045,
@@ -27,7 +28,8 @@
     "mountainUplift": 5,
     "duneHeight": 2.6,
     "duneScale": 0.035,
-    "flatContinent": 0.3
+    "flatContinent": 0.3,
+    "maxHeight": 58
   },
   "rivers": {
     "scale": 0.0065,
@@ -214,6 +216,120 @@
           "mountains",
           "tundra"
         ]
+      },
+      {
+        "key": "jungle",
+        "since": 4,
+        "weight": 5,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "tall",
+        "trunk": [
+          9,
+          14
+        ],
+        "log": "jungle_log",
+        "leaves": "jungle_leaves",
+        "biomes": [
+          "jungle"
+        ]
+      },
+      {
+        "key": "jungle_bush",
+        "since": 4,
+        "weight": 3,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "bush",
+        "trunk": [
+          1,
+          2
+        ],
+        "log": "jungle_log",
+        "leaves": "jungle_leaves",
+        "biomes": [
+          "jungle"
+        ]
+      },
+      {
+        "key": "acacia",
+        "since": 4,
+        "weight": 4,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "flat",
+        "trunk": [
+          4,
+          7
+        ],
+        "log": "acacia_log",
+        "leaves": "acacia_leaves",
+        "biomes": [
+          "savanna"
+        ]
+      },
+      {
+        "key": "swamp_oak",
+        "since": 4,
+        "weight": 4,
+        "heights": [
+          23,
+          99
+        ],
+        "shape": "round",
+        "trunk": [
+          4,
+          6
+        ],
+        "log": "log",
+        "leaves": "swamp_leaves",
+        "biomes": [
+          "swamp"
+        ]
+      },
+      {
+        "key": "taiga_spruce",
+        "since": 4,
+        "weight": 6,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "cone",
+        "trunk": [
+          7,
+          11
+        ],
+        "log": "spruce_log",
+        "leaves": "spruce_leaves",
+        "biomes": [
+          "taiga"
+        ]
+      },
+      {
+        "key": "taiga_birch",
+        "since": 4,
+        "weight": 1,
+        "heights": [
+          24,
+          99
+        ],
+        "shape": "round",
+        "trunk": [
+          5,
+          7
+        ],
+        "log": "birch_log",
+        "leaves": "birch_leaves",
+        "biomes": [
+          "taiga"
+        ]
       }
     ]
   },
@@ -257,40 +373,407 @@
         "surface": "grass",
         "filler": "dirt",
         "fillerDepth": 3,
-        "trees": 0.3
+        "trees": 0.3,
+        "label": "Plains",
+        "cover": {
+          "chance": 0.28,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.3
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.22
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.12
+            },
+            {
+              "block": "dandelion",
+              "weight": 0.1
+            },
+            {
+              "block": "rose",
+              "weight": 0.05
+            },
+            {
+              "block": "oxeye_daisy",
+              "weight": 0.07
+            },
+            {
+              "block": "cornflower",
+              "weight": 0.04
+            },
+            {
+              "block": "orange_tulip",
+              "weight": 0.03
+            },
+            {
+              "block": "pink_tulip",
+              "weight": 0.03
+            }
+          ]
+        }
       },
       "forest": {
         "surface": "grass",
         "filler": "dirt",
         "fillerDepth": 3,
-        "trees": 1.0,
-        "denseMin": 0.6
+        "trees": 1,
+        "denseMin": 0.6,
+        "label": "Forest",
+        "cover": {
+          "chance": 0.24,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.3
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.2
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.1
+            },
+            {
+              "block": "rose",
+              "weight": 0.06
+            },
+            {
+              "block": "allium",
+              "weight": 0.05
+            },
+            {
+              "block": "cornflower",
+              "weight": 0.05
+            },
+            {
+              "block": "fern",
+              "weight": 0.06
+            }
+          ]
+        }
       },
       "hills": {
         "surface": "grass",
         "filler": "dirt",
         "fillerDepth": 3,
-        "trees": 0.55
+        "trees": 0.55,
+        "label": "Hills",
+        "cover": {
+          "chance": 0.24,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.34
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.24
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.12
+            },
+            {
+              "block": "dandelion",
+              "weight": 0.06
+            },
+            {
+              "block": "oxeye_daisy",
+              "weight": 0.05
+            }
+          ]
+        }
       },
       "mountains": {
         "surface": "grass",
         "filler": "dirt",
         "fillerDepth": 2,
         "trees": 0.3,
-        "rockFrom": 36
+        "rockFrom": 36,
+        "label": "Mountains",
+        "cover": {
+          "chance": 0.2,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.4
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.2
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.08
+            }
+          ]
+        }
       },
       "desert": {
         "surface": "sand",
         "filler": "sand",
         "fillerDepth": 5,
-        "trees": 0
+        "trees": 0,
+        "label": "Desert",
+        "climate": "hot",
+        "cover": {
+          "chance": 0.025,
+          "variants": [
+            {
+              "block": "dead_bush",
+              "weight": 1
+            }
+          ]
+        }
       },
       "tundra": {
         "surface": "snow",
         "filler": "dirt",
         "fillerDepth": 3,
-        "trees": 0.4
+        "trees": 0.4,
+        "label": "Tundra",
+        "climate": "cold",
+        "freeze": true
+      },
+      "savanna": {
+        "label": "Savanna",
+        "surface": "savanna_grass",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 0.07,
+        "climate": "hot",
+        "cover": {
+          "chance": 0.22,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.5
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.3
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.1
+            },
+            {
+              "block": "dead_bush",
+              "weight": 0.05
+            },
+            {
+              "block": "orange_tulip",
+              "weight": 0.04
+            },
+            {
+              "block": "dandelion",
+              "weight": 0.04
+            }
+          ]
+        }
+      },
+      "jungle": {
+        "label": "Jungle",
+        "surface": "grass",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 1.6,
+        "denseMin": 0.8,
+        "climate": "hot",
+        "cover": {
+          "chance": 0.5,
+          "variants": [
+            {
+              "block": "grass_s",
+              "weight": 0.15
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.25
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.4
+            },
+            {
+              "block": "fern",
+              "weight": 0.2
+            },
+            {
+              "block": "cornflower",
+              "weight": 0.04
+            },
+            {
+              "block": "rose",
+              "weight": 0.03
+            }
+          ]
+        }
+      },
+      "swamp": {
+        "label": "Swamp",
+        "surface": "mud",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 0.35,
+        "noBeach": true,
+        "cover": {
+          "chance": 0.3,
+          "variants": [
+            {
+              "block": "fern",
+              "weight": 0.3
+            },
+            {
+              "block": "cornflower",
+              "weight": 0.12
+            },
+            {
+              "block": "dead_bush",
+              "weight": 0.06
+            },
+            {
+              "block": "grass_s",
+              "weight": 0.2
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.1
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.05
+            }
+          ]
+        }
+      },
+      "taiga": {
+        "label": "Taiga",
+        "surface": "podzol",
+        "filler": "dirt",
+        "fillerDepth": 3,
+        "trees": 1,
+        "denseMin": 0.7,
+        "climate": "cold",
+        "cover": {
+          "chance": 0.22,
+          "variants": [
+            {
+              "block": "fern",
+              "weight": 0.25
+            },
+            {
+              "block": "grass_s",
+              "weight": 0.3
+            },
+            {
+              "block": "grass_m",
+              "weight": 0.12
+            },
+            {
+              "block": "grass_l",
+              "weight": 0.04
+            },
+            {
+              "block": "allium",
+              "weight": 0.02
+            }
+          ]
+        }
+      },
+      "badlands": {
+        "label": "Badlands",
+        "surface": "red_sand",
+        "filler": "terracotta",
+        "fillerDepth": 8,
+        "trees": 0,
+        "climate": "hot",
+        "strata": [
+          "terracotta",
+          "terracotta_orange",
+          "terracotta",
+          "terracotta_white",
+          "terracotta",
+          "terracotta_orange",
+          "terracotta_orange",
+          "terracotta"
+        ],
+        "cover": {
+          "chance": 0.02,
+          "variants": [
+            {
+              "block": "dead_bush",
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "ocean": {
+        "label": "Ocean",
+        "surface": "sand",
+        "filler": "sand",
+        "fillerDepth": 3,
+        "trees": 0,
+        "water": true
+      },
+      "deep_ocean": {
+        "label": "Deep Ocean",
+        "surface": "gravel",
+        "filler": "gravel",
+        "fillerDepth": 3,
+        "trees": 0,
+        "water": true
+      },
+      "frozen_ocean": {
+        "label": "Frozen Ocean",
+        "surface": "gravel",
+        "filler": "gravel",
+        "fillerDepth": 3,
+        "trees": 0,
+        "water": true,
+        "climate": "cold",
+        "freeze": true
       }
+    },
+    "ocean": {
+      "_comment": "Terrain 4: seas. A very slow noise field (scale) puts the sea where it is below threshold; blend is how wide the slope from coast to sea is. The sea floor falls to shelfDepth blocks under sea level and, in deep ocean (from deepFrom), to deepDepth. Below gravelBelow blocks of water the floor is gravel, shallower it is sand. Cold seas (temp under iceTemp) freeze over.",
+      "scale": 0.0017,
+      "threshold": -0.12,
+      "blend": 0.26,
+      "shelfDepth": 2.5,
+      "deepDepth": 17,
+      "deepFrom": 0.78,
+      "gravelBelow": 5,
+      "iceTemp": -0.2,
+      "minFactor": 0.45,
+      "sand": "sand",
+      "gravel": "gravel",
+      "ice": "ice"
+    },
+    "select4": {
+      "_comment": "Terrain 4 climate cut-offs (see select): the extra biomes. Hot and wet is jungle, hot and middling is savanna, hot and dry with relief is badlands; cold and wet is taiga; wet, mild and low-lying is swamp.",
+      "mountainRel": 0.215,
+      "hillsRel": 0.075,
+      "hotTemp": 0.1,
+      "dryWet": -0.04,
+      "coldTemp": -0.19,
+      "forestWet": 0,
+      "jungleWet": 0.1,
+      "taigaWet": -0.02,
+      "swampWet": 0.075,
+      "swampRel": 0,
+      "badlandsRel": 0.03,
+      "swampTemp": [
+        -0.1,
+        0.1
+      ],
+      "blend": 0.07
     }
   },
   "villages": {
@@ -309,7 +792,23 @@
     "biomes": [
       "plains",
       "forest",
-      "desert"
+      "desert",
+      "savanna",
+      "taiga"
     ]
+  },
+  "terrain4": {
+    "_comment": "Terrain 4 (new worlds only) is the terrain above with these numbers on top, and room for taller mountains. maxHeight: the highest the ground gets.",
+    "maxHeight": 104,
+    "mountainHeight": 36,
+    "mountainUplift": 8,
+    "continentHeight": 22
+  },
+  "snowLine4": 66,
+  "villages4": {
+    "_comment": "Terrain 4 villages: this many people (5-7), each with a house of their own and a bed.",
+    "minVillagers": 5,
+    "maxVillagers": 7,
+    "minHouses": 5
   }
 }

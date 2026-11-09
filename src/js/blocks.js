@@ -45,13 +45,22 @@ export const GLOW = new Float32Array(BLOCK_COUNT);          // 0-1: the block sh
 export const FILTER = new Uint8Array(BLOCK_COUNT);         // how much light is lost passing through it (leaves, water)
 export const HYDRATES = new Uint8Array(BLOCK_COUNT);         // 1 = soil that tracks moisture (fast check)
 export const HYDRATION = new Map();                        // soil id -> { wet, dry, decayInto, decayRate }
-export const SHAPE = new Uint8Array(BLOCK_COUNT);          // 0 = a plain cube, 1 = stairs, 2 = door (the "model" of the block)
+export const SHAPE = new Uint8Array(BLOCK_COUNT);          // 0 = a plain cube, 1 = stairs, 2 = door, 3 = other boxes: slabs, columns, windows, beds (the "model" of the block)
+export const UNBREAKABLE = new Uint8Array(BLOCK_COUNT);     // bedrock: cannot be mined, in any game mode
 export const BASE_OF = new Uint8Array(BLOCK_COUNT);        // the block it counts as when broken or picked: itself, or the stairs it is a turned copy of
 export const STAIRS = new Map();                           // base stairs id -> [n, e, s, w]: the four ways round (n = the tall back is on the north side)
 export const FACING_OF = new Int8Array(BLOCK_COUNT).fill(-1); // stairs: 0-3 = n, e, s, w
 export const BOXES = new Map();                            // id -> [[x0, y0, z0, x1, y1, z1], ...] inside the cell: what stairs and doors are made of
-export const DOOR = new Map();                             // door block id -> { top, open, axis, partner, toggled }
-export const DOOR_PLACE = {};                              // axis -> [lower half, upper half] block ids of a closed door
+export const DOOR = new Map();                             // door block id -> { top, open, axis, kind, partner, toggled }
+export const DOOR_PLACE = {};                              // axis -> [lower half, upper half] block ids of a closed wooden door
+export const DOOR_KINDS = {};                              // kind (wood, iron) -> { x: [lower, upper], z: [lower, upper] } of its closed door
+export const AXIS_VARIANTS = new Map();                    // base id of a window -> { x, z }: the two ways it can span
+export const AXIS_OF = new Int8Array(BLOCK_COUNT).fill(-1); // window: 0 = spans x, 1 = spans z
+export const BED = new Map();                              // bed block id -> { part: 'head' | 'foot', facing: 0-3 | -1, color }
+export const BED_FOOT = {};                                // colour -> the foot block id
+export const BED_HEADS = {};                               // colour -> [n, e, s, w] head block ids
+export const CHEST = new Map();                            // chest block id -> { slots, stack }
+export const PLACE_ON = new Map();                         // flower block id -> [block ids it can be planted on]
 export const OPENS = new Map();                           // block id -> crafting window it opens when used
 
 export const WATER_FLOW = [0, 0, 0, 0, 0, 0, 0]; // flowing level (1..6) -> block id
@@ -84,12 +93,30 @@ for (const b of REG.blocks) {
     if (!STAIRS.has(base)) STAIRS.set(base, [0, 0, 0, 0]);
     STAIRS.get(base)[f] = b.id;
   }
+  if (b.unbreakable) UNBREAKABLE[b.id] = 1;
+  if (b.model?.type === 'boxes') {
+    SHAPE[b.id] = 3; SOLID[b.id] = 2; OPAQUE[b.id] = 0;
+    BOXES.set(b.id, b.model.boxes.map((bx) => bx.slice()));
+  }
+  if (b.axis) {
+    const base = b.variantOf || b.id;
+    if (!AXIS_VARIANTS.has(base)) AXIS_VARIANTS.set(base, { x: 0, z: 0 });
+    AXIS_VARIANTS.get(base)[b.axis] = b.id;
+    AXIS_OF[b.id] = b.axis === 'x' ? 0 : 1;
+  }
+  if (b.bed) {
+    BED.set(b.id, { part: b.bed.part, facing: b.bed.facing ? FACINGS.indexOf(b.bed.facing) : -1, color: b.bed.color });
+    if (b.bed.part === 'foot') BED_FOOT[b.bed.color] = b.id;
+    else (BED_HEADS[b.bed.color] ??= [0, 0, 0, 0])[FACINGS.indexOf(b.bed.facing)] = b.id;
+  }
+  if (b.chest) CHEST.set(b.id, b.chest);
+  if (b.plant?.placeOn) PLACE_ON.set(b.id, b.plant.placeOn);
   if (b.model?.type === 'door') {
     SHAPE[b.id] = 2;
     const { axis, half, open } = b.model;
     // closed: a thin plate across the cell; open: the plate has swung round to the edge (the other way)
     BOXES.set(b.id, [open ? (axis === 'x' ? [0, 0, 0, EDGE, 1, 1] : [0, 0, 0, 1, 1, EDGE]) : (axis === 'x' ? [0, 0, T3, 1, 1, T3b] : [T3, 0, 0, T3b, 1, 1])]);
-    DOOR.set(b.id, { top: half === 'top', open: !!open, axis, partner: 0, toggled: 0 });
+    DOOR.set(b.id, { top: half === 'top', open: !!open, axis, kind: b.model.kind, partner: 0, toggled: 0 });
   }
   if (b.support) { HAS_SUPPORT[b.id] = 1; SUPPORT.set(b.support, b.id * 3); }
   if (b.role === 'log') ROLE_LOG[b.id] = 1;
@@ -106,12 +133,16 @@ for (const b of REG.blocks) {
 
 // link the halves of each door, and the open / closed copy of each
 {
-  const find = (axis, top, open) => { for (const [id, d] of DOOR) if (d.axis === axis && d.top === top && d.open === open) return id; return 0; };
+  const find = (kind, axis, top, open) => { for (const [id, d] of DOOR) if (d.kind === kind && d.axis === axis && d.top === top && d.open === open) return id; return 0; };
   for (const [id, d] of DOOR) {
-    d.partner = find(d.axis, !d.top, d.open);
-    d.toggled = find(d.axis, d.top, !d.open);
+    d.partner = find(d.kind, d.axis, !d.top, d.open);
+    d.toggled = find(d.kind, d.axis, d.top, !d.open);
   }
-  for (const axis of ['x', 'z']) DOOR_PLACE[axis] = [find(axis, false, false), find(axis, true, false)];
+  for (const kind of new Set([...DOOR.values()].map((d) => d.kind))) {
+    DOOR_KINDS[kind] = {};
+    for (const axis of ['x', 'z']) DOOR_KINDS[kind][axis] = [find(kind, axis, false, false), find(kind, axis, true, false)];
+  }
+  for (const axis of ['x', 'z']) DOOR_PLACE[axis] = DOOR_KINDS.wood[axis];
 }
 
 // Everything available in creative mode's block palette

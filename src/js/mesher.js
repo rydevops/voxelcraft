@@ -10,7 +10,6 @@ import { hash2 } from './noise.js';
 import { skyBrightness, blockBrightness, MAX_LIGHT } from './light.js';
 
 const PW = CS + 2;            // padded width
-const PH = CH + 2;            // padded height
 const pidx = (x, y, z) => (y * PW + z) * PW + x; // x,y,z in padded space
 
 // Face table. t1 x t2 = normal so every quad is wound counter-clockwise from outside.
@@ -33,7 +32,8 @@ const waterHeight = (pad, px, py, pz, id) => (IS_WATER[pad[pidx(px, py + 1, pz)]
 // Copy the chunk and a 1-block border from its neighbours into one flat array, so the inner loop never needs Map
 // lookups. Returns the block ids and the sky / block light level of every cell (cells outside the loaded world count
 // as fully sky-lit so the edge of the map doesn't turn into a dark wall).
-function buildPadded(world, chunk) {
+function buildPadded(world, chunk, top) {
+  const PH = top + 2; // padded height: rows above the highest block are open sky and never stored
   const pad = new Uint8Array(PW * PH * PW);
   const sky = new Uint8Array(PW * PH * PW).fill(MAX_LIGHT);
   const blk = new Uint8Array(PW * PH * PW);
@@ -45,7 +45,7 @@ function buildPadded(world, chunk) {
       const x1 = dx < 0 ? CS - 1 : dx > 0 ? 0 : CS - 1;
       const z0 = dz < 0 ? CS - 1 : dz > 0 ? 0 : 0;
       const z1 = dz < 0 ? CS - 1 : dz > 0 ? 0 : CS - 1;
-      for (let y = 0; y < CH; y++) {
+      for (let y = 0; y < top; y++) {
         for (let z = z0; z <= z1; z++) {
           for (let x = x0; x <= x1; x++) {
             const l = c.light[idx(x, y, z)];
@@ -170,7 +170,10 @@ function addBoxes(buf, id, x, y, z, pad, px, py, pz, sky, blk) {
 }
 
 export function meshChunk(world, chunk) {
-  const { pad, sky: litS, blk: litB } = buildPadded(world, chunk);
+  let top = chunk.top; // (a neighbour's taller blocks can still show their sides next to us, and they are read through the padding)
+  for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) top = Math.max(top, world.getChunk(chunk.cx + dx, chunk.cz + dz)?.top ?? 0);
+  top = Math.min(CH, top);
+  const { pad, sky: litS, blk: litB } = buildPadded(world, chunk, top);
   const solid = new Buf();  // opaque + cutout (leaves, glass)
   const water = new Buf();
   const plants = new Buf(); // swaying foliage, drawn with its own wind material
@@ -178,7 +181,7 @@ export function meshChunk(world, chunk) {
   const inset = 0.0004;
   const tsU = 1 / ATLAS_COLS, tsV = 1 / ATLAS_ROWS;
 
-  for (let y = 0; y < CH; y++) {
+  for (let y = 0; y < chunk.top; y++) {
     for (let z = 0; z < CS; z++) {
       for (let x = 0; x < CS; x++) {
         const id = chunk.data[idx(x, y, z)];

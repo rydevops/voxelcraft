@@ -1,0 +1,159 @@
+{
+  "_comment": "Animals (peaceful, in herds on grass) and monsters (they spawn in the dark and come for you). health in half hearts, speed = share of walking speed (1 = a player walking), damage in half hearts before armor. loot = a loot.json table; xp is what a kill is worth.",
+  "species": {
+    "cow": {
+      "name": "Cow",
+      "kind": "animal",
+      "health": 10,
+      "speed": 0.22,
+      "panic": 2.4,
+      "size": {
+        "hw": 0.45,
+        "height": 1.4
+      },
+      "loot": "cow",
+      "herd": [
+        2,
+        4
+      ],
+      "biomes": [
+        "plains",
+        "forest",
+        "hills",
+        "savanna",
+        "taiga"
+      ],
+      "call": "moo"
+    },
+    "pig": {
+      "name": "Pig",
+      "kind": "animal",
+      "health": 10,
+      "speed": 0.24,
+      "panic": 2.4,
+      "size": {
+        "hw": 0.42,
+        "height": 0.9
+      },
+      "loot": "pig",
+      "herd": [
+        2,
+        3
+      ],
+      "biomes": [
+        "plains",
+        "forest",
+        "jungle",
+        "swamp",
+        "hills"
+      ],
+      "call": "oink"
+    },
+    "sheep": {
+      "name": "Sheep",
+      "kind": "animal",
+      "health": 8,
+      "speed": 0.22,
+      "panic": 2.4,
+      "size": {
+        "hw": 0.45,
+        "height": 1.3
+      },
+      "loot": "sheep",
+      "herd": [
+        2,
+        4
+      ],
+      "biomes": [
+        "plains",
+        "hills",
+        "mountains",
+        "savanna",
+        "taiga",
+        "tundra"
+      ],
+      "call": "baa",
+      "shear": {
+        "loot": "sheep_shear",
+        "regrowSeconds": 180
+      }
+    },
+    "zombie": {
+      "name": "Zombie",
+      "kind": "hostile",
+      "health": 20,
+      "speed": 0.52,
+      "size": {
+        "hw": 0.3,
+        "height": 1.8
+      },
+      "damage": 3,
+      "sight": 20,
+      "reach": 1.4,
+      "cooldown": 1.1,
+      "loot": "zombie",
+      "xp": 6,
+      "call": "groan"
+    },
+    "skeleton": {
+      "name": "Skeleton",
+      "kind": "hostile",
+      "health": 16,
+      "speed": 0.45,
+      "size": {
+        "hw": 0.3,
+        "height": 1.8
+      },
+      "damage": 2,
+      "sight": 22,
+      "reach": 1.1,
+      "cooldown": 1.2,
+      "ranged": {
+        "range": 15,
+        "damage": 3,
+        "cooldown": 2.2,
+        "speed": 18
+      },
+      "keepDistance": 7,
+      "loot": "skeleton",
+      "xp": 8,
+      "call": "rattle"
+    },
+    "spider": {
+      "name": "Spider",
+      "kind": "hostile",
+      "health": 14,
+      "speed": 0.85,
+      "size": {
+        "hw": 0.6,
+        "height": 0.8
+      },
+      "damage": 2,
+      "sight": 16,
+      "reach": 1.5,
+      "cooldown": 0.9,
+      "loot": "spider",
+      "xp": 6,
+      "call": "hiss"
+    }
+  },
+  "spawning": {
+    "animals": {
+      "radius": 3,
+      "minLight": 9,
+      "maxPerChunk": 5,
+      "chunkChance": 0.4,
+      "storeBeyond": 6
+    },
+    "hostile": {
+      "maxLight": 5,
+      "max": 4,
+      "minDistance": 18,
+      "maxDistance": 38,
+      "attemptSeconds": 3,
+      "despawnDistance": 72,
+      "sunSeconds": 8,
+      "villageMargin": 8
+    }
+  }
+}

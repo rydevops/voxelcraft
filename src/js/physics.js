@@ -2,6 +2,7 @@
 // Pure logic on the voxel world (no rendering) so it can be tested in Node; main.js animates the fall.
 import { B, PLANT, IS_WATER, SOLID, ROLE_LOG, ROLE_LEAF } from './blocks.js';
 import { REG } from './registry.js';
+import { CH } from './voxel.js';
 
 const SIDES6 = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 const MAX_LOGS = 300;
@@ -134,7 +135,7 @@ const canLandIn = (id) => id === B.AIR || PLANT[id] > 0 || IS_WATER[id] === 1;
 function restingY(world, tx, ty, tz, maxLift) {
   for (let lift = 0; lift <= maxLift; lift++) {
     let cy = ty + lift;
-    if (cy < 1 || cy >= 64 || !canLandIn(world.getBlock(tx, cy, tz))) continue;
+    if (cy < 1 || cy >= CH || !canLandIn(world.getBlock(tx, cy, tz))) continue;
     for (let drop = 0; drop < 5 && cy > 1 && canLandIn(world.getBlock(tx, cy - 1, tz)); drop++) cy--; // never hover in mid-air
     return cy;
   }

@@ -86,7 +86,7 @@ export function createTouchControls(hooks) {
 
   // A finger that starts on the minimap, the info panels or the hotbar is a tap there, until it moves: then it is a look drag too,
   // so no part of the screen is a dead spot for turning around.
-  const SOFT_LOOK = '#hotbar, #minimap, #hud-right, #mm-info, #goals, #bagbtn';
+  const SOFT_LOOK = '#hotbar, #minimap, #hud-right, #mm-info, #bagbtn';
   let soft = null;
   window.addEventListener('pointerdown', (e) => {
     if (!enabled || !shown || editing || e.pointerType === 'mouse' || document.body.classList.contains('hudedit') || !e.target.closest?.(SOFT_LOOK)) return;
@@ -211,6 +211,7 @@ export function createTouchControls(hooks) {
   const sprintBtn = toggleButton('sprint', 'sprint', 'Sprint', 'sprint');
   const crouchBtn = toggleButton('crouch', 'crouch', 'Crouch', 'crouch');
   tapButton('menu', 'menu', 'Pause', () => hooks.menu());
+  tapButton('book', 'book', 'Quest book', () => hooks.book());
 
   // the loot bag, attached to the right of the hotbar (it moves with the hotbar, so it is not part of the layout the player edits)
   const bagBtn = el('div', 'bagbtn', '', document.body);

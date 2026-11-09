@@ -60,7 +60,9 @@ Every control is a picture, not a word:
 
 The five action buttons (pickaxe, hand, jump, sprint, crouch) all sit on the right, in an arc around where the right thumb rests: attack in the corner, use right above it, jump beside them, sprint and crouch a little further out.
 
-**The HUD panels.** Tap the **clock panel** or the **goals** to fold them to one line and tap again to open them: more of the world on a small screen. The **gear** on the clock panel opens a window where you switch each part of the HUD on or off (minimap, real-world time, game time, time of day, coordinates, goals) and **Move panels...**, which lets you drag the minimap, the clock panel and the goals anywhere on the screen. Everything is remembered; *Reset* in that window puts it all back.
+**The HUD panels.** Tap (or click) the **clock panel** to fold it to one line and again to open it: more of the world on a small screen. On a computer the **H** key (rebindable) opens the HUD window; on a phone it is the **gear** on the clock panel. There you switch each part of the HUD on or off (minimap, real-world time, game time, time of day, weather and biome, coordinates) and use **Move panels...**, which lets you drag the minimap and the clock panel anywhere on the screen. Everything is remembered; *Reset* in that window puts it all back.
+
+**The quest book.** Press **L** (rebindable) on a computer, or tap the **book button** next to pause on a phone, to open a two-page book: the **goals** first, a few to a page, with a tick for each one done and the next one marked, then the **jobs** villagers have given you with whose they are and how far along each is. Arrow keys or the Back / Next buttons turn the page; the tabs jump to Goals or Jobs. The game tells you about it when you start a new world.
 
 **Put the controls where your thumbs want them:** *Options -> Move the touch controls...* (from the pause menu, in a world) shows the controls over the world with a **Move the controls** window; drag the joystick or any button anywhere on the screen and tap **Done** to go back to Options. **Reset** in that window, or *Reset controls to default* in Options, puts them back. The loot bag stays on the hotbar.
 
@@ -76,7 +78,7 @@ Each world is its own file in `worlds/` (an older single `world.json` is importe
 
 ## Playing (survival is the default)
 
-You start with **nothing**. The on-screen goals walk you through it:
+You start with **nothing**. The goals in your quest book (**L**) walk you through it:
 
 1. Punch a tree (hold left click) to collect **wood**.
 2. Craft **planks**, **sticks** and a **crafting table** from the inventory (**E**).
@@ -93,8 +95,10 @@ You start with **nothing**. The on-screen goals walk you through it:
 | Left click (hold) | Break block | Right click | Place / use table & furnace / till / plant / eat (hold) |
 | 1-9 / wheel | Select slot | Middle click | Pick a block you carry |
 | E | Inventory & crafting | Q | Drop one item |
-| T | Skip time of day | M | Toggle music |
+| T | Skip time of day | M | Full-screen map |
+| L | Quest book: goals and jobs | H | HUD settings: show, hide, move |
 | [ ] | Render distance | F3 | Debug info |
+| N | Toggle music | | |
 
 **Every keyboard key above can be remapped** in *Options & Key Bindings* (main/pause menu), where you can also set mouse sensitivity, field of view, invert-Y, raw mouse input and music/sound volume. Settings are remembered in your browser.
 
@@ -110,17 +114,28 @@ The menu has a **Mode** button: **Creative** gives a block palette (E), unlimite
 - **Sand falls**: sand (anything with `"gravity": true`) drops when the block under it is removed, and so does everything stacked on top of it: break the bottom of a stack of four and the other three slide down one level together, animated. Sand lands on (and crushes) plants, displaces water, and drops as an item if you build into its path.
 - **Light levels**: every block has a light level from 0 to 15. Open sky is 15 and falls straight down; beyond that light loses one level per block, so the deeper you dig a tunnel the darker it gets, down to a dim floor (never pitch black, set by `lighting.minBrightness` in `game.json`). Sealing yourself in a house or a hole cuts the light off, and opening a gap lets it flow back in. Leaves and water dim light as it passes (`lightFilter`), blocks can glow (`light`, none do yet), and the sky, fog and your hand darken with the light around you. Light is baked into the block faces with smooth shading and updated incrementally when you build or dig.
 - **Damp soil**: tilled soil next to water (the same radius as tilling) turns darker and damp and crops grow on it. If water is not close enough (or is taken away) it dries out to pale farmland; crops do not grow on dry farmland, and empty dry farmland eventually turns back into dirt.
-- **Full-screen map**: tap the minimap (or press **N**) to open a map of the terrain you have seen; the map remembers ground you have left behind. Drag to move around, scroll or pinch to zoom, **Find me** to come back to your arrow.
+- **Full-screen map**: tap the minimap (or press **M**) to open a map of the terrain you have seen; the map remembers ground you have left behind. Drag to move around, scroll or pinch to zoom, **Find me** to come back to your arrow.
 - **Minimap** (top right, also on a phone, with the real-life clock under it): a circular compass-style map of the terrain around you (north is up), outlined with N/E/S/W marks. It scrolls as you move and shows water depth, hills and trees, with an arrow for the way you face. Under it: your real-life clock, the in-game clock with the part of the day and day number, and your X / Y / Z.
 - **What you are looking at**: a HUD at the top centre names the block you are aiming at within 5 blocks and, for growing things (wheat, grass), shows its stage of growth and whether it is ready to harvest.
 - **Sky**: volumetric clouds with real thickness, a lit 3D moon with craters that cycles through 8 phases (one per day) and twinkling stars.
 
+## The living world
+
+- **Oceans and biomes** (new worlds): seas with sandy shallows, gravel floors and deep trenches; frozen seas; savanna, jungle, swamp, taiga and badlands next to the plains, forests, hills, mountains, desert and tundra. Worlds you were already playing keep their old terrain exactly, so your builds never change.
+- **Weather**: spells of rain, thunderstorms (lightning and thunder, a darker sky, shorter view, stronger wind), snow and blizzards in cold biomes, sandstorms in hot ones, and rare hurricanes at sea. The weather is the same every time for a world. Rain only falls where you can see the sky, so a roof keeps you dry. The clock panel shows the biome and the weather.
+- **Animals and monsters**: cows, pigs and sheep live in herds on grass (hit one for beef, porkchops, lamb chops, wool and leather; shear a sheep with iron shears for wool and it grows back). Zombies, skeletons (they shoot) and spiders appear only where the light is below 6, never too many, never close, never in a village; they come for you when they see you, burn away in daylight and drop loot and experience. Armor softens their blows and a better weapon (sword > hammer > axe > pickaxe) hurts them more.
+- **Beds**: single, double, queen and king, in eight dye colours. Right-click one to sleep (day becomes night and night becomes day) and set the place you wake up if you die; break it and you are back at the world spawn.
+- **Villages** (new worlds) have five to seven villagers, each with a house and a bed of their own. Right-click a villager for the job they have for you: accept or decline, and the harder it is the better the reward.
+- **Chests** hold more as they are upgraded and crafting uses what is in the chests near you. **Hammers** break a 3x3 patch of stone. **Air**: your breath runs out under water.
+- **The world has no ceiling** (build as high as you like) and a floor of **bedrock**; nothing grows, flows or falls above y 120.
+
 ## Content is data
 
 Everything below is described in `src/data/*.json` and read at startup (the page shows a clear message if a file is wrong):
-`blocks.json` (look, hardness, tool, sound, loot, plant growth, what a block opens/tills into/spreads onto), `items.json` (tools, food, seeds, tool tiers),
+`blocks.json` (look, hardness, tool, sound, loot, plant growth, what a block opens/tills into/spreads onto, its shape, bed, chest), `items.json` (tools, food, seeds, tool tiers, beds, chest upgrades),
 `loot.json`, `recipes.json` (recipes, stations, crafting windows), `goals.json`, `textures.json` (procedural generators with parameters, hand-drawn
-pixel art, or PNG files), `sounds.json`, `worldgen.json` (terrain, ores, trees...) and `game.json` (health, hunger, falling, tilling, day length...).
+pixel art, or PNG files), `sounds.json`, `worldgen.json` (terrain, oceans, biomes, ores, trees...), `game.json` (health, hunger, falling, breath, combat, tilling, day length...),
+`mobs.json` (animals and monsters and when they spawn), `quests.json` (what villagers ask for) and `weather.json` (rain, storms, snow and the rest).
 The engine only knows generic behaviours (a block with `"role": "log"` topples, one with `"opens": "table"` opens that window, an item with `"plants"` plants seeds),
 so new content needs no code. Tests prove it by adding a whole new ore, item, tool tier, recipe and goal from JSON alone.
 
@@ -143,7 +158,7 @@ so new content needs no code. Tests prove it by adding a whole new ore, item, to
 - **Farming**: tall grass grows in three stages (short, tall, lush) and sways in the wind (`plants.js`, wind shader in `main.js`). Larger tufts are likelier to drop seeds. Hoes (wood/stone/iron) till grass or dirt that has water within a 4-block circle (up to 4 blocks below / 1 above the soil). Wheat goes sprout -> young -> ripe on farmland; a ripe crop gives wheat plus seeds. Crops only grow in loaded chunks near you. Rivers are carved into the lowlands so there is always grass beside water.
 - **Hunger and healing**: standing still costs nothing; walking drains the bar slowly, **sprinting about five times faster**, **every jump costs a little (more when sprinting)** and **mining slowly drains it** too, per block broken and for as long as you are working at one (`jumpCost`, `sprintJumpCost`, `miningCost`, `miningDrainPerSecond` in `game.json`). Bread restores 3 icons; hold right-click to eat (the food shrinks as you chew, with crumbs and juice flying off it). At 3 icons or fewer you can no longer sprint. At zero you move more slowly and **lose half a heart every 15 seconds until you die**. **Saturation** is what heals you: eating also fills a hidden reserve (the thin gold line above the hunger icons), capped at what your bar holds when you eat. It **only goes down when it heals you**: walking, sprinting and mining cost hunger, never saturation. Once the hunger bar is full, healing spends saturation (half a heart every 1.5 seconds, one unit each); when the reserve runs dry half an icon of hunger disappears and healing stops until you eat again. An empty reserve on its own never drains the hunger bar. A loaf of bread heals a few hearts. All tunable in `game.json` -> `hunger`; what each food gives is `food` and `saturation` on the item.
 - **Shovels**: grass, dirt, sand and snow are slow to dig by hand; wood/stone/iron shovels speed this up 2x / 3.5x / 5.5x.
-- **Goals tracker**: shows your latest achievement and the next two goals (there are now goals for finding a village and talking to a villager).
+- **Quest book**: the goals (with a tick for each done and the next one marked) and your villager jobs, in a two-page book you open with **L** (or the book button on a phone). A toast tells you when a goal is complete.
 - **Persistence** (`scripts/server.js`, `src/js/storage.js`): the dev server keeps each world (seed, edits, inventory, tool wear, health, progress, position) as `worlds/<id>.json`, written atomically. API: `GET/POST /api/worlds`, `GET/POST/DELETE /api/worlds/<id>`. Without the server the game keeps the same data in the browser (IndexedDB) behind the same interface; the game picks one at startup by asking `api/ping`.
 - **One instance at a time**: the server writes `.voxelcraft.lock` and refuses to start a second copy (it checks the old one really responds, so a crash never blocks you). In the browser, only one tab can run the game; a second tab shows a message instead of loading. `npm run stop` asks the server to shut down (loopback only, and it needs a header a web page can't send).
 

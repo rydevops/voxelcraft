@@ -326,6 +326,797 @@
       "fuel": 10,
       "creative": true,
       "door": "door_b_x_c"
+    },
+    {
+      "id": 300,
+      "key": "raw_beef",
+      "name": "Raw Beef",
+      "food": 3,
+      "saturation": 1.8
+    },
+    {
+      "id": 301,
+      "key": "steak",
+      "name": "Steak",
+      "food": 8,
+      "saturation": 12.8
+    },
+    {
+      "id": 302,
+      "key": "raw_porkchop",
+      "name": "Raw Porkchop",
+      "food": 3,
+      "saturation": 1.8
+    },
+    {
+      "id": 303,
+      "key": "cooked_porkchop",
+      "name": "Cooked Porkchop",
+      "food": 8,
+      "saturation": 12.8
+    },
+    {
+      "id": 304,
+      "key": "raw_lamb_chop",
+      "name": "Raw Lamb Chop",
+      "food": 2,
+      "saturation": 1.2
+    },
+    {
+      "id": 305,
+      "key": "lamb_chop",
+      "name": "Lamb Chop",
+      "food": 6,
+      "saturation": 9.6
+    },
+    {
+      "id": 306,
+      "key": "leather",
+      "name": "Leather"
+    },
+    {
+      "id": 307,
+      "key": "rotten_flesh",
+      "name": "Rotten Flesh",
+      "food": 2,
+      "saturation": 0.4
+    },
+    {
+      "id": 308,
+      "key": "bone",
+      "name": "Bone"
+    },
+    {
+      "id": 309,
+      "key": "string",
+      "name": "String"
+    },
+    {
+      "id": 310,
+      "key": "red_dye",
+      "name": "Red Dye"
+    },
+    {
+      "id": 311,
+      "key": "yellow_dye",
+      "name": "Yellow Dye"
+    },
+    {
+      "id": 312,
+      "key": "blue_dye",
+      "name": "Blue Dye"
+    },
+    {
+      "id": 313,
+      "key": "orange_dye",
+      "name": "Orange Dye"
+    },
+    {
+      "id": 314,
+      "key": "purple_dye",
+      "name": "Purple Dye"
+    },
+    {
+      "id": 315,
+      "key": "pink_dye",
+      "name": "Pink Dye"
+    },
+    {
+      "id": 316,
+      "key": "white_dye",
+      "name": "White Dye"
+    },
+    {
+      "id": 317,
+      "key": "green_dye",
+      "name": "Green Dye"
+    },
+    {
+      "id": 318,
+      "key": "iron_door",
+      "name": "Iron Door",
+      "creative": true,
+      "door": "iron_door_b_x_c"
+    },
+    {
+      "id": 319,
+      "key": "iron_shears",
+      "name": "Iron Shears",
+      "stack": 1,
+      "shears": true,
+      "tool": {
+        "type": "shears",
+        "tier": "iron",
+        "durabilityMul": 0.6
+      }
+    },
+    {
+      "id": 320,
+      "key": "chest_upgrade_iron",
+      "name": "Iron Chest Upgrade",
+      "stack": 16,
+      "upgrade": {
+        "from": "chest",
+        "to": "iron_chest"
+      }
+    },
+    {
+      "id": 321,
+      "key": "chest_upgrade_vault",
+      "name": "Vault Upgrade",
+      "stack": 16,
+      "upgrade": {
+        "from": "iron_chest",
+        "to": "vault_chest"
+      }
+    },
+    {
+      "id": 322,
+      "key": "wood_sword",
+      "name": "Wooden Sword",
+      "tool": {
+        "type": "sword",
+        "tier": "wood"
+      },
+      "creative": true
+    },
+    {
+      "id": 323,
+      "key": "stone_sword",
+      "name": "Stone Sword",
+      "tool": {
+        "type": "sword",
+        "tier": "stone"
+      },
+      "creative": true
+    },
+    {
+      "id": 324,
+      "key": "iron_sword",
+      "name": "Iron Sword",
+      "tool": {
+        "type": "sword",
+        "tier": "iron"
+      },
+      "creative": true
+    },
+    {
+      "id": 325,
+      "key": "wood_hammer",
+      "name": "Wooden Hammer",
+      "tool": {
+        "type": "hammer",
+        "tier": "wood",
+        "mines": "pickaxe",
+        "area": 3,
+        "speed": 0.7,
+        "durabilityMul": 2.5
+      },
+      "creative": true
+    },
+    {
+      "id": 326,
+      "key": "stone_hammer",
+      "name": "Stone Hammer",
+      "tool": {
+        "type": "hammer",
+        "tier": "stone",
+        "mines": "pickaxe",
+        "area": 3,
+        "speed": 0.7,
+        "durabilityMul": 2.5
+      },
+      "creative": true
+    },
+    {
+      "id": 327,
+      "key": "iron_hammer",
+      "name": "Iron Hammer",
+      "tool": {
+        "type": "hammer",
+        "tier": "iron",
+        "mines": "pickaxe",
+        "area": 3,
+        "speed": 0.7,
+        "durabilityMul": 2.5
+      },
+      "creative": true
+    },
+    {
+      "id": 328,
+      "key": "bed_single_white",
+      "name": "Single Bed",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "white",
+        "foot": "bed_white_foot",
+        "heads": [
+          "bed_white_head_n",
+          "bed_white_head_e",
+          "bed_white_head_s",
+          "bed_white_head_w"
+        ]
+      }
+    },
+    {
+      "id": 329,
+      "key": "bed_single_red",
+      "name": "Single Bed (Red)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "red",
+        "foot": "bed_red_foot",
+        "heads": [
+          "bed_red_head_n",
+          "bed_red_head_e",
+          "bed_red_head_s",
+          "bed_red_head_w"
+        ]
+      }
+    },
+    {
+      "id": 330,
+      "key": "bed_single_orange",
+      "name": "Single Bed (Orange)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "orange",
+        "foot": "bed_orange_foot",
+        "heads": [
+          "bed_orange_head_n",
+          "bed_orange_head_e",
+          "bed_orange_head_s",
+          "bed_orange_head_w"
+        ]
+      }
+    },
+    {
+      "id": 331,
+      "key": "bed_single_yellow",
+      "name": "Single Bed (Yellow)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "yellow",
+        "foot": "bed_yellow_foot",
+        "heads": [
+          "bed_yellow_head_n",
+          "bed_yellow_head_e",
+          "bed_yellow_head_s",
+          "bed_yellow_head_w"
+        ]
+      }
+    },
+    {
+      "id": 332,
+      "key": "bed_single_green",
+      "name": "Single Bed (Green)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "green",
+        "foot": "bed_green_foot",
+        "heads": [
+          "bed_green_head_n",
+          "bed_green_head_e",
+          "bed_green_head_s",
+          "bed_green_head_w"
+        ]
+      }
+    },
+    {
+      "id": 333,
+      "key": "bed_single_blue",
+      "name": "Single Bed (Blue)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "blue",
+        "foot": "bed_blue_foot",
+        "heads": [
+          "bed_blue_head_n",
+          "bed_blue_head_e",
+          "bed_blue_head_s",
+          "bed_blue_head_w"
+        ]
+      }
+    },
+    {
+      "id": 334,
+      "key": "bed_single_purple",
+      "name": "Single Bed (Purple)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "purple",
+        "foot": "bed_purple_foot",
+        "heads": [
+          "bed_purple_head_n",
+          "bed_purple_head_e",
+          "bed_purple_head_s",
+          "bed_purple_head_w"
+        ]
+      }
+    },
+    {
+      "id": 335,
+      "key": "bed_single_pink",
+      "name": "Single Bed (Pink)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 1,
+        "color": "pink",
+        "foot": "bed_pink_foot",
+        "heads": [
+          "bed_pink_head_n",
+          "bed_pink_head_e",
+          "bed_pink_head_s",
+          "bed_pink_head_w"
+        ]
+      }
+    },
+    {
+      "id": 336,
+      "key": "bed_double_white",
+      "name": "Double Bed",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "white",
+        "foot": "bed_white_foot",
+        "heads": [
+          "bed_white_head_n",
+          "bed_white_head_e",
+          "bed_white_head_s",
+          "bed_white_head_w"
+        ]
+      }
+    },
+    {
+      "id": 337,
+      "key": "bed_double_red",
+      "name": "Double Bed (Red)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "red",
+        "foot": "bed_red_foot",
+        "heads": [
+          "bed_red_head_n",
+          "bed_red_head_e",
+          "bed_red_head_s",
+          "bed_red_head_w"
+        ]
+      }
+    },
+    {
+      "id": 338,
+      "key": "bed_double_orange",
+      "name": "Double Bed (Orange)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "orange",
+        "foot": "bed_orange_foot",
+        "heads": [
+          "bed_orange_head_n",
+          "bed_orange_head_e",
+          "bed_orange_head_s",
+          "bed_orange_head_w"
+        ]
+      }
+    },
+    {
+      "id": 339,
+      "key": "bed_double_yellow",
+      "name": "Double Bed (Yellow)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "yellow",
+        "foot": "bed_yellow_foot",
+        "heads": [
+          "bed_yellow_head_n",
+          "bed_yellow_head_e",
+          "bed_yellow_head_s",
+          "bed_yellow_head_w"
+        ]
+      }
+    },
+    {
+      "id": 340,
+      "key": "bed_double_green",
+      "name": "Double Bed (Green)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "green",
+        "foot": "bed_green_foot",
+        "heads": [
+          "bed_green_head_n",
+          "bed_green_head_e",
+          "bed_green_head_s",
+          "bed_green_head_w"
+        ]
+      }
+    },
+    {
+      "id": 341,
+      "key": "bed_double_blue",
+      "name": "Double Bed (Blue)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "blue",
+        "foot": "bed_blue_foot",
+        "heads": [
+          "bed_blue_head_n",
+          "bed_blue_head_e",
+          "bed_blue_head_s",
+          "bed_blue_head_w"
+        ]
+      }
+    },
+    {
+      "id": 342,
+      "key": "bed_double_purple",
+      "name": "Double Bed (Purple)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "purple",
+        "foot": "bed_purple_foot",
+        "heads": [
+          "bed_purple_head_n",
+          "bed_purple_head_e",
+          "bed_purple_head_s",
+          "bed_purple_head_w"
+        ]
+      }
+    },
+    {
+      "id": 343,
+      "key": "bed_double_pink",
+      "name": "Double Bed (Pink)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 2,
+        "color": "pink",
+        "foot": "bed_pink_foot",
+        "heads": [
+          "bed_pink_head_n",
+          "bed_pink_head_e",
+          "bed_pink_head_s",
+          "bed_pink_head_w"
+        ]
+      }
+    },
+    {
+      "id": 344,
+      "key": "bed_queen_white",
+      "name": "Queen Bed",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "white",
+        "foot": "bed_white_foot",
+        "heads": [
+          "bed_white_head_n",
+          "bed_white_head_e",
+          "bed_white_head_s",
+          "bed_white_head_w"
+        ]
+      }
+    },
+    {
+      "id": 345,
+      "key": "bed_queen_red",
+      "name": "Queen Bed (Red)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "red",
+        "foot": "bed_red_foot",
+        "heads": [
+          "bed_red_head_n",
+          "bed_red_head_e",
+          "bed_red_head_s",
+          "bed_red_head_w"
+        ]
+      }
+    },
+    {
+      "id": 346,
+      "key": "bed_queen_orange",
+      "name": "Queen Bed (Orange)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "orange",
+        "foot": "bed_orange_foot",
+        "heads": [
+          "bed_orange_head_n",
+          "bed_orange_head_e",
+          "bed_orange_head_s",
+          "bed_orange_head_w"
+        ]
+      }
+    },
+    {
+      "id": 347,
+      "key": "bed_queen_yellow",
+      "name": "Queen Bed (Yellow)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "yellow",
+        "foot": "bed_yellow_foot",
+        "heads": [
+          "bed_yellow_head_n",
+          "bed_yellow_head_e",
+          "bed_yellow_head_s",
+          "bed_yellow_head_w"
+        ]
+      }
+    },
+    {
+      "id": 348,
+      "key": "bed_queen_green",
+      "name": "Queen Bed (Green)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "green",
+        "foot": "bed_green_foot",
+        "heads": [
+          "bed_green_head_n",
+          "bed_green_head_e",
+          "bed_green_head_s",
+          "bed_green_head_w"
+        ]
+      }
+    },
+    {
+      "id": 349,
+      "key": "bed_queen_blue",
+      "name": "Queen Bed (Blue)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "blue",
+        "foot": "bed_blue_foot",
+        "heads": [
+          "bed_blue_head_n",
+          "bed_blue_head_e",
+          "bed_blue_head_s",
+          "bed_blue_head_w"
+        ]
+      }
+    },
+    {
+      "id": 350,
+      "key": "bed_queen_purple",
+      "name": "Queen Bed (Purple)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "purple",
+        "foot": "bed_purple_foot",
+        "heads": [
+          "bed_purple_head_n",
+          "bed_purple_head_e",
+          "bed_purple_head_s",
+          "bed_purple_head_w"
+        ]
+      }
+    },
+    {
+      "id": 351,
+      "key": "bed_queen_pink",
+      "name": "Queen Bed (Pink)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 3,
+        "color": "pink",
+        "foot": "bed_pink_foot",
+        "heads": [
+          "bed_pink_head_n",
+          "bed_pink_head_e",
+          "bed_pink_head_s",
+          "bed_pink_head_w"
+        ]
+      }
+    },
+    {
+      "id": 352,
+      "key": "bed_king_white",
+      "name": "King Bed",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "white",
+        "foot": "bed_white_foot",
+        "heads": [
+          "bed_white_head_n",
+          "bed_white_head_e",
+          "bed_white_head_s",
+          "bed_white_head_w"
+        ]
+      }
+    },
+    {
+      "id": 353,
+      "key": "bed_king_red",
+      "name": "King Bed (Red)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "red",
+        "foot": "bed_red_foot",
+        "heads": [
+          "bed_red_head_n",
+          "bed_red_head_e",
+          "bed_red_head_s",
+          "bed_red_head_w"
+        ]
+      }
+    },
+    {
+      "id": 354,
+      "key": "bed_king_orange",
+      "name": "King Bed (Orange)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "orange",
+        "foot": "bed_orange_foot",
+        "heads": [
+          "bed_orange_head_n",
+          "bed_orange_head_e",
+          "bed_orange_head_s",
+          "bed_orange_head_w"
+        ]
+      }
+    },
+    {
+      "id": 355,
+      "key": "bed_king_yellow",
+      "name": "King Bed (Yellow)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "yellow",
+        "foot": "bed_yellow_foot",
+        "heads": [
+          "bed_yellow_head_n",
+          "bed_yellow_head_e",
+          "bed_yellow_head_s",
+          "bed_yellow_head_w"
+        ]
+      }
+    },
+    {
+      "id": 356,
+      "key": "bed_king_green",
+      "name": "King Bed (Green)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "green",
+        "foot": "bed_green_foot",
+        "heads": [
+          "bed_green_head_n",
+          "bed_green_head_e",
+          "bed_green_head_s",
+          "bed_green_head_w"
+        ]
+      }
+    },
+    {
+      "id": 357,
+      "key": "bed_king_blue",
+      "name": "King Bed (Blue)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "blue",
+        "foot": "bed_blue_foot",
+        "heads": [
+          "bed_blue_head_n",
+          "bed_blue_head_e",
+          "bed_blue_head_s",
+          "bed_blue_head_w"
+        ]
+      }
+    },
+    {
+      "id": 358,
+      "key": "bed_king_purple",
+      "name": "King Bed (Purple)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "purple",
+        "foot": "bed_purple_foot",
+        "heads": [
+          "bed_purple_head_n",
+          "bed_purple_head_e",
+          "bed_purple_head_s",
+          "bed_purple_head_w"
+        ]
+      }
+    },
+    {
+      "id": 359,
+      "key": "bed_king_pink",
+      "name": "King Bed (Pink)",
+      "stack": 16,
+      "creative": true,
+      "bed": {
+        "width": 4,
+        "color": "pink",
+        "foot": "bed_pink_foot",
+        "heads": [
+          "bed_pink_head_n",
+          "bed_pink_head_e",
+          "bed_pink_head_s",
+          "bed_pink_head_w"
+        ]
+      }
     }
   ]
 }

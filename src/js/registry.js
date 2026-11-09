@@ -7,8 +7,8 @@ import { GLYPHS } from './pixelfont.js';
 
 export class DataError extends Error {}
 
-const FILES = ['blocks', 'items', 'loot', 'recipes', 'goals', 'textures', 'sounds', 'worldgen', 'game', 'music'];
-const KNOWN_FLAGS = ['tilled', 'planted', 'ate', 'equipped', 'village', 'talked'];
+const FILES = ['blocks', 'items', 'loot', 'recipes', 'goals', 'textures', 'sounds', 'worldgen', 'game', 'music', 'mobs', 'quests', 'weather'];
+const KNOWN_FLAGS = ['tilled', 'planted', 'ate', 'equipped', 'village', 'talked', 'slept', 'slain', 'quest', 'ocean'];
 const TILE_TYPES = ['noise', 'capped', 'bark', 'rings', 'planks', 'cells', 'waves', 'bricks', 'ore', 'stripes', 'blades', 'stalks', 'pixelart', 'image', 'layers', 'ref'];
 const KEY_RE = /^[a-z][a-z0-9_]*$/;
 
@@ -122,11 +122,15 @@ export function buildRegistry(data) {
       if (m.type === 'torch') { if (!(isNum(m.height) && m.height > 0 && m.height <= 1)) err(`${where}: a torch "model" needs "height": 0-1 (and "lean": [dx, dz])`); }
       else if (m.type === 'stairs') { if (!['n', 'e', 's', 'w'].includes(m.facing)) err(`${where}: a stairs "model" needs "facing": n, e, s or w (the side the tall back is on)`); }
       else if (m.type === 'door') { if (!(['x', 'z'].includes(m.axis) && ['bottom', 'top'].includes(m.half) && typeof m.open === 'boolean')) err(`${where}: a door "model" needs "axis": x or z, "half": bottom or top and "open": true or false`); }
-      else err(`${where}: "model" type must be torch, stairs or door`);
+      else if (m.type === 'boxes') { if (!(isArr(m.boxes) && m.boxes.length && m.boxes.every((bx) => isArr(bx) && bx.length === 6 && bx.every(isNum) && bx[0] < bx[3] && bx[1] < bx[4] && bx[2] < bx[5] && bx.every((v) => v >= 0 && v <= 1)))) err(`${where}: a boxes "model" needs "boxes": a list of [x0, y0, z0, x1, y1, z1] inside the cell (0-1)`); }
+      else err(`${where}: "model" type must be torch, stairs, door or boxes`);
     }
     if (b.model?.lean != null && !(isArr(b.model.lean) && b.model.lean.length === 2 && b.model.lean.every(Number.isInteger))) err(`${where}: model.lean must be [dx, dz]`);
     if (b.support != null && !(isArr(b.support) && b.support.length === 3 && b.support.every(Number.isInteger))) err(`${where}: "support" must be [dx, dy, dz]: where the block it hangs on is`);
     if (b.fuel != null && !(isNum(b.fuel) && b.fuel > 0)) err(`${where}: "fuel" must be the seconds it burns in a furnace`);
+    if (b.axis != null && !['x', 'z'].includes(b.axis)) err(`${where}: "axis" must be x or z (the way a window or wall piece spans; needs "variantOf" on the z copy)`);
+    if (b.bed != null && !(['head', 'foot'].includes(b.bed.part) && (b.bed.part === 'foot' || ['n', 'e', 's', 'w'].includes(b.bed.facing)) && typeof b.bed.color === 'string')) err(`${where}: "bed" needs "part": head or foot, "facing": n/e/s/w (for a head) and a "color"`);
+    if (b.chest != null && !(Number.isInteger(b.chest.slots) && b.chest.slots >= 1 && Number.isInteger(b.chest.stack) && b.chest.stack >= 1)) err(`${where}: "chest" needs "slots" and "stack" (how many times a normal stack each slot holds), whole numbers >= 1`);
     if (b.glow != null && !(isNum(b.glow) && b.glow >= 0 && b.glow <= 1)) err(`${where}: "glow" must be 0-1 (how much the block shines for itself, even in the dark)`);
     for (const f of ['light', 'lightFilter']) if (b[f] != null && !(Number.isInteger(b[f]) && b[f] >= 0 && b[f] <= 15)) err(`${where}: "${f}" must be a whole number 0-15`);
     if (b.water && !(Number.isInteger(b.water.level) && b.water.level >= 1 && b.water.level <= 7)) err(`${where}: water.level must be 1-7 (7 = source)`);
@@ -138,7 +142,11 @@ export function buildRegistry(data) {
       waterLevel: b.water ? b.water.level : 0,
       role: b.role ?? null, opens: b.opens ?? null,
       gravity: !!b.gravity, // falls when nothing is underneath (sand)
-      model: b.model ? { type: b.model.type, height: b.model.height, lean: b.model.lean ?? [0, 0], facing: b.model.facing, axis: b.model.axis, half: b.model.half, open: !!b.model.open } : null, // drawn as a small model instead of a cube (torches, stairs, doors)
+      model: b.model ? { type: b.model.type, height: b.model.height, lean: b.model.lean ?? [0, 0], facing: b.model.facing, axis: b.model.axis, half: b.model.half, open: !!b.model.open, boxes: b.model.boxes, kind: b.model.kind ?? 'wood' } : null, // drawn as a small model instead of a cube (torches, stairs, doors)
+      unbreakable: !!b.unbreakable, // bedrock: cannot be mined, even in creative
+      axis: b.axis ?? null, // a window / wall piece that spans x or z; the z copy lists the x one as variantOf
+      bed: b.bed ? { part: b.bed.part, facing: b.bed.facing ?? null, color: b.bed.color } : null, // one square of a bed: the foot, or the head with the pillow on the side it faces
+      chest: b.chest ? { slots: b.chest.slots, stack: b.chest.stack } : null, // storage: how many slots, and by how many times a normal stack each slot is bigger
       variantOf: b.variantOf ? needBlock(b.variantOf, `${where} variantOf`) : 0, // another way round of the same block (stairs facing other ways): it drops and picks as that block
       support: b.support ?? null, // [dx, dy, dz] of the solid block this one hangs on; it drops as an item when that goes
       fuel: b.fuel ?? 0, // seconds it burns in a furnace
@@ -170,6 +178,7 @@ export function buildRegistry(data) {
           next: needBlock(p.growth.next, `${where} plant.growth.next`), rate: p.growth.chancePerSecond ?? 0,
           soil: needBlock(p.growth.soil, `${where} plant.growth.soil`),
         } : null,
+        placeOn: p.placeOn ? [].concat(p.placeOn).map((k) => needBlock(k, `${where} plant.placeOn`)) : null, // a flower you can carry and put down on these blocks
         stage: p.stage ? { label: p.stage.label ?? out.name, step: p.stage.step ?? 1, name: p.stage.name ?? '', ripe: !!p.stage.ripe, crop: !!p.stage.crop } : null,
         grows: p.grows ? { // a sapling: after a while it turns into one of these trees (worldgen.json trees.variants)
           trees: isArr(p.grows.trees) ? p.grows.trees : [], rate: p.grows.chancePerSecond ?? 0,
@@ -194,12 +203,16 @@ export function buildRegistry(data) {
       const t = tiers[it.tool.tier];
       if (!t) err(`${where}: tier "${it.tool.tier}" is not defined in items.json "tiers"`);
       if (typeof it.tool.type !== 'string') err(`${where}: tool.type is required`);
-      tool = { type: it.tool.type, tier: t?.level ?? 1, speed: t?.speed ?? 1, uses: t?.durability ?? 100, head: t?.head ?? it.tool.tier };
+      tool = { type: it.tool.type, tier: t?.level ?? 1, speed: (t?.speed ?? 1) * (it.tool.speed ?? 1), uses: Math.round((t?.durability ?? 100) * (it.tool.durabilityMul ?? 1)), head: t?.head ?? it.tool.tier, name: it.tool.tier,
+        mines: it.tool.mines ?? null, area: it.tool.area ?? 1 }; // mines: the kind of block it also digs as if it were that tool (a hammer is a pickaxe); area: it breaks a square of this width (a 3x3 hammer)
+      if (it.tool.mines != null && typeof it.tool.mines !== 'string') err(`${where}: tool.mines must be a tool type such as "pickaxe"`);
+      if (!Number.isInteger(tool.area) || tool.area < 1 || tool.area % 2 === 0) err(`${where}: tool.area must be an odd whole number (1, 3, 5)`);
     }
     if (!sprites[it.key] && !tool) err(`${where}: no sprite - add "${it.key}" to textures.json "sprites"`);
     if (it.equip && !(equipSlotIds.includes(it.equip.slot))) err(`${where}: equip.slot "${it.equip.slot}" is not one of the slots in game.json equipment (${equipSlotIds.join(', ')})`);
     if (it.equip && ![it.equip.armor ?? 0, it.equip.slots ?? 0].every((n) => Number.isInteger(n) && n >= 0)) err(`${where}: equip.armor and equip.slots must be whole numbers`);
     if (it.fuel != null && !(isNum(it.fuel) && it.fuel > 0)) err(`${where}: "fuel" must be the seconds it burns in a furnace`);
+    if (it.bed && !(Number.isInteger(it.bed.width) && it.bed.width >= 1 && it.bed.width <= 8 && it.bed.heads?.length === 4)) err(`${where}: bed needs "width" (1-8), "foot" and four "heads" (facing n, e, s, w)`);
     return {
       id: it.id, key: it.key, name: it.name ?? it.key, stack: it.stack ?? (tool ? 1 : 64), tool, food: it.food ?? 0,
       fuel: it.fuel ?? 0, creative: !!it.creative, offhand: !!it.offhand, // offhand: can sit in the shield slot
@@ -210,7 +223,10 @@ export function buildRegistry(data) {
         return [face, needBlock(k, `${where} places.${face}`)];
       })) : null, // block placed for the face you click (torches); no "down": they cannot hang from a ceiling
 
-      door: it.door ? needBlock(it.door, `${where} door`) : 0, // places a two-block-tall door: the block key of its closed lower half
+      door: it.door ? needBlock(it.door, `${where} door`) : 0,
+      bed: it.bed ? { width: it.bed.width, color: it.bed.color, foot: needBlock(it.bed.foot, `${where} bed.foot`), heads: (it.bed.heads || []).map((k) => needBlock(k, `${where} bed.heads`)) } : null, // places a bed `width` wide and two long: the foot block and the four head blocks (facing n, e, s, w)
+      upgrade: it.upgrade ? { from: needBlock(it.upgrade.from, `${where} upgrade.from`), to: needBlock(it.upgrade.to, `${where} upgrade.to`) } : null, // used on the `from` chest, it becomes the `to` chest and keeps what is inside
+      shears: !!it.shears, // shears a sheep // places a two-block-tall door: the block key of its closed lower half
       plants: it.plants ? { block: needBlock(it.plants.block, `${where} plants.block`), on: [].concat(it.plants.on).map((k) => needBlock(k, `${where} plants.on`)) } : null, // `on` may be one block or a list
     };
   });
@@ -260,7 +276,7 @@ export function buildRegistry(data) {
   const windowDefs = {};
   for (const [k, w] of Object.entries(windowsIn)) {
     for (const s of w.stations || []) if (s !== null && !stations[s]) err(`recipes.json window "${k}": station "${s}" is not defined`);
-    windowDefs[k] = { title: w.title ?? k, sub: w.sub ?? '', stations: w.stations ?? [null], furnace: !!w.furnace }; // furnace: a window with input / fuel / output slots
+    windowDefs[k] = { title: w.title ?? k, sub: w.sub ?? '', stations: w.stations ?? [null], furnace: !!w.furnace, chest: !!w.chest }; // furnace: a window with input / fuel / output slots
   }
   // furnace cooking: one item in -> one item out, taking some seconds
   const smelting = (data.recipes.smelting || []).map((r, i) => {
@@ -304,18 +320,21 @@ export function buildRegistry(data) {
       variants: (wg.trees?.variants || []).map((v, i) => {
         const w = `worldgen.json trees.variants[${i}] (${v.key})`;
         if (typeof v.key !== 'string') err(`${w}: "key" is required`);
-        if (!['round', 'tall', 'cone', 'bush'].includes(v.shape)) err(`${w}: shape must be round, tall, cone or bush`);
+        if (!['round', 'tall', 'cone', 'bush', 'flat'].includes(v.shape)) err(`${w}: shape must be round, tall, cone, bush or flat`);
         if (!isNum(v.weight) || v.weight <= 0) err(`${w}: weight must be more than 0`);
         if (!(isArr(v.trunk) && v.trunk.length === 2 && v.trunk.every(Number.isInteger) && v.trunk[0] >= 1 && v.trunk[1] >= v.trunk[0])) err(`${w}: trunk must be [min, max] whole numbers`);
         const heights = v.heights ?? [0, 99];
         if (!(isArr(heights) && heights.length === 2 && heights[1] >= heights[0])) err(`${w}: heights must be [lowest, highest] terrain height`);
-        return { key: v.key, weight: v.weight, shape: v.shape, trunk: v.trunk, heights, biomes: isArr(v.biomes) ? v.biomes : null, logId: needBlock(v.log, `${w} log`), leavesId: needBlock(v.leaves, `${w} leaves`) };
+        return { key: v.key, since: v.since ?? 0, weight: v.weight, shape: v.shape, trunk: v.trunk, heights, biomes: isArr(v.biomes) ? v.biomes : null, logId: needBlock(v.log, `${w} log`), leavesId: needBlock(v.leaves, `${w} leaves`) };
       }),
     },
     biomes: wg.biomes && {
       ...wg.biomes,
       types: Object.fromEntries(Object.entries(wg.biomes.types || {}).filter(([k]) => !k.startsWith('_')).map(([k, b]) => [k, {
-        ...b, surfaceId: needBlock(b.surface, `worldgen.json biomes.types.${k} surface`), fillerId: needBlock(b.filler, `worldgen.json biomes.types.${k} filler`),
+        ...b, label: b.label ?? k, climate: b.climate ?? 'temperate', surfaceId: needBlock(b.surface, `worldgen.json biomes.types.${k} surface`), fillerId: needBlock(b.filler, `worldgen.json biomes.types.${k} filler`),
+        // strata: bands of these blocks below the surface (badlands); cover: what grows on the ground (grass tufts, flowers), chance per column
+        strataIds: (b.strata || []).map((s) => needBlock(s, `worldgen.json biomes.types.${k} strata`)),
+        cover: b.cover ? { chance: b.cover.chance, variants: b.cover.variants.map((v, i) => ({ id: needBlock(v.block, `worldgen.json biomes.types.${k} cover[${i}]`), weight: v.weight })) } : null,
       }])),
     },
     groundCover: {
@@ -324,9 +343,14 @@ export function buildRegistry(data) {
     },
   };
   if (!worldgen.trees.variants.length) err('worldgen.json: trees.variants needs at least one tree');
+  if (worldgen.biomes?.ocean) { // terrain 4 only: the sea floor and what covers it
+    const o = worldgen.biomes.ocean;
+    for (const f of ['scale', 'threshold', 'blend', 'shelfDepth', 'deepDepth', 'deepFrom', 'gravelBelow', 'iceTemp']) if (!isNum(o[f])) err(`worldgen.json biomes.ocean.${f} must be a number`);
+    o.sandId = needBlock(o.sand, 'worldgen.json biomes.ocean.sand'); o.gravelId = needBlock(o.gravel, 'worldgen.json biomes.ocean.gravel'); o.iceId = needBlock(o.ice, 'worldgen.json biomes.ocean.ice');
+  }
   if (worldgen.biomes) {
     const kinds = Object.keys(worldgen.biomes.types);
-    for (const need of ['plains', 'forest', 'hills', 'mountains', 'desert', 'tundra']) if (!kinds.includes(need)) err(`worldgen.json biomes.types needs "${need}"`);
+    for (const need of ['plains', 'forest', 'hills', 'mountains', 'desert', 'tundra', 'savanna', 'jungle', 'swamp', 'taiga', 'badlands', 'ocean', 'deep_ocean', 'frozen_ocean']) if (!kinds.includes(need)) err(`worldgen.json biomes.types needs "${need}"`);
     for (const v of worldgen.trees.variants) for (const k of v.biomes ?? []) if (!kinds.includes(k)) err(`worldgen.json tree "${v.key}": biome "${k}" is not in biomes.types`);
   }
   const treeKeys = new Set(worldgen.trees.variants.map((v) => v.key));
@@ -340,6 +364,12 @@ export function buildRegistry(data) {
     else for (const ch of text.toUpperCase()) if (!GLYPHS[ch]) err(`game.json studio.${key}: the logo font has no "${ch}" (letters, digits, space and - . ! & ' work)`);
   }
   if (!['shatter', 'land'].includes(game.treeFall?.mode)) err('game.json treeFall.mode must be "shatter" or "land"');
+  for (const [where, o, keys] of [['breath', game.breath, ['max', 'drainPerSecond', 'refillPerSecond', 'drownEverySeconds', 'drownDamage']], ['combat', game.combat, ['handDamage', 'attackCooldown', 'knockback']], ['xp', game.xp, ['perLevel']],
+    ['sleep', game.sleep, ['monsterRadius', 'fadeSeconds']], ['chests', game.chests, ['craftRange']], ['world', game.world, ['tickCeiling']]]) {
+    for (const k of keys) if (!isNum(o?.[k])) err(`game.json ${where}.${k} must be a number`);
+  }
+  for (const [type, dmg] of Object.entries(game.combat?.weapons ?? {})) if (!isNum(dmg) || dmg < 0) err(`game.json combat.weapons.${type} must be a damage number`);
+  for (const [tier, dmg] of Object.entries(game.combat?.tierBonus ?? {})) if (!isNum(dmg)) err(`game.json combat.tierBonus.${tier} must be a number`);
   for (const name of Object.keys(soundMats)) if (!isArr(soundMats[name])) err(`sounds.json material "${name}" must be a list of layers`);
   for (const b of blocks) if (b.sound !== 'default' && !soundMats[b.sound]) err(`blocks.json "${b.key}": sound "${b.sound}" is not defined in sounds.json (using "default" is fine)`);
 
@@ -399,9 +429,82 @@ export function buildRegistry(data) {
   if (tracks.filter((t) => t.key !== mIn.title).length < 2) err('music.json: the game needs at least two tracks besides the title theme, so there is something to shuffle');
   const music = { gapSeconds: gapIn, title: mIn.title, tracks };
 
+  // ---- mobs: animals and monsters ----
+  const mobsIn = data.mobs ?? {};
+  const KINDS = ['animal', 'hostile'];
+  const species = {};
+  for (const [k, m] of Object.entries(mobsIn.species ?? {})) {
+    if (k.startsWith('_')) continue;
+    const where = `mobs.json "${k}"`;
+    if (!KEY_RE.test(k)) err(`${where}: key must be lowercase letters, digits and underscores`);
+    if (!KINDS.includes(m.kind)) err(`${where}: kind must be animal or hostile`);
+    for (const f of ['health', 'speed']) if (!isNum(m[f]) || m[f] <= 0) err(`${where}: "${f}" must be a number more than 0`);
+    if (!isNum(m.size?.hw) || !isNum(m.size?.height)) err(`${where}: size needs "hw" (half width) and "height"`);
+    if (m.loot != null && !lootIn[m.loot]) err(`${where}: loot table "${m.loot}" is not defined in loot.json`);
+    if (m.kind === 'hostile') for (const f of ['damage', 'sight', 'reach', 'cooldown']) if (!isNum(m[f]) || m[f] <= 0) err(`${where}: a hostile mob needs "${f}" (a number more than 0)`);
+    if (m.ranged && !(isNum(m.ranged.range) && isNum(m.ranged.damage) && isNum(m.ranged.cooldown))) err(`${where}: ranged needs "range", "damage" and "cooldown"`);
+    if (m.kind === 'animal' && m.biomes && !isArr(m.biomes)) err(`${where}: biomes must be a list`);
+    if (m.shear && !lootIn[m.shear.loot]) err(`${where}: shear.loot "${m.shear.loot}" is not defined in loot.json`);
+    species[k] = { key: k, ...m, name: m.name ?? k, xp: m.xp ?? 0, shear: m.shear ? { loot: m.shear.loot, regrowSeconds: m.shear.regrowSeconds ?? 120 } : null };
+  }
+  for (const need of ['cow', 'pig', 'sheep', 'zombie', 'skeleton', 'spider']) if (!species[need]) err(`mobs.json needs "${need}"`);
+  const sp = mobsIn.spawning ?? {};
+  for (const [grp, keys] of [['animals', ['radius', 'minLight', 'maxPerChunk', 'chunkChance']], ['hostile', ['maxLight', 'max', 'minDistance', 'maxDistance', 'attemptSeconds', 'despawnDistance']]]) {
+    for (const f of keys) if (!isNum(sp[grp]?.[f])) err(`mobs.json spawning.${grp}.${f} must be a number`);
+  }
+  const mobs = { species, spawning: sp };
+
+  // ---- quests: villagers ask for things; the reward depends on how hard the job was ----
+  const qIn = data.quests ?? {};
+  const tierNames = Object.keys(qIn.tiers ?? {}).filter((k) => !k.startsWith('_'));
+  if (!tierNames.length) err('quests.json: "tiers" must list at least one difficulty');
+  const questTiers = {};
+  for (const k of tierNames) {
+    const t = qIn.tiers[k];
+    if (!lootIn[t.loot]) err(`quests.json tiers.${k}: loot table "${t.loot}" is not defined in loot.json`);
+    questTiers[k] = { key: k, label: t.label ?? k, loot: t.loot, xp: t.xp ?? 0, weight: t.weight ?? 1, reward: t.reward ?? '' };
+  }
+  const questJobs = {};
+  for (const [job, byTier] of Object.entries(qIn.jobs ?? {})) {
+    if (job.startsWith('_')) continue;
+    questJobs[job] = {};
+    for (const tier of tierNames) {
+      const list = byTier[tier] ?? [];
+      if (!isArr(list) || !list.length) { err(`quests.json jobs.${job}.${tier}: needs at least one quest`); continue; }
+      questJobs[job][tier] = list.map((q, i) => {
+        const w = `quests.json jobs.${job}.${tier} #${i + 1}`;
+        const c = q.count ?? 1, [min, max] = isArr(c) ? c : [c, c];
+        if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max < min) err(`${w}: count must be a whole number or [min, max]`);
+        if (q.type === 'fetch') return { type: 'fetch', item: idOf(q.item, w), min, max, text: q.text ?? null };
+        if (q.type === 'slay') { if (!species[q.mob]) err(`${w}: mob "${q.mob}" is not in mobs.json`); return { type: 'slay', mob: q.mob, min, max, text: q.text ?? null }; }
+        err(`${w}: type must be fetch or slay`);
+        return null;
+      });
+    }
+  }
+  const quests = { tiers: questTiers, tierOrder: tierNames, jobs: questJobs };
+
+  // ---- weather ----
+  const wIn = data.weather ?? {};
+  const events = {};
+  for (const [k, e] of Object.entries(wIn.events ?? {})) {
+    if (k.startsWith('_')) continue;
+    const w = `weather.json "${k}"`;
+    if (!isNum(e.weight) || e.weight < 0) err(`${w}: "weight" must be a number`);
+    for (const f of ['darkness', 'wind', 'fog', 'lightning']) if (e[f] != null && !isNum(e[f])) err(`${w}: "${f}" must be a number`);
+    if (e.particles != null && !['rain', 'snow', 'sand'].includes(e.particles)) err(`${w}: particles must be rain, snow or sand`);
+    events[k] = { key: k, label: e.label ?? k, weight: e.weight ?? 0, minDay: e.minDay ?? 0, darkness: e.darkness ?? 0, wind: e.wind ?? 0, fog: e.fog ?? 1, lightning: e.lightning ?? 0, particles: e.particles ?? null, density: e.density ?? 0,
+      sound: e.sound ?? null, climates: e.climates ?? null, fallback: e.fallback ?? null, cold: e.cold ?? null, hot: e.hot ?? null, wet: !!e.wet, speed: e.speed ?? 1 };
+  }
+  for (const k of Object.keys(events)) for (const f of ['cold', 'hot', 'fallback']) if (events[k][f] && !events[events[k][f]]) err(`weather.json "${k}": "${f}" names "${events[k][f]}", which is not an event`);
+  if (!events.clear) err('weather.json needs a "clear" event');
+  if (!isNum(wIn.periodDays) || wIn.periodDays <= 0) err('weather.json: "periodDays" must be a number more than 0');
+  const weather = { periodDays: wIn.periodDays, events };
+
   if (errors.length) throw new DataError('Content data problems:\n - ' + errors.join('\n - '));
 
   return {
+    mobs, quests, weather,
     music, animations,
     smelting, fuelTime,
     data, blocks, items, idOfKey, keyOfId, tileNames, tiles, sprites,

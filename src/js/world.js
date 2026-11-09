@@ -7,6 +7,7 @@ const TILL = REG.game.tilling; // how close water must be for soil to be tilled
 
 const WG = REG.worldgen; // terrain / ore / tree / ground-cover settings from data/worldgen.json
 const IDS = WG.ids;
+IDS.bedrock = REG.idOfKey.get('bedrock');
 
 import { CS, CH, chunkKey, idx } from './voxel.js';
 import { Lighting } from './light.js';
@@ -15,6 +16,7 @@ import { applyVillages, inVillage } from './villages.js';
 export { CS, CH, chunkKey, idx };
 export const SEA = WG.seaLevel;
 export const SNOW_LINE = WG.snowLine;
+export const LATEST_TERRAIN = 4; // what a new world starts with (see World)
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -34,18 +36,31 @@ export class Chunk {
     this.plants = new Set(); // local indices of plant blocks (so growth doesn't scan the whole chunk)
     this.hydrating = new Set(); // local indices of soil that tracks moisture (farmland)
     this.version = 0;    // bumped on every edit (the minimap re-reads a chunk when this changes)
+    this.top = 0;        // one above the highest block that is not air: everything from here up is open sky, so scans can stop there
     this.light = new Uint8Array(CS * CH * CS); // per cell: sky light (high nibble) and block light (low nibble), 0-15 each
+  }
+
+  // Work out `top` from the blocks (after the data was filled in directly instead of through World.setBlock)
+  recomputeTop() {
+    this.top = 0;
+    for (let i = this.data.length - 1; i >= 0; i--) if (this.data[i] !== 0) { this.top = (i >> 8) + 1; break; }
+    return this.top;
   }
 }
 
 export class World {
-  // terrain: 3 = biomes and villages; 2 = the biomes without villages; 1 = the original rolling terrain. Worlds keep the terrain they were
-  // started with (it is saved), so the ground under what people built never changes.
+  // terrain: 4 = oceans, more biomes and new villages; 3 = biomes and villages; 2 = the biomes without villages; 1 = the original rolling terrain.
+  // Worlds keep the terrain they were started with (it is saved), so the ground under what people built never changes.
   constructor(seed, { terrain = 3 } = {}) {
     this.seed = seed;
     this.terrain = terrain;
+    this.T = terrain >= 4 ? { ...WG.terrain, ...WG.terrain4 } : WG.terrain; // terrain shape numbers
+    this.S = terrain >= 4 ? WG.biomes.select4 : WG.biomes.select;        // climate cut-offs
+    this.maxHeight = terrain >= 4 ? WG.terrain4.maxHeight : WG.terrain.maxHeight; // the highest the ground gets
+    this.snowLine = terrain >= 4 ? WG.snowLine4 : WG.snowLine;
     this.noise = new Noise(seed);
     this.noiseB = new Noise(seed ^ 0x5bd1e995);
+    this.noiseC = new Noise(seed ^ 0x2545f491); // the sea
     this.chunks = new Map();
     this.edits = new Map(); // chunkKey -> Map(localIndex -> blockId)
     this.legacyCaves = new Set(); // chunkKeys that keep the original cave rules (see loadEdits)
@@ -65,10 +80,67 @@ export class World {
     };
   }
 
-  // The biome of a column: 'plains', 'forest', 'hills', 'mountains', 'desert' or 'tundra' (null in the original terrain)
+  // The biome of a column: 'plains', 'forest', 'hills', 'mountains', 'desert' or 'tundra'; terrain 4 adds 'savanna', 'jungle', 'swamp',
+  // 'taiga', 'badlands' and the seas 'ocean', 'deep_ocean' and 'frozen_ocean' (null in the original terrain)
   biomeAt(x, z) {
     if (this.terrain < 2) return null;
-    return this.biomeOf(this.climate(x, z));
+    const c = this.climate(x, z);
+    if (this.terrain < 4) return this.biomeOf(c);
+    let f = this.oceanFactor(x, z);
+    if (f >= WG.biomes.ocean.minFactor && this.heightAt(x, z) > SEA) f = 0; // (a shore or cliff above the water is land, whatever the sea round it)
+    return this.biomeOf4(c, f);
+  }
+
+  // What to show for the place you are standing in: { key, label, climate: 'cold' | 'hot' | 'temperate' | 'ocean' | 'coast' }
+  biomeInfo(x, z, y = 99) {
+    const key = this.biomeAt(x, z);
+    const t = key && WG.biomes.types[key];
+    if (!t) return { key: null, label: '', climate: 'temperate' };
+    if (t.water) return { key, label: t.label, climate: t.climate === 'cold' ? 'cold' : 'ocean' }; // (a frozen sea is cold: it snows on it)
+    if (this.terrain >= 4 && y <= SEA + 3 && this.heightAt(Math.floor(x), Math.floor(z)) <= SEA + 2) return { key, label: t.label + ' (coast)', climate: 'coast' };
+    return { key, label: t.label, climate: t.climate };
+  }
+
+  // How much sea there is at a column: 0 = dry land, 1 = the middle of the ocean (terrain 4)
+  oceanFactor(x, z) {
+    const o = WG.biomes.ocean;
+    const v = this.noiseC.fbm2(x * o.scale + 1700, z * o.scale - 900, 3);
+    return clamp((o.threshold - v) / o.blend, 0, 1);
+  }
+
+  biomeOf4(c, f) {
+    const S = this.S, O = WG.biomes.ocean;
+    if (f >= O.minFactor) return c.temp < O.iceTemp ? 'frozen_ocean' : f >= O.deepFrom ? 'deep_ocean' : 'ocean';
+    if (c.rel > S.mountainRel) return 'mountains';
+    if (c.temp > S.hotTemp) {
+      if (c.wet < S.dryWet) return c.rel > S.badlandsRel ? 'badlands' : 'desert';
+      return c.wet > S.jungleWet ? 'jungle' : 'savanna';
+    }
+    if (c.temp < S.coldTemp) return c.wet > S.taigaWet ? 'taiga' : 'tundra';
+    if (c.wet > S.swampWet && c.rel < S.swampRel && c.temp > S.swampTemp[0] && c.temp < S.swampTemp[1]) return 'swamp';
+    if (c.rel > S.hillsRel) return 'hills';
+    return c.wet > S.forestWet ? 'forest' : 'plains';
+  }
+
+  // Terrain 4 on top of the shared height: swamps lie flat just at the water line, badlands rise in terraces, and the sea takes the land down
+  // to a shelf and then a deep floor.
+  shapeV4(x, z, h, c, hills) {
+    const S = this.S, O = WG.biomes.ocean, bl = S.blend;
+    const mild = smoothstep(S.swampTemp[0] - bl, S.swampTemp[0] + bl, c.temp) * (1 - smoothstep(S.swampTemp[1] - bl, S.swampTemp[1] + bl, c.temp));
+    const swamp = smoothstep(S.swampWet - bl, S.swampWet + bl, c.wet) * (1 - smoothstep(S.swampRel - bl, S.swampRel + bl, c.rel)) * mild;
+    if (swamp > 0) h = lerp(h, SEA + 1.4 + hills * 1.8, swamp);
+    const hot = smoothstep(S.hotTemp - bl * 0.5, S.hotTemp + bl, c.temp), dry = 1 - smoothstep(S.dryWet - bl, S.dryWet + bl * 0.5, c.wet);
+    const bad = hot * dry * smoothstep(S.badlandsRel - bl, S.badlandsRel + bl, c.rel) * (1 - smoothstep(S.mountainRel - bl, S.mountainRel + bl, c.rel));
+    if (bad > 0) {
+      const u = (h - SEA) / 5, k = Math.floor(u);
+      h = lerp(h, SEA + (k + smoothstep(0.7, 1, u - k)) * 5 + 2, bad);
+    }
+    const f = this.oceanFactor(x, z);
+    if (f > 0) {
+      const floor = SEA - lerp(O.shelfDepth, O.deepDepth, smoothstep(0.25, 0.95, f));
+      h = lerp(h, floor, smoothstep(0, 0.7, f));
+    }
+    return h;
   }
 
   biomeOf(c) {
@@ -84,7 +156,7 @@ export class World {
   // foothills. The big continent noise (oceans, lakes) and the rivers are shared by every biome.
   heightBiomes(x, z) {
     const n = this.noise;
-    const T = WG.terrain, S = WG.biomes.select;
+    const T = this.T, S = this.S;
     const c = this.climate(x, z);
     const continent = n.fbm2(x * T.continentScale, z * T.continentScale, 3);
     const hills = n.fbm2(x * T.hillScale + 100, z * T.hillScale + 100, 4);
@@ -99,6 +171,7 @@ export class World {
     h += hills * lerp(T.plainsHills, T.rollingHills, rolling) * (1 - 0.45 * desert);
     h += desert * (n.noise2(x * T.duneScale + 40, z * T.duneScale - 90) * 0.5 + 0.5) * T.duneHeight;
     h += mountain * T.mountainUplift + Math.pow(ridge, 2.4) * mountain * T.mountainHeight;
+    if (this.terrain >= 4) h = this.shapeV4(x, z, h, c, hills);
     return this.carveRivers(x, z, h);
   }
 
@@ -115,7 +188,7 @@ export class World {
     const carve = (1 - smoothstep(R.coreWidth, R.bankWidth, a)) * lowland;
     const bed = SEA - R.bedBelowSea;
     if (carve > 0 && h > bed) h -= (h - bed) * carve;
-    return Math.floor(clamp(h, 3, CH - 6));
+    return Math.floor(clamp(h, 3, this.maxHeight));
   }
 
   heightAt(x, z) {
@@ -141,7 +214,7 @@ export class World {
     const bed = SEA - R.bedBelowSea;
     if (carve > 0 && h > bed) h -= (h - bed) * carve;
 
-    return Math.floor(clamp(h, 3, CH - 6));
+    return Math.floor(clamp(h, 3, this.maxHeight));
   }
 
   // Chance that a column grows a tree: patchy forests everywhere, scaled by the biome (none in deserts, dense in forests)
@@ -191,7 +264,7 @@ export class World {
     if (hv >= this.forestDensity(wx, wz, this.biomeAt(wx, wz))) return false;
     if (this.terrain >= 3 && inVillage(this, wx, wz, 5)) return false; // (the same rule as growTrees)
     const h = this.heightAt(wx, wz);
-    return h >= SEA + WG.trees.minAboveSea && h < SNOW_LINE - WG.trees.belowSnowLine;
+    return h >= SEA + WG.trees.minAboveSea && h < this.snowLine - WG.trees.belowSnowLine;
   }
 
   treesNear(x, z, r) {
@@ -210,31 +283,41 @@ export class World {
       for (let lx = 0; lx < CS; lx++) {
         const wx = ox + lx, wz = oz + lz;
         const h = this.heightAt(wx, wz);
-        const beach = h <= SEA + WG.beachAboveSea;
-        const snowy = h >= SNOW_LINE;
+        const v4 = this.terrain >= 4;
         const biome = WG.biomes?.types[this.biomeAt(wx, wz)]; // undefined in the original terrain
-        const rock = biome && biome.rockFrom != null && h >= biome.rockFrom; // bare stone high in the mountains
-        const topId = beach ? IDS.beach : snowy ? IDS.snowSurface : rock ? IDS.stone : biome ? biome.surfaceId : IDS.surface;
-        const underId = beach ? IDS.beachFiller : snowy ? IDS.snowFiller : rock ? IDS.stone : biome ? biome.fillerId : IDS.filler;
+        const sea = v4 && !!biome?.water; // the floor of an ocean
+        const O = WG.biomes.ocean;
+        const beach = !sea && !(v4 && biome?.noBeach) && h <= SEA + WG.beachAboveSea;
+        const snowy = !sea && h >= this.snowLine;
+        const rock = biome && biome.rockFrom != null && h >= biome.rockFrom && !sea; // bare stone high in the mountains
+        const gravelFloor = sea && (SEA - h > O.gravelBelow || biome.surfaceId === O.gravelId);
+        const topId = sea ? (gravelFloor ? O.gravelId : biome.surfaceId) : beach ? IDS.beach : snowy ? IDS.snowSurface : rock ? IDS.stone : biome ? biome.surfaceId : IDS.surface;
+        const underId = sea ? (gravelFloor ? O.gravelId : biome.fillerId) : beach ? IDS.beachFiller : snowy ? IDS.snowFiller : rock ? IDS.stone : biome ? biome.fillerId : IDS.filler;
         const depth = biome && !beach && !snowy ? biome.fillerDepth : WG.blocks.fillerDepth;
+        const strata = v4 && !beach && !snowy && biome?.strataIds?.length ? biome.strataIds : null; // bands of clay (badlands)
         const cave = WG.caves;
         const entrance = modern && this.isEntrance(wx, wz);
 
         for (let y = 0; y <= h; y++) {
           let id = IDS.stone;
-          if (y === h) id = topId;
+          if (y === 0) id = IDS.bedrock; // the bottom of the world cannot be dug
+          else if (y === h) id = topId;
+          else if (strata && y >= h - 14) id = strata[(y >> 1) % strata.length];
           else if (y >= h - depth) id = underId;
           const open = y >= cave.minY && (y < h - cave.surfaceDepth || (h > SEA + 1 && y <= h && entrance) ? this.isCave(wx, y, wz) : false);
-          if (open || (modern && y < h - (cave.caverns?.surfaceDepth ?? 6) && this.isCavern(wx, y, wz))) id = B.AIR;
+          if (y === 0) { /* bedrock stays */ } else if (open || (modern && y < h - (cave.caverns?.surfaceDepth ?? 6) && this.isCavern(wx, y, wz))) id = B.AIR;
           else if (id === IDS.stone) id = this.oreAt(wx, y, wz);
           d[idx(lx, y, lz)] = id;
         }
         for (let y = h + 1; y <= SEA; y++) d[idx(lx, y, lz)] = IDS.sea;
-        if (topId === IDS.surface && h + 1 < CH && d[idx(lx, h, lz)] !== B.AIR && hash2(wx, wz, this.seed + 97) < WG.groundCover.chance) {
+        if (v4 && biome?.freeze && h < SEA) d[idx(lx, SEA, lz)] = O.iceId; // cold lakes and seas freeze over
+        // what grows on the ground: grass tufts (and, in terrain 4, flowers and ferns that depend on the biome)
+        const cover = v4 ? (topId === biome?.surfaceId && h > SEA ? biome.cover : null) : topId === IDS.surface ? { chance: WG.groundCover.chance, variants: WG.groundCover.variants } : null;
+        if (cover && h + 1 < CH && d[idx(lx, h, lz)] !== B.AIR && hash2(wx, wz, this.seed + 97) < cover.chance) {
           let r = hash2(wx, wz, this.seed + 131);
-          const total = WG.groundCover.variants.reduce((t, v) => t + v.weight, 0);
-          let pick = WG.groundCover.variants[WG.groundCover.variants.length - 1].id;
-          for (const v of WG.groundCover.variants) { if (r < v.weight / total) { pick = v.id; break; } r -= v.weight / total; }
+          const total = cover.variants.reduce((t, v) => t + v.weight, 0);
+          let pick = cover.variants[cover.variants.length - 1].id;
+          for (const v of cover.variants) { if (r < v.weight / total) { pick = v.id; break; } r -= v.weight / total; }
           d[idx(lx, h + 1, lz)] = pick;
         }
       }
@@ -243,6 +326,7 @@ export class World {
     this.growTrees(chunk);
     if (this.terrain >= 3) applyVillages(this, chunk); // levelled ground, houses, roads
     this.applyEdits(chunk);
+    chunk.recomputeTop();
     for (let i = 0; i < d.length; i++) { if (PLANT[d[i]]) chunk.plants.add(i); if (HYDRATES[d[i]]) chunk.hydrating.add(i); }
     this.chunks.set(chunkKey(cx, cz), chunk);
     this.lighting.initChunk(chunk);
@@ -271,8 +355,8 @@ export class World {
         if (hv >= this.forestDensity(wx, wz, biome)) continue;
         if (this.terrain >= 3 && inVillage(this, wx, wz, 5)) continue; // villages are kept clear of trees
         const h = this.heightAt(wx, wz);
-        if (h < SEA + WG.trees.minAboveSea || h >= SNOW_LINE - WG.trees.belowSnowLine) continue;
-        const variant = pickVariant(this.seed, wx, wz, h, legacy, biome);
+        if (h < SEA + WG.trees.minAboveSea || h >= this.snowLine - WG.trees.belowSnowLine) continue;
+        const variant = pickVariant(this.seed, wx, wz, h, legacy, biome, this.terrain);
         for (const blk of treeBlocks(variant, this.seed, wx, h, wz)) put(blk.x, blk.y, blk.z, blk.id, blk.leaf); // leaves only into air, logs over anything
       }
     }
@@ -331,6 +415,7 @@ export class World {
     const old = c.data[idx(lx, y, lz)];
     c.data[idx(lx, y, lz)] = id;
     c.version++;
+    if (id !== B.AIR && y >= c.top) c.top = y + 1;
     if (PLANT[old]) c.plants.delete(idx(lx, y, lz));
     if (PLANT[id]) c.plants.add(idx(lx, y, lz));
     if (HYDRATES[old]) c.hydrating.delete(idx(lx, y, lz));
@@ -369,7 +454,7 @@ export class World {
           const x = Math.round(Math.cos((a * Math.PI) / 4) * r);
           const z = Math.round(Math.sin((a * Math.PI) / 4) * r);
           const h = this.heightAt(x, z);
-          if (h <= SEA + WG.beachAboveSea || h >= SNOW_LINE - 4) continue;
+          if (h <= SEA + WG.beachAboveSea || h >= this.snowLine - 4) continue;
           if (this.terrain >= 3 && inVillage(this, x, z, 12)) continue; // (the village floor is not at this terrain height)
           if (needTrees && this.treesNear(x, z, WG.spawn.treeRadius) < WG.spawn.minTrees) continue;
           if (needWater && !this.hasWaterNear(x, z, WG.spawn.waterRadius)) continue;

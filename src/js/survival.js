@@ -77,3 +77,43 @@ export function tickHunger(s, dt, { moving, sprinting, mining = false, maxHealth
   // (saturation is left alone here: walking, sprinting and mining only ever cost food. The reserve is spent on nothing but healing.)
   return out;
 }
+
+// ---- air under water -----------------------------------------------------------------------------
+// While your head is under water the air runs out (game.json "breath"); when it is gone you take drowning damage every second.
+// Come up and it fills again, quickly. `s` = { air, drownTimer } is updated in place; returns the damage to apply now (0 = none).
+const BR = REG.game.breath;
+export const MAX_AIR = BR.max;
+export function tickBreath(s, dt, submerged) {
+  s.air = s.air ?? MAX_AIR;
+  s.drownTimer = s.drownTimer ?? 0;
+  if (!submerged) {
+    s.air = Math.min(MAX_AIR, s.air + dt * BR.refillPerSecond);
+    s.drownTimer = 0;
+    return 0;
+  }
+  if (s.air > 0) { s.air = Math.max(0, s.air - dt * BR.drainPerSecond); s.drownTimer = 0; return 0; }
+  s.drownTimer += dt;
+  if (s.drownTimer >= BR.drownEverySeconds) { s.drownTimer = 0; return BR.drownDamage; }
+  return 0;
+}
+
+// ---- fighting -----------------------------------------------------------------------------------
+// Damage one blow of a held item does: the weapon's own (swords hit hardest) plus a bonus for the metal it is made of; bare hands do handDamage.
+const C = REG.game.combat;
+export function weaponDamage(tool) {
+  if (!tool) return C.handDamage;
+  const base = C.weapons[tool.type];
+  if (base == null) return C.handDamage;
+  return base + (C.tierBonus[tool.name] ?? 0);
+}
+// How many uses a tool loses hitting something: swords 1, anything else 2 (see combat.weaponWear)
+export const attackWear = (tool) => (tool ? C.weaponWear?.[tool.type] ?? 2 : 0);
+
+// ---- experience ---------------------------------------------------------------------------------
+// Level n needs perLevel * n points to reach level n + 1, so each level takes a little longer. Returns { level, into, need }.
+export function xpLevel(xp) {
+  const per = REG.game.xp.perLevel;
+  let level = 0, left = Math.max(0, xp);
+  while (left >= per * (level + 1)) { left -= per * (level + 1); level++; }
+  return { level, into: left, need: per * (level + 1) };
+}

@@ -48,6 +48,23 @@ assert.notDeepEqual(paintTile('stone', 3, reg.tiles, {}), paintTile('stone', 4, 
 { const d = await fresh(); d.blocks.blocks[0].lightFilter = -1; expectError(d, /"lightFilter" must be a whole number 0-15/, 'negative light filter'); }
 { const d = await fresh(); d.game.studio.name = 'Café Studio'; expectError(d, /studio.name: the logo font has no/, 'studio name with a letter the logo font lacks'); }
 { const d = await fresh(); delete d.game.studio; expectError(d, /studio.name must be some text/, 'studio is required'); }
+// the living-world content: creatures, quests, weather, beds, chests, building shapes
+{ const d = await fresh(); delete d.mobs.species.cow; expectError(d, /mobs.json needs "cow"/, 'every species the game relies on must exist'); }
+{ const d = await fresh(); d.mobs.species.zombie.loot = 'nothing'; expectError(d, /mobs.json "zombie": loot table "nothing" is not defined/, 'a creature must drop a real loot table'); }
+{ const d = await fresh(); d.mobs.species.zombie.damage = 0; expectError(d, /a hostile mob needs "damage"/, 'monsters must hurt'); }
+{ const d = await fresh(); d.mobs.spawning.hostile.maxLight = 'dark'; expectError(d, /spawning.hostile.maxLight must be a number/, 'spawning numbers'); }
+{ const d = await fresh(); d.quests.tiers.hard.loot = 'nothing'; expectError(d, /quests.json tiers.hard: loot table "nothing" is not defined/, 'a quest tier needs a real reward table'); }
+{ const d = await fresh(); d.quests.jobs.farmer.easy = []; expectError(d, /quests.json jobs.farmer.easy: needs at least one quest/, 'every job has quests at every difficulty'); }
+{ const d = await fresh(); d.quests.jobs.farmer.easy[0].mob = 'dragon'; d.quests.jobs.farmer.easy[0].type = 'slay'; expectError(d, /mob "dragon" is not in mobs.json/, 'a quest can only ask for a known monster'); }
+{ const d = await fresh(); delete d.weather.events.clear; expectError(d, /weather.json needs a "clear" event/, 'there must be fair weather'); }
+{ const d = await fresh(); d.weather.events.rain.cold = 'hail'; expectError(d, /"cold" names "hail", which is not an event/, 'weather conversions name real events'); }
+{ const d = await fresh(); delete d.worldgen.biomes.types.jungle; expectError(d, /biomes.types needs "jungle"/, 'every biome the world makes must be defined'); }
+{ const d = await fresh(); d.blocks.blocks.find((b) => b.key === 'chest').chest.slots = 0; expectError(d, /"chest" needs "slots" and "stack"/, 'a chest has slots'); }
+{ const d = await fresh(); d.blocks.blocks.find((b) => b.key === 'stone_column').model.boxes[0] = [0, 0, 0]; expectError(d, /a boxes "model" needs "boxes"/, 'a boxes model needs real boxes'); }
+{ const d = await fresh(); d.items.items.find((i) => i.key === 'bed_single_red').bed.heads.pop(); expectError(d, /bed needs "width" \(1-8\), "foot" and four "heads"/, 'a bed needs all four head blocks'); }
+{ const d = await fresh(); d.items.items.find((i) => i.key === 'iron_hammer').tool.area = 2; expectError(d, /tool.area must be an odd whole number/, 'a hammer breaks a square with a middle'); }
+{ const d = await fresh(); d.game.breath.max = 'lots'; expectError(d, /game.json breath.max must be a number/, 'breath numbers'); }
+
 { const d = await fresh(); d.blocks.blocks[0].id = 300; expectError(d, /block ids must be 1-255/, 'block id too big'); }
 { const d = await fresh(); d.loot.tables.stone[0].item = 'unobtainium'; expectError(d, /loot\.json "stone" #1: unknown block\/item "unobtainium"/, 'unknown loot item'); }
 { const d = await fresh(); d.loot.tables.stone[0].chance = 3; expectError(d, /chance must be 0-1/, 'bad chance'); }
@@ -72,8 +89,8 @@ assert.notDeepEqual(paintTile('stone', 3, reg.tiles, {}), paintTile('stone', 4, 
 // ---- NEW CONTENT WITH JSON ONLY: a ruby ore, a ruby gem, a ruby sword recipe, loot, a goal ----
 function addRuby(d) {
   d.textures.tiles.ruby_ore = { type: 'ore', base: 'stone', color: [190, 20, 50], light: [255, 110, 130], clusters: 7 };
-  d.blocks.blocks.push({ id: 95, key: 'ruby_ore', name: 'Ruby Ore', tiles: { top: 'ruby_ore', bottom: 'ruby_ore', side: 'ruby_ore' }, hardness: 6, tool: 'pickaxe', need: 4, sound: 'stone', loot: 'ruby_ore', creative: true });
-  d.items.items.push({ id: 150, key: 'ruby', name: 'Ruby' }, { id: 151, key: 'ruby_pickaxe', name: 'Ruby Pickaxe', tool: { type: 'pickaxe', tier: 'ruby' } });
+  d.blocks.blocks.push({ id: 250, key: 'ruby_ore', name: 'Ruby Ore', tiles: { top: 'ruby_ore', bottom: 'ruby_ore', side: 'ruby_ore' }, hardness: 6, tool: 'pickaxe', need: 4, sound: 'stone', loot: 'ruby_ore', creative: true });
+  d.items.items.push({ id: 950, key: 'ruby', name: 'Ruby' }, { id: 951, key: 'ruby_pickaxe', name: 'Ruby Pickaxe', tool: { type: 'pickaxe', tier: 'ruby' } });
   d.items.tiers.ruby = { level: 4, speed: 9, durability: 800, head: 'ruby' };
   d.textures.toolHeads.ruby = { light: [255, 150, 170], base: [220, 30, 70], dark: [120, 10, 40] };
   d.textures.sprites.ruby = { type: 'pixelart', palette: { r: [220, 30, 70], w: [255, 190, 200] }, rows: ['', '', '', '......rrrr', '.....rwwrr', '....rrwrrr', '.....rrrr'] };
@@ -86,7 +103,7 @@ function addRuby(d) {
 {
   const r = buildRegistry(addRuby(await fresh()));
   const rubyOre = r.idOfKey.get('ruby_ore'), ruby = r.idOfKey.get('ruby');
-  assert.equal(rubyOre, 95);
+  assert.equal(rubyOre, 250);
   assert.deepEqual(r.loot.ruby_ore.map((e) => [e.id, e.min, e.max]), [[ruby, 1, 3], [r.idOfKey.get('coal'), 1, 1]]);
   const rp = r.recipes.find((x) => x.out === r.idOfKey.get('ruby_pickaxe'));
   assert.deepEqual(rp.ins, [[ruby, 3], [r.idOfKey.get('stick'), 2]]);
@@ -115,11 +132,11 @@ function addRuby(d) {
   const out = spawnSync(process.execPath, ['--input-type=module', '-e', probe], { env: { ...process.env, VOXELCRAFT_DATA: dir }, encoding: 'utf8' });
   assert.equal(out.status, 0, out.stderr);
   const got = JSON.parse(out.stdout.trim().split('\n').pop());
-  assert.equal(got.id, 95);
+  assert.equal(got.id, 250);
   assert.ok(got.inPalette, 'shows up in the creative palette');
-  assert.equal(got.ruby, 150);
+  assert.equal(got.ruby, 950);
   assert.ok(got.ore > 0, `ruby ore is generated in the world (${got.ore} blocks)`);
-  assert.deepEqual(got.drops, [{ id: 150, n: 1 }, { id: 101, n: 1 }], 'its loot table works');
+  assert.deepEqual(got.drops, [{ id: 950, n: 1 }, { id: 101, n: 1 }], 'its loot table works');
   assert.equal(got.needsTier, false, 'an iron pickaxe is not enough');
   assert.equal(got.rubyTool, true, 'the new ruby pickaxe is');
   assert.equal(got.recipes, reg.recipes.length + 1, 'and the recipe exists');

@@ -35,7 +35,7 @@ export function lookDelta(dx, dy, rate, invertY = false) {
 // ---- where the player has put the buttons ----
 // A layout maps a button name to the centre of the button as fractions of the screen ({ x: 0.9, y: 0.8 }), so it survives
 // turning the phone or a different screen size. Anything missing keeps the button's built-in place.
-export const LAYOUT_BUTTONS = ['stick', 'attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'menu']; // (the loot bag is part of the hotbar, so it is not here)
+export const LAYOUT_BUTTONS = ['stick', 'attack', 'use', 'jump', 'fly', 'sprint', 'crouch', 'menu', 'book']; // (the loot bag is part of the hotbar, so it is not here)
 
 // Whatever came out of storage -> a layout with only known buttons and sane numbers
 export function cleanLayout(raw) {

@@ -8,7 +8,54 @@
     "logs": [
       "log",
       "birch_log",
-      "spruce_log"
+      "spruce_log",
+      "jungle_log",
+      "acacia_log"
+    ],
+    "planks": [
+      "planks",
+      "birch_planks",
+      "spruce_planks"
+    ],
+    "beds_single": [
+      "bed_single_white",
+      "bed_single_red",
+      "bed_single_orange",
+      "bed_single_yellow",
+      "bed_single_green",
+      "bed_single_blue",
+      "bed_single_purple",
+      "bed_single_pink"
+    ],
+    "beds_double": [
+      "bed_double_white",
+      "bed_double_red",
+      "bed_double_orange",
+      "bed_double_yellow",
+      "bed_double_green",
+      "bed_double_blue",
+      "bed_double_purple",
+      "bed_double_pink"
+    ],
+    "beds_queen": [
+      "bed_queen_white",
+      "bed_queen_red",
+      "bed_queen_orange",
+      "bed_queen_yellow",
+      "bed_queen_green",
+      "bed_queen_blue",
+      "bed_queen_purple",
+      "bed_queen_pink"
+    ],
+    "beds_king": [
+      "bed_king_white",
+      "bed_king_red",
+      "bed_king_orange",
+      "bed_king_yellow",
+      "bed_king_green",
+      "bed_king_blue",
+      "bed_king_purple",
+      "bed_king_pink"
     ]
   },
   "stations": {
@@ -33,6 +80,13 @@
     "furnace": {
       "title": "Furnace",
       "furnace": true
+    },
+    "chest": {
+      "title": "Chest",
+      "chest": true,
+      "stations": [
+        null
+      ]
     }
   },
   "recipes": [
@@ -424,6 +478,1173 @@
         ]
       ],
       "at": "table"
+    },
+    {
+      "out": "birch_planks",
+      "n": 4,
+      "in": [
+        [
+          "birch_log",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "spruce_planks",
+      "n": 4,
+      "in": [
+        [
+          "spruce_log",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "wool",
+      "n": 1,
+      "in": [
+        [
+          "string",
+          4
+        ]
+      ]
+    },
+    {
+      "out": "red_dye",
+      "n": 2,
+      "in": [
+        [
+          "rose",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "yellow_dye",
+      "n": 2,
+      "in": [
+        [
+          "dandelion",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "blue_dye",
+      "n": 2,
+      "in": [
+        [
+          "cornflower",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "orange_dye",
+      "n": 2,
+      "in": [
+        [
+          "orange_tulip",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "purple_dye",
+      "n": 2,
+      "in": [
+        [
+          "allium",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "pink_dye",
+      "n": 2,
+      "in": [
+        [
+          "pink_tulip",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "white_dye",
+      "n": 2,
+      "in": [
+        [
+          "oxeye_daisy",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "green_dye",
+      "n": 2,
+      "in": [
+        [
+          "fern",
+          1
+        ]
+      ]
+    },
+    {
+      "out": "wood_sword",
+      "n": 1,
+      "in": [
+        [
+          "@planks",
+          2
+        ],
+        [
+          "stick",
+          1
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_hammer",
+      "n": 1,
+      "in": [
+        [
+          "@planks",
+          5
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_sword",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          2
+        ],
+        [
+          "stick",
+          1
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_hammer",
+      "n": 1,
+      "in": [
+        [
+          "cobble",
+          5
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_sword",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          2
+        ],
+        [
+          "stick",
+          1
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_hammer",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          5
+        ],
+        [
+          "stick",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_shears",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "iron_door",
+      "n": 3,
+      "in": [
+        [
+          "iron_ingot",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "bed_single_white",
+      "n": 1,
+      "in": [
+        [
+          "wool",
+          3
+        ],
+        [
+          "@planks",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "bed_single_white",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "white_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "White Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_red",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "red_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Red Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_orange",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "orange_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Orange Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_yellow",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "yellow_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Yellow Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_green",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "green_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Green Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_blue",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "blue_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Blue Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_purple",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "purple_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Purple Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_single_pink",
+      "n": 1,
+      "in": [
+        [
+          "@beds_single",
+          1
+        ],
+        [
+          "pink_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Pink Single Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_white",
+      "n": 1,
+      "in": [
+        [
+          "wool",
+          6
+        ],
+        [
+          "@planks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "bed_double_white",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "white_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "White Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_red",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "red_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Red Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_orange",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "orange_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Orange Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_yellow",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "yellow_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Yellow Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_green",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "green_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Green Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_blue",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "blue_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Blue Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_purple",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "purple_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Purple Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_double_pink",
+      "n": 1,
+      "in": [
+        [
+          "@beds_double",
+          1
+        ],
+        [
+          "pink_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Pink Double Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_white",
+      "n": 1,
+      "in": [
+        [
+          "wool",
+          9
+        ],
+        [
+          "@planks",
+          9
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "bed_queen_white",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "white_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "White Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_red",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "red_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Red Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_orange",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "orange_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Orange Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_yellow",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "yellow_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Yellow Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_green",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "green_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Green Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_blue",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "blue_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Blue Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_purple",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "purple_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Purple Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_queen_pink",
+      "n": 1,
+      "in": [
+        [
+          "@beds_queen",
+          1
+        ],
+        [
+          "pink_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Pink Queen Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_white",
+      "n": 1,
+      "in": [
+        [
+          "wool",
+          12
+        ],
+        [
+          "@planks",
+          12
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "bed_king_white",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "white_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "White King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_red",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "red_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Red King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_orange",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "orange_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Orange King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_yellow",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "yellow_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Yellow King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_green",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "green_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Green King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_blue",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "blue_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Blue King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_purple",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "purple_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Purple King Bed (dye a bed)"
+    },
+    {
+      "out": "bed_king_pink",
+      "n": 1,
+      "in": [
+        [
+          "@beds_king",
+          1
+        ],
+        [
+          "pink_dye",
+          1
+        ]
+      ],
+      "at": "table",
+      "label": "Pink King Bed (dye a bed)"
+    },
+    {
+      "out": "chest",
+      "n": 1,
+      "in": [
+        [
+          "@planks",
+          8
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "chest_upgrade_iron",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          8
+        ],
+        [
+          "@planks",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "chest_upgrade_vault",
+      "n": 1,
+      "in": [
+        [
+          "iron_ingot",
+          16
+        ],
+        [
+          "stone_bricks",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_bricks",
+      "n": 4,
+      "in": [
+        [
+          "stone",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "sandstone",
+      "n": 2,
+      "in": [
+        [
+          "sand",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "plaster",
+      "n": 4,
+      "in": [
+        [
+          "sand",
+          2
+        ],
+        [
+          "stone",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_red",
+      "n": 4,
+      "in": [
+        [
+          "brick",
+          2
+        ],
+        [
+          "cobble",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_slate",
+      "n": 4,
+      "in": [
+        [
+          "stone",
+          2
+        ],
+        [
+          "cobble",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "floor_tiles",
+      "n": 4,
+      "in": [
+        [
+          "stone",
+          2
+        ],
+        [
+          "sandstone",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_bricks_stairs",
+      "n": 4,
+      "in": [
+        [
+          "stone_bricks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "sandstone_stairs",
+      "n": 4,
+      "in": [
+        [
+          "sandstone",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "birch_planks_stairs",
+      "n": 4,
+      "in": [
+        [
+          "birch_planks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "spruce_planks_stairs",
+      "n": 4,
+      "in": [
+        [
+          "spruce_planks",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_red_stairs",
+      "n": 4,
+      "in": [
+        [
+          "roof_red",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_slate_stairs",
+      "n": 4,
+      "in": [
+        [
+          "roof_slate",
+          6
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "planks_slab",
+      "n": 6,
+      "in": [
+        [
+          "planks",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "birch_planks_slab",
+      "n": 6,
+      "in": [
+        [
+          "birch_planks",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "spruce_planks_slab",
+      "n": 6,
+      "in": [
+        [
+          "spruce_planks",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "cobble_slab",
+      "n": 6,
+      "in": [
+        [
+          "cobble",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_bricks_slab",
+      "n": 6,
+      "in": [
+        [
+          "stone_bricks",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "brick_slab",
+      "n": 6,
+      "in": [
+        [
+          "brick",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "sandstone_slab",
+      "n": 6,
+      "in": [
+        [
+          "sandstone",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_red_slab",
+      "n": 6,
+      "in": [
+        [
+          "roof_red",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "roof_slate_slab",
+      "n": 6,
+      "in": [
+        [
+          "roof_slate",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "floor_tiles_slab",
+      "n": 6,
+      "in": [
+        [
+          "floor_tiles",
+          3
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_column",
+      "n": 3,
+      "in": [
+        [
+          "stone_bricks",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_column",
+      "n": 3,
+      "in": [
+        [
+          "log",
+          2
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "brick_column",
+      "n": 3,
+      "in": [
+        [
+          "brick",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "wood_window",
+      "n": 2,
+      "in": [
+        [
+          "glass",
+          2
+        ],
+        [
+          "stick",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "stone_window",
+      "n": 2,
+      "in": [
+        [
+          "glass",
+          2
+        ],
+        [
+          "stone",
+          4
+        ]
+      ],
+      "at": "table"
+    },
+    {
+      "out": "glass_pane",
+      "n": 6,
+      "in": [
+        [
+          "glass",
+          3
+        ]
+      ],
+      "at": "table"
     }
   ],
   "smelting": [
@@ -455,6 +1676,21 @@
     {
       "in": "spruce_log",
       "out": "charcoal",
+      "seconds": 10
+    },
+    {
+      "in": "raw_beef",
+      "out": "steak",
+      "seconds": 10
+    },
+    {
+      "in": "raw_porkchop",
+      "out": "cooked_porkchop",
+      "seconds": 10
+    },
+    {
+      "in": "raw_lamb_chop",
+      "out": "lamb_chop",
       "seconds": 10
     }
   ]
